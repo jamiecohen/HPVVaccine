@@ -142,6 +142,10 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string MultipliersNamesFileName = "MultipliersNamesFile";
     string SimulationsName = "Simulations";
     string IterationsName = "Iterations";
+    string MultipleLesionsName = "MultipleLesions";
+    string MultipleInfectionsName = "MultipleInfections";
+    string DurationBasedPersistenceName = "DurationBasedPersistence";
+    string LesionProgressionName = "LesionProgression";
 
 
     //READ IN DATA FROM INPUT FILE HERE FIRST
@@ -172,6 +176,11 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     StartYear = RunsFile.GetValueI(CurKey, StartYearName);
     SimulationYears = RunsFile.GetValueI (CurKey, SimulationYearsName);
     Tuning_Factor = RunsFile.GetValueF (CurKey, TuningFactorName);
+
+    multiple_lesions = RunsFile.GetValueI(CurKey, MultipleLesionsName);
+    multiple_infections = RunsFile.GetValueI(CurKey, MultipleInfectionsName);
+    duration_based_persistence = RunsFile.GetValueI(CurKey, DurationBasedPersistenceName);
+    lesion_progression = RunsFile.GetValueI(CurKey, LesionProgressionName);
 
     InitialPopulationFile.append(DataFolder);
     InitialPopulationFile.append(RunsFile.GetValue(CurKey, InitialPopulationFileName));
@@ -371,9 +380,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
 
     ScreenStrategy = RunsFile.GetValue(CurKey, ScreenStrategyName);
     ScreenStartAge = RunsFile.GetValueI(CurKey, ScreenStartAgeName);
-
     ScreenStopAge = RunsFile.GetValueI(CurKey, ScreenStopAgeName);
-
     ScreenFrequency = RunsFile.GetValueI(CurKey, ScreenFrequencyName);
     ScreenCoverage = RunsFile.GetValueF(CurKey, ScreenCoverageName);
     ScreenCompliance = RunsFile.GetValueF(CurKey, ScreenComplianceName);
@@ -395,7 +402,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
-
     HPVSensFile.append(DataFolder);
     HPVSensFile.append(RunsFile.GetValue(CurKey, HPVSensFileName));
     Infile.open(HPVSensFile, ios::in);
@@ -408,7 +414,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     loadData (Infile, hpvsens);
     Infile.close();
     Infile.clear();
-
 
     ColpoSensFile.append(DataFolder);
     ColpoSensFile.append(RunsFile.GetValue(CurKey, ColpoSensFileName));
@@ -439,8 +444,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CryoSuccessRateCIN = RunsFile.GetValueF(CurKey, CryoSuccessRateCINName);
     CryoSuccessRateHPV = RunsFile.GetValueF(CurKey, CryoSuccessRateHPVName);
 
-    // todo-Jamie Figure out what cryo success rate for HPV should be? Currently set to 0.5
-
     ImmuneDegreeLR = RunsFile.GetValueF(CurKey, ImmuneDegreeLRName);
     ImmuneDegreeotherHR = RunsFile.GetValueF(CurKey, ImmuneDegreeotherHRName);
     ImmuneDegree16 = RunsFile.GetValueF(CurKey, ImmuneDegree16Name);
@@ -450,8 +453,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     ImmuneDegree45 = RunsFile.GetValueF(CurKey, ImmuneDegree45Name);
     ImmuneDegree52 = RunsFile.GetValueF(CurKey, ImmuneDegree52Name);
     ImmuneDegree58 = RunsFile.GetValueF(CurKey, ImmuneDegree58Name);
-
-    // NEW PARAMETERS
 
     CIN2_NL_1_5 = RunsFile.GetValueF(CurKey, CIN2_NL_1_5Name);
     CIN2_NL_6_10 = RunsFile.GetValueF(CurKey, CIN2_NL_6_10Name);
@@ -771,10 +772,7 @@ void Inputs::loadVariables() {
 
     }
 
-   
-
     cPtTime = costs[0][0];
-    cPapTest = costs[1][0];
     cHPVTest = costs[2][0];
     cReturnforResult = costs[4][0];
     cColpoTime = costs[5][0];
@@ -835,7 +833,6 @@ void Inputs::loadVariables() {
         VE_1618 = vaccineefficacy[0][1]*VaccineEfficacy;
         VE_high5 = vaccineefficacy[1][1]*VaccineEfficacy;
     }
-
 
 }
 

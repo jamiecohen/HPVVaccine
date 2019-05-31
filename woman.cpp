@@ -63,7 +63,6 @@ Woman::Woman(int Age, int StartYear) {
     hpvtest = 0;
     hpvcolpotest = 0;
     hpv_first_hiv = 0;
-    hpvcolpo_first_hiv = 0;
     vaccinated = true;
     completevaccine = true;
     vaccineage = {9};

@@ -63,7 +63,6 @@ public:
     bool    Alive;
     int Cycle;
     bool hpv;
-
     bool cancer;
     int ca1Timer;
     int ca2Timer;
@@ -81,7 +80,6 @@ public:
     bool VaccineCoverage;
     std::vector<int> vaccineage;
     int hpv_first_hiv;
-    int hpvcolpo_first_hiv;
     int nextscreenage;
 
     caT cancerstage;

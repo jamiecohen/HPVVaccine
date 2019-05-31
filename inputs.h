@@ -37,7 +37,6 @@ public:
     int Simulations;
     double Tuning_Factor;
 
-
     std::string LifeExpectancyFile;
     std::vector<std::vector<double> > LifeExpectancy;
 
@@ -61,8 +60,6 @@ public:
 
     std::string HPVIncidenceFile;
     std::vector< std::vector<double> > HPVInc;
-    
-    
 
     std::string SymptomDetectionFile;
     std::vector< std::vector<double> > sympdet;
@@ -88,7 +85,6 @@ public:
 
     int ScreenStartAge;
     int ScreenStopAge;
-
     int ScreenFrequency;
 
     double ScreenCoverage;
@@ -98,6 +94,11 @@ public:
     int VaccineStartAge;
     double VaccineEfficacy;
     double VaccineWaneTime;
+
+    bool multiple_lesions;
+    bool multiple_infections;
+    bool duration_based_persistence;
+    bool lesion_progression;
 
     std::string CalibTargsFile;
     std::vector< std::vector<double> > CalibTargs;
@@ -200,7 +201,6 @@ public:
     double cryoelig_CIN2;
     double cryoelig_CIN3;
     double cryoelig_Ca;
-    double cPapTest;
     double cHPVTest;
     double cReturnforResult;
     double cColpoTime;

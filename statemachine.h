@@ -35,6 +35,8 @@ public:
     double immune_deg_58;
     double vaccine_deg_1618;
     double vaccine_deg_high5;
+    double pHPV_CIN2;
+    double pHPV_CIN3;
 
     StateMachine();
     ~StateMachine();
@@ -58,6 +60,8 @@ public:
     void Colpo(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help);
     void Cryo(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help);
     double GetEff(double wanetime, int age, int waneage, double intercept);
+    double GetLesionRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);
+
 };
 
 #endif //HIVHPVVaccine_STATEMACHINE_H

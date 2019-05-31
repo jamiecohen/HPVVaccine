@@ -13,13 +13,7 @@ Output::Output(Inputs &Tables, int y) {
     DALY.resize (y + 1);
     YLL.resize (y + 1);
     YLD.resize (y + 1);
-
-    viascreens.resize(y + 1);
     hpvscreens.resize(y + 1);
-    hpvcolposcreens.resize(y + 1);
-    papscreens.resize(y + 1);
-    vaccines.resize(y+1);
-    
     CaIncStandardized = 0;
 
     trace.resize(Tables.ModelStopAge + 1);
@@ -36,56 +30,21 @@ Output::Output(Inputs &Tables, int y) {
     }
 
     total_alive.resize (Tables.ModelStopAge+1);
-
     totaldeadcancer = 0;
-
     TotalHPV.resize(y+1);
-
-
     totalcancer_mort.resize (Tables.ModelStopAge + 1);
-
-
-
     LE.resize (y + 1);
-
     cost.resize (y + 1);
-
-
-    HIVcount.resize (Tables.ModelStopAge + 1);
-
-
     HIVHPVcount.resize (Tables.ModelStopAge + 1);
-
-
     HIVCIN2count.resize (Tables.ModelStopAge + 1);
-
     HIVCIN3count.resize (Tables.ModelStopAge + 1);
-
-
     HIVCAcount.resize (Tables.ModelStopAge + 1);
-
-
     HIVCAdead.resize (Tables.ModelStopAge + 1);
-
-
-
-    HIVdenom.resize (Tables.ModelStopAge + 1);
-
-
     HIVHPVdenom.resize (Tables.ModelStopAge + 1);
-
-
     HIVCIN2denom.resize (Tables.ModelStopAge + 1);
-
-
     HIVCIN3denom.resize (Tables.ModelStopAge + 1);
-
-
     HIVCAdenom.resize (Tables.ModelStopAge + 1);
-
-
     CIN2HIVpos.resize (Tables.ModelStopAge + 1);
-
     CIN3HIVpos.resize (Tables.ModelStopAge + 1);
     TotalPrevCancer.resize(y);
     TotalCancer.resize(y);
@@ -94,27 +53,18 @@ Output::Output(Inputs &Tables, int y) {
     TotalCancer_allother.resize(y);
     TotalCancerDenom.resize(y);
     cancerHIVpos = 0;
-
     CA1618HIV = 0;
-
     CIN21618HIV = 0;
-
     CIN31618HIV = 0;
-
     CAotherHRHIV = 0;
-
     CAhigh5HIV = 0;
-
     CIN2otherHRHIV = 0;
     CIN2LRHIV = 0;
     CIN2high5HIV = 0;
-
     CIN3otherHRHIV = 0;
     CIN3LRHIV = 0;
     CIN3high5HIV = 0;
-
     CIN2HIVpostotal = 0;
-
     CIN3HIVpostotal = 0;
     QALY = 0;
     discDALY = 0;

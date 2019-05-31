@@ -41,12 +41,10 @@ public:
     double CaIncStandardized;
     DoubleMatrix totalcancer_mort;
     vector<int> HIVCAdead;
-    vector<int> HIVcount;
     vector<int> HIVHPVcount;
     vector<int> HIVCIN2count;
     vector<int> HIVCIN3count;
     vector<int> HIVCAcount;
-    vector<int> HIVdenom;
     vector<int> HIVHPVdenom;
     vector<int> HIVCIN2denom;
     vector<int> HIVCIN3denom;
@@ -68,11 +66,6 @@ public:
     unsigned int CIN2HIVpostotal;
     unsigned int CIN3HIVpostotal;
     vector<int> hpvscreens;
-    vector<int> papscreens;
-    vector<int> viascreens;
-    vector<int> hpvcolposcreens;
-    vector<unsigned int> vaccines;
-
     double QALY;
     double discQALY;
     double TotalCost;
