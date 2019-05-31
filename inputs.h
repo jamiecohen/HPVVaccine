@@ -257,12 +257,15 @@ public:
     // CIN/Ca progression
 
     double pCIN2_CA1_1618[100];
+    double pCIN2_CIN3_1618[100];
     double pCIN3_CA1_1618[100];
 
     double pCIN2_CA1_oHR[100];
+    double pCIN2_CIN3_oHR[100];
     double pCIN3_CA1_oHR[100];
 
     double pCIN2_CA1_high5[100];
+    double pCIN2_CIN3_high5[100];
     double pCIN3_CA1_high5[100];
 
     // HPV progression
