@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
 
     if(argc == 1){
-        RunsFileName.append("Calibration.ini");
+        RunsFileName.append("Structure1_test.ini");
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -434,7 +434,6 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
 }
 
 Output RunVaccineCohort(string RunsFileName, string CurKey, string OutputFolder, string DataFolder, bool VOI, double VaccineEff){
-
     helper help;
     StateMachine Machine;
     Inputs tables(std::move(OutputFolder), std::move(DataFolder));
@@ -442,11 +441,8 @@ Output RunVaccineCohort(string RunsFileName, string CurKey, string OutputFolder,
     if(VOI){
         tables.VaccineEfficacy = VaccineEff;
     }
-
     tables.loadVariables ();
-
     int CurrentModelYear = tables.StartYear;
-
     vector<Woman> women;
     women.reserve(tables.CohortSize);
     for (int j = 0; j < tables.CohortSize; j++) {
@@ -455,24 +451,18 @@ Output RunVaccineCohort(string RunsFileName, string CurKey, string OutputFolder,
         double rand = help.getrand();
         women[j].ScreenAccess = rand < tables.ScreenCoverage;
     }
-
     Output trace (tables, tables.SimulationYears);
-
     for(int y = 0; y < tables.SimulationYears; y++){
         for (int k = 0; k < tables.CohortSize; k++) {
             Machine.runPopulationYear (women[k], tables, trace, y, CurrentModelYear, false, help);
         }
-
         CurrentModelYear++;
         trace.discDALY += (trace.YLL[y] + trace.YLD[y])/ pow ((1 + trace.discountrate), static_cast<double>(y));
         trace.discQALY += trace.LE[y]/pow((1+trace.discountrate),static_cast<double>(y));
         trace.TotalCost += trace.cost[y]/pow((1+trace.discountrate),static_cast<double>(y)) ;
     }
-
     trace.createInc (tables);
-
     return(trace);
-
 }
 
 vector<Output> VOI(const string& RunsFileName, string CurKey, string OutputFolder, string DataFolder, int runs){

@@ -57,11 +57,8 @@ Woman::Woman(int Age, int StartYear) {
     ca2Timer = 0;
     ca3Timer = 0;
     hpvstart = false;
-    hpvcolpostart = false;
     hpvage = {0};
-    hpvcolpoage = {0};
     hpvtest = 0;
-    hpvcolpotest = 0;
     hpv_first_hiv = 0;
     vaccinated = true;
     completevaccine = true;

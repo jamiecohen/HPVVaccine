@@ -800,12 +800,6 @@ void Inputs::loadVariables() {
     utilityCA1 = utilities[4][0];
     utilityCA2 = utilities[5][0];
     utilityCA3 = utilities[6][0];
-    utilityHIVCD4500 = utilities[8][0];
-    utilityHIVCD4200500 = utilities[9][0];
-    utilityHIVCD4200 = utilities[10][0];
-    utilityHIVCA1 = utilities[11][0];
-    utilityHIVCA2 = utilities[12][0];
-    utilityHIVCA3 = utilities[13][0];
 
     disabilityCA34 = Disability[3][0];
     disabilityCA12 = Disability[4][0];

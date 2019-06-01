@@ -25,7 +25,6 @@ public:
 
     std::string OutputFolder;
     std::string DataFolder;
-
     std::string OutputDir;
     std::string VOI;
     int CohortSize;
@@ -48,7 +47,6 @@ public:
 
     std::string InitialPopulationFile;
     std::vector<std::vector<double> > InitialPopulation;
-
 
     //[NaturalHistory] variable names
 
@@ -86,15 +84,12 @@ public:
     int ScreenStartAge;
     int ScreenStopAge;
     int ScreenFrequency;
-
     double ScreenCoverage;
     double ScreenCompliance;
-
     int VaccineDuration;
     int VaccineStartAge;
     double VaccineEfficacy;
     double VaccineWaneTime;
-
     bool multiple_lesions;
     bool multiple_infections;
     bool duration_based_persistence;
@@ -102,16 +97,12 @@ public:
 
     std::string CalibTargsFile;
     std::vector< std::vector<double> > CalibTargs;
-
     std::string MultipliersFile;
     std::vector< std::vector<double> > Multipliers;
-
     std::string MultipliersNamesFile;
     std::string MultipliersNames;
-
     std::string CalibTargsNamesFile;
     std::string CalibTargsNames;
-
     std::string VaccineType;
 
     enum VxType {
@@ -133,9 +124,6 @@ public:
 
     double CryoSuccessRateCIN;
     double CryoSuccessRateHPV;
-
-    //[Multipliers] variable names
-    //[NaturalImmunity Multipliers] variable names
     double ImmuneDegreeLR;
     double ImmuneDegreeotherHR;
     double ImmuneDegree16;
@@ -145,13 +133,9 @@ public:
     double ImmuneDegree45;
     double ImmuneDegree52;
     double ImmuneDegree58;
-
-    // new parameters
-
     double CIN3_CA_mult;
     double CIN2_NL_mult;
     double HPV_CIN2_mult;
-
     double CIN2_NL_1_5;
     double CIN2_NL_6_10;
     double CIN2_NL_11_20;
@@ -196,7 +180,6 @@ public:
     double NL_HPV_1618;
     double NL_HPV_high5;
     double pRegressToHPV;
-
     double cryoelig_NL;
     double cryoelig_CIN2;
     double cryoelig_CIN3;
@@ -216,7 +199,6 @@ public:
     double cCryoCIN23;
     double cCryoCa;
     double cVaccine;
-
     double utilityHealthy;
     double utilityHPV;
     double utilityCIN2;
@@ -224,13 +206,6 @@ public:
     double utilityCA1;
     double utilityCA2;
     double utilityCA3;
-    double utilityHIVCD4500;
-    double utilityHIVCD4200500;
-    double utilityHIVCD4200;
-    double utilityHIVCA1;
-    double utilityHIVCA2;
-    double utilityHIVCA3;
-
     double disabilityCA12;
     double disabilityCA34;
 
@@ -247,8 +222,8 @@ public:
     double pCA2_CA2D;
     double pCA3_CA3D;
 
+    // HPV incidence
 
-    // HPV and HIV incidence
     double pHPV_LR[100];
     double pHPV_otherHR[100];
     double pHPV_1618[100];
@@ -259,11 +234,9 @@ public:
     double pCIN2_CA1_1618[100];
     double pCIN2_CIN3_1618[100];
     double pCIN3_CA1_1618[100];
-
     double pCIN2_CA1_oHR[100];
     double pCIN2_CIN3_oHR[100];
     double pCIN3_CA1_oHR[100];
-
     double pCIN2_CA1_high5[100];
     double pCIN2_CIN3_high5[100];
     double pCIN3_CA1_high5[100];
@@ -278,28 +251,24 @@ public:
     double pHPV_otherHR_CIN3[100];
     double pHPV_1618_CIN3[100];
     double pHPV_high5_CIN3[100];
-    
 
     // regression
-
-    // regression with HIV
 
     double pCIN3_NL_1618[100];
     double pCIN3_NL_LR[100];
     double pCIN3_NL_oHR[100];
     double pCIN3_NL_high5[100];
-
     double pCIN2_NL_1618[100];
     double pCIN2_NL_LR[100];
     double pCIN2_NL_oHR[100];
     double pCIN2_NL_high5[100];
-
     double pHPV_LR_NL[100];
     double pHPV_otherHR_NL[100];
     double pHPV_1618_NL[100];
     double pHPV_high5_NL[100];
 
-    // mortality (background, HIV and cancer)
+    // mortality (cancer)
+
     double mCA1[100];
     double mCA2[100];
     double mCA3[100];
@@ -309,16 +278,12 @@ public:
     double mCA1dsc[100];
     double mCA2dsc[100];
     double mCA3dsc[100];
-
     double pHPVCIN_ART;
     double pCINNL_ART;
     double hpvsens_NL;
     double hpvsens_CIN;
     double hpvsens_Ca;
     double pResourcesAvail;
-
-
-
 
 };
 

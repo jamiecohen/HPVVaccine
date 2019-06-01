@@ -5,8 +5,6 @@
 #ifndef HPVVaccine_STATEMACHINE_H
 #define HPVVaccine_STATEMACHINE_H
 
-
-
 #include <vector>
 #include "woman.h"
 #include "inputs.h"
@@ -17,7 +15,6 @@
 #include <thread>
 #include <future>
 #include "helper.h"
-
 
 class StateMachine {
 public:

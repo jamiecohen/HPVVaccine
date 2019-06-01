@@ -5,13 +5,10 @@
 #ifndef HPVVaccine_WOMAN_H
 #define HPVVaccine_WOMAN_H
 
-
-
 #include <vector>
 #include <ctgmath>
 #include <cstdlib>
 #include <random>
-
 
 class Woman {
 public:
@@ -68,16 +65,12 @@ public:
     int ca2Timer;
     int ca3Timer;
     bool hpvstart;
-    bool hpvcolpostart;
 
     std::vector<int> hpvage;
-    std::vector<int> hpvcolpoage;
     int hpvtest;
-    int hpvcolpotest;
     bool ScreenAccess;
     bool vaccinated;
     bool completevaccine;
-    bool VaccineCoverage;
     std::vector<int> vaccineage;
     int hpv_first_hiv;
     int nextscreenage;
@@ -86,8 +79,6 @@ public:
 
     Woman(int Age, int StartYear);
     ~Woman(void);
-
-
 
 };
 

@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 StateMachine::StateMachine() = default;
 
 void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
@@ -395,7 +394,7 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, int y,
         if (Data.cancer) {
             CancerNatHistory (Data, Tables, Count, y, help);
         } else {
-            if (!Data.CIN3Lesions.empty ()) {
+            if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
                 StateMachine::StartCIN (Data, Count, Tables, y, help);
             }
             if (!Data.HPVinfections.empty ()) {
@@ -411,7 +410,6 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, int y,
             StateMachine::AcquireHPV58 (Data, Count, Tables, help);
             StateMachine::AcquireHPVoHR (Data, Count, Tables, help);
             StateMachine::AcquireHPVLow (Data, Count, Tables, help);
-
         }
     }
 }
@@ -2218,6 +2216,5 @@ double StateMachine::GetLesionRisk(Woman &Data, Inputs &Tables, int i, Woman::hp
         }
     }
 }
-
 
 StateMachine::~StateMachine(void) = default;
