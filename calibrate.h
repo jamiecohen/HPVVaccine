@@ -2,8 +2,8 @@
 // Created by Jamie Cohen on 3/4/19.
 //
 
-#ifndef HIVHPVVaccine_CALIBRATE_H
-#define HIVHPVVaccine_CALIBRATE_H
+#ifndef HPVVaccine_CALIBRATE_H
+#define HPVVaccine_CALIBRATE_H
 
 
 #include <vector>
@@ -25,11 +25,11 @@ public:
     calibrate(int n_sims, int n_params, int n_targs);
     ~calibrate(void);
 
-    std::vector<double> loadCalibData(int n_params, int n_sim, int tuning_factor);
-    void CalculateGOF(int n_sims);
+    std::vector<double> loadCalibData(int n_params, int n_sim);
+    void CalculateGOF(int n_sims, double tuning_factor, double rand);
     double WeightedDistance(double data, double mean, double SD);
     double rnormal_trunc (double mu, double sigma, double upper, double lower);
-    std::vector<double> tuningparam(int n_sims, int n_param, int tuning_factor);
+    void GetProbAcceptance(double neighbor, double current, int n_sims, double temp);
 
     double tune_factor;
 
@@ -46,8 +46,9 @@ public:
     std::string multipliers_names;
     std::string calib_targs_names;
     std::vector<double> tuned_SD;
+    double ProbAcceptance;
 
 };
 
 
-#endif //HIVHPVVaccine_CALIBRATE_H
+#endif //HPVVaccine_CALIBRATE_H

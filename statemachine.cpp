@@ -10,61 +10,66 @@ StateMachine::StateMachine() = default;
 
 void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
     if (Data.Alive) {
+        StateMachine::GetMortality (Data, Tables);
         switch (Data.cancerstage) {
             case Woman::Stage1:
                 rand = help.getrand ();
                 if (rand < Tables.CA1_CA2) {
                     Data.cancerstage = Data.Stage2;
                     Data.ca2Timer++;
-                } else if (rand < (Tables.CA1_CA2 + Tables.mCA1[Data.ca1Timer])) {
+                } else if (rand < (Tables.CA1_CA2 + mCA)) {
                     Data.Alive = false;
                     Count.totaldeadcancer++;
-                } else if (rand < (Tables.CA1_CA2 + Tables.mCA1[Data.ca1Timer] + Tables.pCA1_CA1D)) {
+                } else if (rand < (Tables.CA1_CA2 + mCA + Tables.pCA1_CA1D)) {
                     Data.cancerstage = Data.Stage1d;
+                    Count.DwellTime_CA_detected_num += Data.ca1Timer;
+                    Count.DwellTime_CA_detected_denom++;
+                    StateMachine::CountDetectedCancer (Data, Count);
                     Data.ca1Timer++;
                     StateMachine::Colpo (Data, Tables, Count, y, help);
                 } else {
                     Data.ca1Timer++;
                 }
                 break;
-
             case Woman::Stage2:
                 rand = help.getrand ();
                 if (rand < Tables.CA2_CA3) {
                     Data.cancerstage = Data.Stage3;
                     Data.ca3Timer++;
-                } else if (rand < (Tables.CA2_CA3 + Tables.mCA2[Data.ca2Timer])) {
+                } else if (rand < (Tables.CA2_CA3 + mCA)) {
                     Data.Alive = false;
                     Count.totaldeadcancer++;
-                } else if (rand < (Tables.CA2_CA3 + Tables.mCA2[Data.ca2Timer] + Tables.pCA2_CA2D)) {
+                } else if (rand < (Tables.CA2_CA3 + mCA + Tables.pCA2_CA2D)) {
                     Data.cancerstage = Data.Stage2d;
+                    StateMachine::CountDetectedCancer (Data, Count);
+                    Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer;
+                    Count.DwellTime_CA_detected_denom++;
                     Data.ca2Timer++;
                     StateMachine::Colpo (Data, Tables, Count, y, help);
                 } else {
                     Data.ca2Timer++;
                 }
                 break;
-
             case Woman::Stage3:
-
                 rand = help.getrand ();
-                if (rand < Tables.mCA3[Data.ca3Timer]) {
+                if (rand < mCA) {
                     Data.Alive = false;
                     Count.totaldeadcancer++;
-                } else if (rand < (Tables.mCA3[Data.ca3Timer] + Tables.pCA3_CA3D)) {
+                } else if (rand < (mCA + Tables.pCA3_CA3D)) {
                     Data.cancerstage = Data.Stage3d;
+                    StateMachine::CountDetectedCancer (Data, Count);
+                    Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer + Data.ca3Timer;
+                    Count.DwellTime_CA_detected_denom++;
                     Data.ca3Timer++;
                     StateMachine::Colpo (Data, Tables, Count, y, help);
                 } else {
                     Data.ca3Timer++;
                 }
                 break;
-
-
             case Woman::Stage1d:
                 rand = help.getrand ();
-                if (rand < Tables.mCA1d[Data.ca1Timer]) {
-                    Count.HIVCAdead[Data.CurrentAge]++;
+                if (rand < mCA) {
+                    Count.CAdead[Data.CurrentAge]++;
                     Count.totaldeadcancer++;
                     Data.Alive = false;
                 } else {
@@ -73,8 +78,8 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                 break;
             case Woman::Stage2d:
                 rand = help.getrand ();
-                if (rand < Tables.mCA2d[Data.ca2Timer]) {
-                    Count.HIVCAdead[Data.CurrentAge]++;
+                if (rand < mCA) {
+                    Count.CAdead[Data.CurrentAge]++;
                     Count.totaldeadcancer++;
                     Data.Alive = false;
                 } else {
@@ -83,8 +88,8 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                 break;
             case Woman::Stage3d:
                 rand = help.getrand ();
-                if (rand < Tables.mCA3d[Data.ca3Timer]) {
-                    Count.HIVCAdead[Data.CurrentAge]++;
+                if (rand < mCA) {
+                    Count.CAdead[Data.CurrentAge]++;
                     Count.totaldeadcancer++;
                     Data.Alive = false;
                 } else {
@@ -98,29 +103,30 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
 }
 
 void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
+
     if (Data.Alive) {
+        StateMachine::CheckSeropositivity (Data, Tables, help);
         for (int i = 0; i < Data.HPVinfections.size (); i++) {
             StateMachine::GetLesionRisk (Data, Tables, i, Data.HPVinfections[i]);
+            StateMachine::GetHPVClearanceRisk (Data, Tables, i, Data.HPVinfections[i]);
             switch (Data.HPVinfections[i]) {
-                case Woman::No: break;
+                case Woman::No:
+                    break;
                 case Woman::Low:
                     rand = help.getrand ();
                     if (rand < pHPV_CIN2) {
                         Data.HPVinfectionTimer[i]++;
                         Data.CIN2Lesions.push_back (Woman::Low);
                         Data.CIN2LesionTimer.push_back (1);
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN2LRHIV++;
+                        StateMachine::CountCIN2 (Data, Count);
                     } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
                         Data.HPVinfectionTimer[i]++;
                         Data.CIN3Lesions.push_back (Woman::Low);
                         Data.CIN3LesionTimer.push_back (1);
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN3LRHIV++;
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_LR_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpvlo = false;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                        StateMachine::CountCIN3 (Data, Count);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 +
+                                        pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -128,22 +134,20 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                     break;
                 case Woman::otherHR:
                     rand = help.getrand ();
-                    if (rand < pHPV_CIN2) {
+                    if (rand <  pHPV_CIN2) {
+                        Data.CINoHR = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN2otherHRHIV++;
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.CIN2Lesions.push_back (Woman::otherHR);
                         Data.CIN2LesionTimer.push_back (1);
                     } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
+                        Data.CINoHR = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN3otherHRHIV++;
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.CIN3Lesions.push_back (Woman::otherHR);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_otherHR_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpvotherHR = false;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -151,23 +155,20 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                     break;
                 case Woman::High16:
                     rand = help.getrand ();
-                    if (rand < pHPV_CIN2) {
+                    if (rand <  pHPV_CIN2) {
+                        Data.CIN16 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN21618HIV++;
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.CIN2Lesions.push_back (Woman::High16);
                         Data.CIN2LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN31618HIV++;
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3)) {
+                        Data.CIN16 = Data.HPVinfectionTimer[i];
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.HPVinfectionTimer[i]++;
                         Data.CIN3Lesions.push_back (Woman::High16);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_1618_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpv16 = false;
-                        Data.wasHPV16flag = true;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -176,22 +177,19 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                 case Woman::High18:
                     rand = help.getrand ();
                     if (rand < pHPV_CIN2) {
+                        Data.CIN18 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN21618HIV++;
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.CIN2Lesions.push_back (Woman::High18);
                         Data.CIN2LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3)) {
+                        Data.CIN18 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN31618HIV++;
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.CIN3Lesions.push_back (Woman::High18);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_1618_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpv18 = false;
-                        Data.wasHPV18flag = true;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 +pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -199,23 +197,20 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                     break;
                 case Woman::High31:
                     rand = help.getrand ();
-                    if (rand < pHPV_CIN2) {
+                    if (rand <  pHPV_CIN2) {
+                        Data.CIN31 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN2high5HIV++;
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.CIN2Lesions.push_back (Woman::High31);
                         Data.CIN2LesionTimer.push_back (1);
                     } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN3high5HIV++;
+                        Data.CIN31 = Data.HPVinfectionTimer[i];
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.HPVinfectionTimer[i]++;
                         Data.CIN3Lesions.push_back (Woman::High31);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpv31 = false;
-                        Data.wasHPV31flag = true;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -223,23 +218,20 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                     break;
                 case Woman::High33:
                     rand = help.getrand ();
-                    if (rand < pHPV_CIN2) {
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN2high5HIV++;
+                    if (rand <  pHPV_CIN2) {
+                        Data.CIN33 = Data.HPVinfectionTimer[i];
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.HPVinfectionTimer[i]++;
                         Data.CIN2Lesions.push_back (Woman::High33);
                         Data.CIN2LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN3high5HIV++;
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3)) {
+                        Data.CIN33 = Data.HPVinfectionTimer[i];
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.HPVinfectionTimer[i]++;
                         Data.CIN3Lesions.push_back (Woman::High33);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpv33 = false;
-                        Data.wasHPV33flag = true;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -247,23 +239,20 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                     break;
                 case Woman::High45:
                     rand = help.getrand ();
-                    if (rand < pHPV_CIN2) {
+                    if (rand <  pHPV_CIN2) {
+                        Data.CIN45 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN2high5HIV++;
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.CIN2Lesions.push_back (Woman::High45);
                         Data.CIN2LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3)) {
+                        Data.CIN45 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN3high5HIV++;
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.CIN3Lesions.push_back (Woman::High45);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpv45 = false;
-                        Data.wasHPV45flag = true;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -271,23 +260,20 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                     break;
                 case Woman::High52:
                     rand = help.getrand ();
-                    if (rand < pHPV_CIN2) {
+                    if (rand <  pHPV_CIN2) {
+                        Data.CIN52 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN2high5HIV++;
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.CIN2Lesions.push_back (Woman::High52);
                         Data.CIN2LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3)) {
+                        Data.CIN52 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN3high5HIV++;
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.CIN3Lesions.push_back (Woman::High52);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpv52 = false;
-                        Data.wasHPV52flag = true;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -295,23 +281,20 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                     break;
                 case Woman::High58:
                     rand = help.getrand ();
-                    if (rand < pHPV_CIN2) {
-                        Count.CIN2HIVpostotal++;
-                        Count.CIN2high5HIV++;
+                    if (rand <  pHPV_CIN2) {
+                        Data.CIN58 = Data.HPVinfectionTimer[i];
+                        StateMachine::CountCIN2 (Data, Count);
                         Data.HPVinfectionTimer[i]++;
                         Data.CIN2Lesions.push_back (Woman::High58);
                         Data.CIN2LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3)) {
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3)) {
+                        Data.CIN58 = Data.HPVinfectionTimer[i];
                         Data.HPVinfectionTimer[i]++;
-                        Count.CIN3HIVpostotal++;
-                        Count.CIN3high5HIV++;
+                        StateMachine::CountCIN3 (Data, Count);
                         Data.CIN3Lesions.push_back (Woman::High58);
                         Data.CIN3LesionTimer.push_back (1);
-                    } else if (rand < (pHPV_CIN2 + pHPV_CIN3 + Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]])) {
-                        Data.hpv58 = false;
-                        Data.wasHPV58flag = true;
-                        Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-                        Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
+                    } else if (rand < ( pHPV_CIN2 + pHPV_CIN3 + pHPV_NL)) {
+                        StateMachine::ClearHPV (Data, Data.HPVinfections[i]);
                         i--;
                     } else {
                         Data.HPVinfectionTimer[i]++;
@@ -324,272 +307,115 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
 
 void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
     if (Data.Alive) {
-        if (Data.wasHPVloflag) {
-            immune_deg_LR = Tables.ImmuneDegreeLR;
-        } else {
-            immune_deg_LR = 1.00;
-        }
-        if (Data.wasHPVotherHRflag) {
-            immune_deg_otherHR = Tables.ImmuneDegreeotherHR;
-        } else {
-            immune_deg_otherHR = 1.00;
-        }
-        if (Data.wasHPV16flag) {
-            immune_deg_16 = Tables.ImmuneDegree16;
-        } else {
-            immune_deg_16 = 1.00;
-        }
-        if (Data.wasHPV18flag) {
-            immune_deg_18 = Tables.ImmuneDegree18;
-        } else {
-            immune_deg_18 = 1.00;
-        }
-        if (Data.wasHPV31flag) {
-            immune_deg_31 = Tables.ImmuneDegree31;
-        } else {
-            immune_deg_31 = 1.00;
-        }
-        if (Data.wasHPV33flag) {
-            immune_deg_33 = Tables.ImmuneDegree33;
-        } else {
-            immune_deg_33 = 1.00;
-        }
-        if (Data.wasHPV45flag) {
-            immune_deg_45 = Tables.ImmuneDegree45;
-        } else {
-            immune_deg_45 = 1.00;
-        }
-        if (Data.wasHPV52flag) {
-            immune_deg_52 = Tables.ImmuneDegree52;
-        } else {
-            immune_deg_52 = 1.00;
-        }
-        if (Data.wasHPV58flag) {
-            immune_deg_58 = Tables.ImmuneDegree58;
-        } else {
-            immune_deg_58 = 1.00;
-        }
-
-        if (Data.vaccinated) {
-
-            vaccine_deg_1618 = 1 - Tables.VE_1618 * Tables.VaccineEfficacy;
-            vaccine_deg_high5 = 1 - Tables.VE_high5 * Tables.VaccineEfficacy;
-
-            if (Data.CurrentAge > (Tables.VaccineDuration + Tables.VaccineStartAge)) {
-
-                vaccine_deg_1618 = GetEff (Tables.VaccineWaneTime, Data.CurrentAge,
-                                           (Tables.VaccineDuration + Tables.VaccineStartAge),
-                                           (1 - Tables.VE_1618 * Tables.VaccineEfficacy));
-
-                vaccine_deg_high5 = GetEff (Tables.VaccineWaneTime, Data.CurrentAge,
-                                            (Tables.VaccineDuration + Tables.VaccineStartAge),
-                                            (1 - Tables.VE_high5 * Tables.VaccineEfficacy));
-
-            }
-        } else {
-            vaccine_deg_1618 = 1;
-            vaccine_deg_high5 = 1;
-        }
+        StateMachine::GetImmuneDeg (Data, Tables);
+        StateMachine::GetVaccineEff (Data, Tables);
 
         if (Data.cancer) {
             CancerNatHistory (Data, Tables, Count, y, help);
         } else {
             if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
-                StateMachine::StartCIN (Data, Count, Tables, y, help);
+                StateMachine::StartCIN (Data, Count, Tables, help);
             }
             if (!Data.HPVinfections.empty ()) {
                 StateMachine::HPVNatHistory (Data, Tables, Count, help);
             }
-
-            StateMachine::AcquireHPV16 (Data, Count, Tables, help);
-            StateMachine::AcquireHPV18 (Data, Count, Tables, help);
-            StateMachine::AcquireHPV31 (Data, Count, Tables, help);
-            StateMachine::AcquireHPV33 (Data, Count, Tables, help);
-            StateMachine::AcquireHPV45 (Data, Count, Tables, help);
-            StateMachine::AcquireHPV52 (Data, Count, Tables, help);
-            StateMachine::AcquireHPV58 (Data, Count, Tables, help);
-            StateMachine::AcquireHPVoHR (Data, Count, Tables, help);
             StateMachine::AcquireHPVLow (Data, Count, Tables, help);
         }
     }
 }
 
 void StateMachine::HPVScreen(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
+    if (Data.screenstrat == Woman::HPVsnt || Data.screenstrat == Woman::HPVColpo) {
+        Data.screen_first = Tables.ScreenStartAge;
+        ScreenFrequency = Tables.ScreenFrequency;
+        if (!Data.screenstart) {
+            Data.nextscreenage = Data.screen_first;
+        }
+        if (Data.Alive) {
+            if (Data.CurrentAge >= Data.nextscreenage && Data.CurrentAge <= Tables.ScreenStopAge) {
+                Data.screenstart = true;
+                Data.screens++;
+                Data.screenage.push_back (Data.CurrentAge);
+                Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
+                Count.cost[y] += Tables.cHPVTest;
+                Count.cost[y] += Tables.cReturnforResult;
+                Count.cost[y] += Tables.cPtTime;
+                Count.costs[y][4]++;
+                Count.costs[y][1]++;
+                Count.costs[y][5]++;
+                if (Data.hpv16 || Data.hpv18 || Data.hpv31 || Data.hpv33 || Data.hpv45 ||
+                    Data.hpv52 || Data.hpv58 || Data.hpvotherHR) {
+                    if (Data.screenstrat == Woman::HPVsnt) {
+                        StateMachine::SendforTreatment (Data, Tables, Count, y, help);
+                    } else if (Data.screenstrat == Woman::HPVColpo) {
+                        StateMachine::Colpo (Data, Tables, Count, y, help);
+                    }
+                }
+            }
+        }
+    }
+}
 
-    if (Tables.screenstrat == Inputs::HPV) {
-        int ScreenFrequency;
-        Data.hpv_first_hiv = Tables.ScreenStartAge;
+void StateMachine::CytoScreen(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
+    if (Data.screenstrat == Woman::CC || Data.screenstrat == Woman::LBC) {
+        if (Data.screenstrat == Woman::CC) {
+            cPap = Tables.cPapTest;
+            Adequacy = Tables.AdequacyCC;
+        } else if (Data.screenstrat == Woman::LBC) {
+            cPap = Tables.cPapLBCTest;
+            Adequacy = Tables.AdequacyLBC;
+        }
+        Data.screen_first = Tables.ScreenStartAge;
         ScreenFrequency = Tables.ScreenFrequency;
 
+        if(!Data.screenstart) {
+            Data.nextscreenage = Data.screen_first;
+        }
         if (Data.Alive) {
-            if (Data.CurrentAge >= Data.hpv_first_hiv && Data.CurrentAge <= Tables.ScreenStopAge) {
-                if (!Data.hpvstart) {
-                    Data.hpvtest++;
-                    Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
-                    Data.hpv_first_hiv = Data.CurrentAge;
-                    Data.hpvage.push_back (Data.CurrentAge);
-                    Data.hpvstart = true;
-                    Count.cost[y] += Tables.cHPVTest;
-                    Count.cost[y] += Tables.cReturnforResult;
+            if (Data.CurrentAge >= Data.nextscreenage && Data.CurrentAge <= Tables.ScreenStopAge) {
+                Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
+                Data.screens++;
+                Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
+                Data.screen_first = Data.CurrentAge;
+                Data.screenage.push_back (Data.CurrentAge);
+                Count.cost[y] += cPap;
+                Count.cost[y] += Tables.cReturnforResult;
+                Count.cost[y] += Tables.cPtTime;
+                Count.costs[y][4]++;
+                Count.costs[y][1]++;
+                Count.costs[y][5]++;
+                rand = help.getrand();
+                if (rand < Adequacy){
+                    Data.screens++;
+                    Data.screenage.push_back (Data.CurrentAge);
+                    Count.cost[y] += cPap;
                     Count.cost[y] += Tables.cPtTime;
-
-                    if (Data.cancer) {
-                        switch (Data.cancerstage) {
-                            case Woman::Stage0:
-                                break;
-                            case Woman::Stage1:
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    Data.cancerstage = Data.Stage1d;
-                                    rand = help.getrand ();
-                                    if (rand < Tables.cryoelig_Ca) {
-                                        StateMachine::Cryo (Data, Tables, Count, y, help);
-                                    } else {
-                                        StateMachine::Colpo (Data, Tables, Count, y, help);
-                                    }
-                                }
-                                break;
-                            case Woman::Stage2:
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    Data.cancerstage = Data.Stage2d;
-                                    rand = help.getrand ();
-                                    if (rand < Tables.cryoelig_Ca) {
-                                        StateMachine::Cryo (Data, Tables, Count, y, help);
-                                    } else {
-                                        StateMachine::Colpo (Data, Tables, Count, y, help);
-                                    }
-                                }
-                                break;
-                            case Woman::Stage3:
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    Data.cancerstage = Data.Stage3d;
-                                    rand = help.getrand ();
-                                    if (rand < Tables.cryoelig_Ca) {
-                                        StateMachine::Cryo (Data, Tables, Count, y, help);
-                                    } else {
-                                        StateMachine::Colpo (Data, Tables, Count, y, help);
-                                    }
-                                }
-                                break;
-                            case Woman::Stage1d:break;
-                            case Woman::Stage2d:break;
-                            case Woman::Stage3d:break;
-                        }
-                    } else {
-                        if (!Data.HPVinfections.empty ()) {
-                            if (Data.hpv16 || Data.hpv18 || Data.hpv31 || Data.hpv33 || Data.hpv45 ||
-                                Data.hpv52 || Data.hpv58 || Data.otherHR) {
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    rand = help.getrand ();
-                                    if (!Data.CIN3Lesions.empty ()) {
-                                        if (rand < Tables.cryoelig_CIN3) {
-                                            StateMachine::Cryo (Data, Tables, Count, y, help);
-                                        } else {
-                                            StateMachine::Colpo (Data, Tables, Count, y, help);
-                                        }
-                                    } else {
-                                        if (!Data.CIN2Lesions.empty ()) {
-                                            if (rand < Tables.cryoelig_CIN2) {
-                                                StateMachine::Cryo (Data, Tables, Count, y, help);
-                                            } else {
-                                                StateMachine::Colpo (Data, Tables, Count, y, help);
-                                            }
-                                        } else {
-                                            if (rand < Tables.cryoelig_NL) {
-                                                StateMachine::Cryo (Data, Tables, Count, y, help);
-                                            } else {
-                                                StateMachine::Colpo (Data, Tables, Count, y, help);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                    Count.costs[y][4]++;
+                    Count.costs[y][1]++;
+                }
+                if(Data.cancer) {
+                    rand = help.getrand();
+                    if (rand < Tables.cytosens_Ca) {
+                        rand = help.getrand();
+                        if (rand < Tables.ScreenCompliance) {
+                            StateMachine::Colpo (Data, Tables,  Count, y, help);
                         }
                     }
-                } else if (Data.CurrentAge >= Data.nextscreenage && Data.CurrentAge <= Tables.ScreenStopAge) {
-                    Data.hpvtest++;
-                    Data.hpvage.push_back (Data.CurrentAge);
-                    Count.cost[y] += Tables.cHPVTest;
-                    Count.cost[y] += Tables.cReturnforResult;
-                    Count.cost[y] += Tables.cPtTime;
-                    Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
-
-                    if (Data.cancer) {
-                        switch (Data.cancerstage) {
-                            case Woman::Stage0:
-                                break;
-                            case Woman::Stage1:
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    Data.cancerstage = Data.Stage1d;
-                                    rand = help.getrand ();
-                                    if (rand < Tables.cryoelig_Ca) {
-                                        StateMachine::Cryo (Data, Tables, Count, y, help);
-                                    } else {
-                                        StateMachine::Colpo (Data, Tables, Count, y, help);
-                                    }
-                                }
-                                break;
-                            case Woman::Stage2:
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    Data.cancerstage = Data.Stage2d;
-                                    rand = help.getrand ();
-                                    if (rand < Tables.cryoelig_Ca) {
-                                        StateMachine::Cryo (Data, Tables, Count, y, help);
-                                    } else {
-                                        StateMachine::Colpo (Data, Tables, Count, y, help);
-                                    }
-                                }
-                                break;
-                            case Woman::Stage3:
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    Data.cancerstage = Data.Stage3d;
-                                    rand = help.getrand ();
-                                    if (rand < Tables.cryoelig_Ca) {
-                                        StateMachine::Cryo (Data, Tables, Count, y, help);
-                                    } else {
-                                        StateMachine::Colpo (Data, Tables, Count, y, help);
-                                    }
-                                }
-                                break;
-                            case Woman::Stage1d:break;
-                            case Woman::Stage2d:break;
-                            case Woman::Stage3d:break;
+                } else {
+                    if(!Data.CIN3Lesions.empty() || !Data.CIN2Lesions.empty()) {
+                        rand = help.getrand();
+                        if (rand < Tables.cytosens_CIN) {
+                            rand = help.getrand();
+                            if (rand < Tables.ScreenCompliance) {
+                                StateMachine::Colpo (Data, Tables,  Count, y, help);
+                            }
                         }
                     } else {
-                        if (!Data.HPVinfections.empty ()) {
-                            if (Data.hpv16 || Data.hpv18 || Data.hpv31 || Data.hpv33 || Data.hpv45
-                                || Data.hpv52 || Data.hpv58 || Data.otherHR) {
-                                rand = help.getrand ();
-                                if (rand < Tables.hpvsens_CIN) {
-                                    rand = help.getrand ();
-                                    if (!Data.CIN3Lesions.empty ()) {
-                                        if (rand < Tables.cryoelig_CIN3) {
-                                            StateMachine::Cryo (Data, Tables, Count, y, help);
-                                        } else {
-                                            StateMachine::Colpo (Data, Tables, Count, y, help);
-                                        }
-                                    } else {
-                                        if (!Data.CIN2Lesions.empty ()) {
-                                            if (rand < Tables.cryoelig_CIN2) {
-                                                StateMachine::Cryo (Data, Tables, Count, y, help);
-                                            } else {
-                                                StateMachine::Colpo (Data, Tables, Count, y, help);
-                                            }
-                                        } else {
-                                            if (rand < Tables.cryoelig_NL) {
-                                                StateMachine::Cryo (Data, Tables, Count, y, help);
-                                            } else {
-                                                StateMachine::Colpo (Data, Tables, Count, y, help);
-                                            }
-                                        }
-                                    }
-                                }
+                        rand = help.getrand();
+                        if (rand < Tables.cytosens_NL) {
+                            rand = help.getrand();
+                            if (rand < Tables.ScreenCompliance) {
+                                StateMachine::Colpo (Data, Tables,  Count, y, help);
                             }
                         }
                     }
@@ -600,7 +426,6 @@ void StateMachine::HPVScreen(Woman &Data, Inputs &Tables, Output &Count, int y, 
 }
 
 void StateMachine::ClearHPV(Woman &Data, Woman::hpvT genotype) {
-
     int i = 0;
     while (i < Data.HPVinfections.size ()) {
         if (Data.HPVinfections[i] == genotype) {
@@ -616,652 +441,293 @@ void StateMachine::ClearHPV(Woman &Data, Woman::hpvT genotype) {
             break;
         case Woman::Low:
             Data.wasHPVloflag = true;
-            Data.hpv = false;
-            Data.hpvlo = 0;
+            Data.hpvlo = false;
+            Data.hpvlo_ageimmunity = Data.CurrentAge;
             break;
         case Woman::otherHR:
             Data.wasHPVotherHRflag = true;
-            Data.hpv = false;
             Data.hpvotherHR = false;
+            Data.hpvotherHR_ageimmunity = Data.CurrentAge;
             break;
         case Woman::High16:
             Data.wasHPV16flag = true;
-            Data.hpv = false;
             Data.hpv16 = false;
+            Data.hpv16_ageimmunity = Data.CurrentAge;
             break;
         case Woman::High18:
             Data.wasHPV18flag = true;
-            Data.hpv = false;
             Data.hpv18 = false;
+            Data.hpv18_ageimmunity = Data.CurrentAge;
             break;
         case Woman::High31:
             Data.wasHPV31flag = true;
-            Data.hpv = false;
             Data.hpv31 = false;
+            Data.hpv31_ageimmunity = Data.CurrentAge;
             break;
         case Woman::High33:
             Data.wasHPV33flag = true;
-            Data.hpv = false;
             Data.hpv33 = false;
+            Data.hpv33_ageimmunity = Data.CurrentAge;
             break;
         case Woman::High45:
             Data.wasHPV45flag = true;
-            Data.hpv = false;
             Data.hpv45 = false;
+            Data.hpv45_ageimmunity = Data.CurrentAge;
             break;
         case Woman::High52:
             Data.wasHPV52flag = true;
-            Data.hpv = false;
             Data.hpv52 = false;
+            Data.hpv52_ageimmunity = Data.CurrentAge;
             break;
         case Woman::High58:
             Data.wasHPV58flag = true;
-            Data.hpv = false;
             Data.hpv58 = false;
+            Data.hpv58_ageimmunity = Data.CurrentAge;
             break;
     }
 }
 
-void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, int y, helper &help) {
+void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
 
-    for (int i = 0; i < Data.CIN3Lesions.size (); i++) {
-        switch (Data.CIN3Lesions[i]) {
-            case Woman::No:
-                break;
-            case Woman::Low:
-                rand = help.getrand ();
-                if (rand < (Tables.pCIN3_NL_LR[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::Low);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::otherHR:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_oHR[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_allother[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CAotherHRHIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_oHR[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_oHR[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::otherHR);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::High16:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_1618[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_1618[y]++;
-                    Count.TotalCancer_nonavalent[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CA1618HIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_1618[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_1618[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::High16);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::High18:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_1618[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_1618[y]++;
-                    Count.TotalCancer_nonavalent[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CA1618HIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_1618[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_1618[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::High18);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::High31:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_nonavalent[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CAhigh5HIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::High31);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::High33:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_nonavalent[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CAhigh5HIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::High33);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::High45:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_nonavalent[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CAhigh5HIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::High45);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::High52:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_nonavalent[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CAhigh5HIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::High52);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-            case Woman::High58:
-                rand = help.getrand ();
-                if (rand < Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]]) {
-                    Data.cancer = true;
-                    Data.cancerstage = Data.Stage1;
-                    Data.ca1Timer++;
-                    Count.HIVCAcount[Data.CurrentAge]++;
-                    Count.TotalCancer[y]++;
-                    Count.TotalCancer_nonavalent[y]++;
-                    Count.cancerHIVpos++;
-                    Count.CAhigh5HIV++;
-                    Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                    Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                    i--;
-                    break;
-                } else if (rand < (Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]] +
-                                   Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]])) {
-                    rand = help.getrand ();
-                    if (rand < Tables.pRegressToHPV) {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                    } else {
-                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
-                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
-                        i--;
-                        StateMachine::ClearHPV (Data, Woman::High58);
-                    }
-                } else {
-                    Data.CIN3LesionTimer[i]++;
-                }
-                break;
-        }
-    }
-
-
-
-    if(Tables.lesion_progression){
-        for (int i = 0; i < Data.CIN2Lesions.size (); i++) {
-            switch (Data.CIN2Lesions[i]) {
-                case Woman::High16:
-                    rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_1618[Data.CIN2LesionTimer[i]]) {
-                        Data.cancer = true;
-                        Data.cancerstage = Data.Stage1;
-                        Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_1618[y]++;
-                        Count.TotalCancer_nonavalent[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CA1618HIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                        i--;
-                        break;
-                    } else if (rand < (Tables.pCIN2_CA1_1618[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_1618[Data.CIN2LesionTimer[i]])) {
-                        rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High16);
-                        }
-                    } else {
-                        Data.CIN2LesionTimer[i]++;
-                    }
-                    break;
+    if(!Data.cancer){
+        for (int i = 0; i < Data.CIN3Lesions.size (); i++) {
+            StateMachine::GetCIN3Risk (Data, Tables, i, Data.CIN3Lesions[i]);
+            switch (Data.CIN3Lesions[i]) {
                 case Woman::No:
                     break;
                 case Woman::Low:
                     rand = help.getrand ();
-                    if (rand < (Tables.pCIN2_NL_LR[Data.CIN2LesionTimer[i]])) {
+                    if (rand < (pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            StateMachine::ClearHPV (Data, Woman::Low);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::Low);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
                 case Woman::otherHR:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_oHR[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN3_CA) {
+                        Data.CAoHR = Data.CIN3LesionTimer[i];
                         Data.cancer = true;
                         Data.cancerstage = Data.Stage1;
                         Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_allother[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CAotherHRHIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CA1_oHR[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_oHR[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::otherHR);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
+                    }
+                    break;
+                case Woman::High16:
+                    rand = help.getrand ();
+                    if (rand < pCIN3_CA) {
+                        Data.CA16 = Data.CIN3LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
+                        break;
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
+                        rand = help.getrand ();
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
+                        }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
+                    } else {
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
                 case Woman::High18:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_1618[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN3_CA) {
+                        Data.CA18 = Data.CIN3LesionTimer[i];
                         Data.cancer = true;
                         Data.cancerstage = Data.Stage1;
                         Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_1618[y]++;
-                        Count.TotalCancer_nonavalent[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CA1618HIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CA1_1618[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_1618[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High18);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
                 case Woman::High31:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN3_CA) {
+                        Data.CA31 = Data.CIN3LesionTimer[i];
                         Data.cancer = true;
                         Data.cancerstage = Data.Stage1;
                         Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_nonavalent[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CAhigh5HIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High31);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
                 case Woman::High33:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN3_CA) {
+                        Data.CA33 = Data.CIN3LesionTimer[i];
                         Data.cancer = true;
                         Data.cancerstage = Data.Stage1;
                         Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_nonavalent[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CAhigh5HIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High33);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
                 case Woman::High45:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN3_CA) {
+                        Data.CA45 = Data.CIN3LesionTimer[i];
                         Data.cancer = true;
                         Data.cancerstage = Data.Stage1;
                         Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_nonavalent[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CAhigh5HIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High45);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
                 case Woman::High52:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN3_CA) {
+                        Data.CA52 = Data.CIN3LesionTimer[i];
                         Data.cancer = true;
                         Data.cancerstage = Data.Stage1;
                         Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_nonavalent[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CAhigh5HIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High52);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
                 case Woman::High58:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN3_CA) {
+                        Data.CA58 = Data.CIN3LesionTimer[i];
                         Data.cancer = true;
                         Data.cancerstage = Data.Stage1;
                         Data.ca1Timer++;
-                        Count.HIVCAcount[Data.CurrentAge]++;
-                        Count.TotalCancer[y]++;
-                        Count.TotalCancer_nonavalent[y]++;
-                        Count.cancerHIVpos++;
-                        Count.CAhigh5HIV++;
-                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i]);
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High58);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN3Lesions[i]);
                         }
+                        Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
+                        Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
+                        i--;
                     } else {
-                        Data.CIN2LesionTimer[i]++;
+                        Data.CIN3LesionTimer[i]++;
                     }
                     break;
             }
         }
-    } else {
+    }
+    if(!Data.cancer){
         for (int i = 0; i < Data.CIN2Lesions.size (); i++) {
+            StateMachine::GetCIN2Risk (Data, Tables, i, Data.CIN2Lesions[i]);
             switch (Data.CIN2Lesions[i]) {
                 case Woman::High16:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_1618[Data.CIN2LesionTimer[i]]) {
+                    if (rand < pCIN2_CA) {
+                        Data.CA16 = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
-                        Data.CIN3Lesions.push_back(Woman::High16);
-                        Data.CIN3LesionTimer.push_back(1);
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_1618[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_1618[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High16);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
@@ -1270,201 +736,182 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, int y, h
                     break;
                 case Woman::Low:
                     rand = help.getrand ();
-                    if (rand < (Tables.pCIN2_NL_LR[Data.CIN2LesionTimer[i]])) {
+                    if (rand < (pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            StateMachine::ClearHPV (Data, Woman::Low);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::Low);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
                     break;
                 case Woman::otherHR:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_oHR[Data.CIN2LesionTimer[i]]) {
-                        Data.CIN3Lesions.push_back(Woman::otherHR);
-                        Data.CIN3LesionTimer.push_back(1);
+                    if (rand < pCIN2_CA) {
+                        Data.CAoHR = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_oHR[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_oHR[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::otherHR);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
                     break;
                 case Woman::High18:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_1618[Data.CIN2LesionTimer[i]]) {
-                        Data.CIN3Lesions.push_back(Woman::High18);
-                        Data.CIN3LesionTimer.push_back(1);
+                    if (rand < pCIN2_CA) {
+                        Data.CA18 = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_1618[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_1618[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High18);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
                     break;
                 case Woman::High31:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]]) {
-                        Data.CIN3Lesions.push_back(Woman::High31);
-                        Data.CIN3LesionTimer.push_back(1);
+                    if (rand < pCIN2_CA) {
+                        Data.CA31 = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High31);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
                     break;
                 case Woman::High33:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]]) {
-                        Data.CIN3Lesions.push_back(Woman::High33);
-                        Data.CIN3LesionTimer.push_back(1);
+                    if (rand < pCIN2_CA) {
+                        Data.CA33 = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High33);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
                     break;
                 case Woman::High45:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]]) {
-                        Data.CIN3Lesions.push_back(Woman::High45);
-                        Data.CIN3LesionTimer.push_back(1);
+                    if (rand < pCIN2_CA) {
+                        Data.CA45 = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High45);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
                     break;
                 case Woman::High52:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]]) {
-                        Data.CIN3Lesions.push_back(Woman::High52);
-                        Data.CIN3LesionTimer.push_back(1);
+                    if (rand < pCIN2_CA) {
+                        Data.CA52 = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High52);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
                     break;
                 case Woman::High58:
                     rand = help.getrand ();
-                    if (rand < Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]]) {
-                        Data.CIN3Lesions.push_back(Woman::High58);
-                        Data.CIN3LesionTimer.push_back(1);
+                    if (rand < pCIN2_CA) {
+                        Data.CA58 = Data.CIN2LesionTimer[i];
+                        Data.cancer = true;
+                        Data.cancerstage = Data.Stage1;
+                        Data.ca1Timer++;
+                        StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i]);
                         Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                         Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                         i--;
                         break;
-                    } else if (rand < (Tables.pCIN2_CIN3_high5[Data.CIN2LesionTimer[i]] +
-                                       Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]])) {
+                    } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
                         rand = help.getrand ();
-                        if (rand < Tables.pRegressToHPV) {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                        } else {
-                            Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                            Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                            i--;
-                            StateMachine::ClearHPV (Data, Woman::High58);
+                        if (rand > Tables.pRegresstoHPV){
+                            StateMachine::ClearHPV (Data, Data.CIN2Lesions[i]);
                         }
+                        Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                        Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                        i--;
                     } else {
                         Data.CIN2LesionTimer[i]++;
                     }
@@ -1474,40 +921,25 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, int y, h
     }
 }
 
-void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, int y, int CurrentModelYear, bool burnin, helper &help) {
+void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, int y, int CurrentModelYear, bool calib, helper &help) {
 
     if (Data.Alive) {
-
-        int index;
-        if (CurrentModelYear < 1950) {
-            index = 0;
-        } else if (CurrentModelYear < 2085) {
-            index = CurrentModelYear - 1950;
-        } else {
-            index = 134;
-        }
-
-        if (Data.CurrentAge < Tables.ModelStopAge) {
-            mASR = Tables.ASRMortality[Data.CurrentAge][index];
-        } else {
-            mASR = 1;
-        }
-
+        StateMachine::GetBackgroundMortality (Data, Tables, CurrentModelYear);
         rand = help.getrand ();
-
         if (rand < mASR) {
             Data.Alive = false;
         } else {
-            if (!burnin) {
+            if (!calib) {
                 if (Data.ScreenAccess) {
                     StateMachine::HPVScreen (Data, Tables, Count, y, help);
+                    StateMachine::CytoScreen (Data, Tables, Count, y, help);
                 }
             }
             StateMachine::NatHistory (Data, Tables, Count, y, help);
         }
 
-        Count.createTrace (Data, y);
-        if (!burnin) {
+        Count.createTrace (Data);
+        if (!calib) {
             Count.calcLE (Data, Tables, y);
         }
 
@@ -1522,11 +954,31 @@ void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count,
 
 void StateMachine::Cryo(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
 
-    //todo-JAMIE consider allowing some HPV to persist after cryotherapy
+    switch(Data.screenstrat){
+        case Woman::LBC:
+            Count.cost[y] += Tables.cPtTime;
+            Count.cost[y] += Tables.cCryoVisit;
+            Count.costs[y][1]++;
+            Count.costs[y][8]++;
+            break;
+        case Woman::CC:
+            Count.cost[y] += Tables.cPtTime;
+            Count.cost[y] += Tables.cCryoVisit;
+            Count.costs[y][1]++;
+            Count.costs[y][8]++;
+            break;
+        case Woman::HPVColpo:
+            Count.cost[y] += Tables.cPtTime;
+            Count.cost[y] += Tables.cCryoVisit;
+            Count.costs[y][1]++;
+            Count.costs[y][8]++;
+            break;
+        case Woman::HPVsnt:
+            break;
+    }
 
-    Count.cost[y] += Tables.cPtTime;
-    Count.cost[y] += Tables.cCryoVisit;
     Count.cost[y] += Tables.cCryoCIN23;
+    Count.costs[y][9]++;
 
     if (Data.cancer) {
         switch (Data.cancerstage) {
@@ -1552,7 +1004,6 @@ void StateMachine::Cryo(Woman &Data, Inputs &Tables, Output &Count, int y, helpe
                 Data.CIN2Lesions.clear ();
                 Data.CIN3LesionTimer.clear();
                 Data.CIN2LesionTimer.clear();
-
                 rand = help.getrand ();
                 if (rand < Tables.CryoSuccessRateHPV) {
                     if (Data.hpv16) {
@@ -1619,55 +1070,670 @@ void StateMachine::Cryo(Woman &Data, Inputs &Tables, Output &Count, int y, helpe
     }
 }
 
-void StateMachine::Colpo(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
+void StateMachine::LLETZ(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
 
-    Count.cost[y] += Tables.cPtTime;
-    Count.cost[y] += Tables.cColpoProc;
-    Count.cost[y] += Tables.cColpoTime;
+    switch(Data.screenstrat){
+        case Woman::LBC:
+            Count.cost[y] += Tables.cPtTime;
+            Count.cost[y] += Tables.cCryoVisit;
+            Count.costs[y][1]++;
+            Count.costs[y][8]++;
+            break;
+        case Woman::CC:
+            Count.cost[y] += Tables.cPtTime;
+            Count.cost[y] += Tables.cCryoVisit;
+            Count.costs[y][1]++;
+            Count.costs[y][8]++;
+            break;
+        case Woman::HPVColpo:
+            Count.cost[y] += Tables.cPtTime;
+            Count.cost[y] += Tables.cCryoVisit;
+            Count.costs[y][1]++;
+            Count.costs[y][8]++;
+            break;
+        case Woman::HPVsnt:
+            break;
+    }
+
+    Count.cost[y] += Tables.cLLETZ;
+    Count.costs[y][10]++;
 
     if (Data.cancer) {
-        rand = help.getrand ();
-        if(rand < Tables.cryoelig_Ca){
-            StateMachine::Cryo (Data, Tables, Count, y, help);
-        } else {
-            switch (Data.cancerstage) {
-                case Woman::Stage0:break;
-                case Woman::Stage1:
-                    Data.cancerstage = Data.Stage1d;
-                    break;
-                case Woman::Stage2:
-                    Data.cancerstage = Data.Stage2d;
-                    break;
-                case Woman::Stage3:
-                    Data.cancerstage = Data.Stage3d;
-                    break;
-                case Woman::Stage1d:break;
-                case Woman::Stage2d:break;
-                case Woman::Stage3d:break;
-            }
+        switch (Data.cancerstage) {
+            case Woman::Stage0:break;
+            case Woman::Stage1:
+                Data.cancerstage = Data.Stage1d;
+                break;
+            case Woman::Stage2:
+                Data.cancerstage = Data.Stage2d;
+                break;
+            case Woman::Stage3:
+                Data.cancerstage = Data.Stage3d;
+                break;
+            case Woman::Stage1d:break;
+            case Woman::Stage2d:break;
+            case Woman::Stage3d:break;
         }
     } else {
         if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
             rand = help.getrand ();
-            if (rand < Tables.colposens[1][1]) {
-                StateMachine::Cryo (Data, Tables, Count, y, help);
+            if (rand < Tables.LLETZSuccessRateCIN) {
+                Data.CIN3Lesions.clear ();
+                Data.CIN2Lesions.clear ();
+                Data.CIN3LesionTimer.clear();
+                Data.CIN2LesionTimer.clear();
+                rand = help.getrand ();
+                if (rand < Tables.LLETZSuccessRateHPV) {
+                    if (Data.hpv16) {
+                        StateMachine::ClearHPV (Data, Woman::High16);
+                    }
+                    if (Data.hpv18) {
+                        StateMachine::ClearHPV (Data, Woman::High18);
+                    }
+                    if (Data.hpv31) {
+                        StateMachine::ClearHPV (Data, Woman::High31);
+                    }
+                    if (Data.hpv33) {
+                        StateMachine::ClearHPV (Data, Woman::High33);
+                    }
+                    if (Data.hpv45) {
+                        StateMachine::ClearHPV (Data, Woman::High45);
+                    }
+                    if (Data.hpv52) {
+                        StateMachine::ClearHPV (Data, Woman::High52);
+                    }
+                    if (Data.hpv58) {
+                        StateMachine::ClearHPV (Data, Woman::High58);
+                    }
+                    if (Data.hpvotherHR) {
+                        StateMachine::ClearHPV (Data, Woman::otherHR);
+                    }
+                    if (Data.hpvlo) {
+                        StateMachine::ClearHPV (Data, Woman::Low);
+                    }
+                }
             }
         } else if (!Data.HPVinfections.empty ()) {
             rand = help.getrand ();
-            if (rand < Tables.colposens[1][0]) {
-                StateMachine::Cryo (Data, Tables, Count, y, help);
-            }
-        } else {
-            rand = help.getrand ();
-            if (rand < Tables.colposens[1][0]) {
-                StateMachine::Cryo (Data, Tables, Count, y, help);
+            if (rand < Tables.LLETZSuccessRateHPV) {
+                if (Data.hpv16) {
+                    StateMachine::ClearHPV (Data, Woman::High16);
+                }
+                if (Data.hpv18) {
+                    StateMachine::ClearHPV (Data, Woman::High18);
+                }
+                if (Data.hpv31) {
+                    StateMachine::ClearHPV (Data, Woman::High31);
+                }
+                if (Data.hpv33) {
+                    StateMachine::ClearHPV (Data, Woman::High33);
+                }
+                if (Data.hpv45) {
+                    StateMachine::ClearHPV (Data, Woman::High45);
+                }
+                if (Data.hpv52) {
+                    StateMachine::ClearHPV (Data, Woman::High52);
+                }
+                if (Data.hpv58) {
+                    StateMachine::ClearHPV (Data, Woman::High58);
+                }
+                if (Data.hpvotherHR) {
+                    StateMachine::ClearHPV (Data, Woman::otherHR);
+                }
+                if (Data.hpvlo) {
+                    StateMachine::ClearHPV (Data, Woman::Low);
+                }
             }
         }
     }
 }
 
-double StateMachine::GetEff(double wanetime, int age, int waneage, double starteff) {
+void StateMachine::Colpo(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
 
+    rand = help.getrand ();
+    if(rand < Tables.ScreenCompliance){
+        Count.cost[y] += Tables.cPtTime;
+        Count.cost[y] += Tables.cColpoProc;
+        Count.cost[y] += Tables.cColpoTime;
+        Count.costs[y][1]++;
+        Count.costs[y][6]++;
+        Count.costs[y][7]++;
+        if (Data.cancer) {
+            StateMachine::SendforTreatment (Data, Tables, Count, y, help);
+        } else {
+            if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
+                rand = help.getrand ();
+                if (rand < Tables.colposens[1][1]) {
+                    rand = help.getrand ();
+                    if(rand < Tables.ScreenCompliance){
+                        StateMachine::SendforTreatment (Data, Tables, Count, y, help);
+                    }
+                }
+            } else if (!Data.HPVinfections.empty ()) {
+                rand = help.getrand ();
+                if (rand < Tables.colposens[1][0]) {
+                    rand = help.getrand ();
+                    if(rand < Tables.ScreenCompliance){
+                        StateMachine::SendforTreatment (Data, Tables, Count, y, help);
+                    }
+                }
+            } else {
+                rand = help.getrand ();
+                if (rand < Tables.colposens[1][0]) {
+                    rand = help.getrand ();
+                    if(rand < Tables.ScreenCompliance){
+                        StateMachine::SendforTreatment (Data, Tables, Count, y, help);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void StateMachine::GetMortality(Woman &Data, Inputs &Tables) {
+    switch(Data.cancerstage){
+        case Woman::Stage0:break;
+        case Woman::Stage1:
+            mCA = Tables.mCA1[Data.ca1Timer];
+            break;
+        case Woman::Stage2:
+            mCA = Tables.mCA2[Data.ca2Timer];
+            break;
+        case Woman::Stage3:
+            mCA = Tables.mCA3[Data.ca3Timer];
+            break;
+        case Woman::Stage1d:
+            mCA = Tables.mCA1d[Data.ca1Timer];
+            break;
+        case Woman::Stage2d:
+            mCA = Tables.mCA2d[Data.ca2Timer];
+            break;
+        case Woman::Stage3d:
+            mCA = Tables.mCA3d[Data.ca3Timer];
+            break;
+    }
+}
+
+void StateMachine::GetVaccineEff(Woman &Data, Inputs &Tables) {
+    if (Data.completevaccine) {
+        vaccine_eff_1618 = Tables.VE_1618;
+        vaccine_eff_high5 = Tables.VE_high5;
+        if (Data.CurrentAge > (Tables.VaccineDuration + Tables.VaccineStartAge)) {
+            vaccine_eff_1618 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                        (Tables.VaccineDuration + Data.vaccineage),
+                                        vaccine_eff_1618);
+            vaccine_eff_high5 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                         (Tables.VaccineDuration + Data.vaccineage),
+                                         vaccine_eff_high5);
+        }
+    } else {
+        vaccine_eff_1618 = 0;
+        vaccine_eff_high5 = 0;
+    }
+    vaccine_deg_1618 = 1 - vaccine_eff_1618;
+    vaccine_deg_high5 = 1 - vaccine_eff_high5;
+}
+
+void StateMachine::AcquireHPV16(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::High16);
+    rand = help.getrand ();
+    if (rand < pHPV_16) {
+        Data.hpv16 = true;
+        Data.age16 = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::High16);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+        Count.HPV16count[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPVoHR (Data, Count, Tables, help);
+    }
+}
+
+void StateMachine::AcquireHPV18(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::High18);
+    rand = help.getrand ();
+    if (rand < pHPV_18) {
+        Data.hpv18 = true;
+        Data.age18 = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::High18);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+        Count.HPV18count[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPV31 (Data, Count, Tables, help);
+    }
+}
+
+void StateMachine::AcquireHPV31(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::High31);
+    rand = help.getrand ();
+    if (rand < pHPV_31) {
+        Data.hpv31 = true;
+        Data.age31 = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::High31);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPV33 (Data, Count, Tables, help);
+    }
+}
+
+void StateMachine::AcquireHPV33(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::High33);
+    rand = help.getrand ();
+    if (rand < pHPV_33) {
+        Data.hpv33 = true;
+        Data.age33 = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::High33);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPV45 (Data, Count, Tables, help);
+    }
+
+}
+
+void StateMachine::AcquireHPV45(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::High45);
+    rand = help.getrand ();
+    if (rand < pHPV_45) {
+        Data.hpv45 = true;
+        Data.age45 = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::High45);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPV52 (Data, Count, Tables, help);
+    }
+
+}
+
+void StateMachine::AcquireHPV52(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::High52);
+    rand = help.getrand ();
+    if (rand < pHPV_52) {
+        Data.hpv52 = true;
+        Data.age52 = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::High52);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPV58 (Data, Count, Tables, help);
+    }
+}
+
+void StateMachine::AcquireHPV58(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::High58);
+    rand = help.getrand ();
+    if (rand < pHPV_58) {
+        Data.hpv58 = true;
+        Data.age58 = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::High58);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+    }
+}
+
+void StateMachine::AcquireHPVoHR(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::otherHR);
+    rand = help.getrand ();
+    if (rand < pHPV_oHR) {
+        Data.hpvotherHR = true;
+        Data.ageoHR = Data.CurrentAge;
+        Data.HPVinfections.push_back (Woman::otherHR);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPV18 (Data, Count, Tables, help);
+    }
+}
+
+void StateMachine::AcquireHPVLow(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+
+    StateMachine::GetHPVRisk (Data, Tables, Woman::Low);
+    rand = help.getrand ();
+    if (rand < pHPV_LR) {
+        Data.hpvlo = true;
+        Data.HPVinfections.push_back (Woman::Low);
+        Data.HPVinfectionTimer.push_back (1);
+        Count.HPVcount[Data.CurrentAge]++;
+    } else {
+        StateMachine::AcquireHPV16 (Data, Count, Tables, help);
+    }
+
+}
+
+void StateMachine::GetLesionRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype) {
+
+    switch(genotype){
+        case Woman::No:break;
+        case Woman::Low:
+            pHPV_CIN3 = Tables.pHPV_LR_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_LR_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::otherHR:
+            pHPV_CIN3 = Tables.pHPV_otherHR_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_otherHR_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High16:
+            pHPV_CIN3 = Tables.pHPV_16_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_16_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High18:
+            pHPV_CIN3 = Tables.pHPV_18_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_18_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High31:
+            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High33:
+            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High45:
+            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High52:
+            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High58:
+            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
+            pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
+            break;
+    }
+
+    for (auto & CIN2Lesion : Data.CIN2Lesions){
+        if(CIN2Lesion == genotype){
+            pHPV_CIN2 = 0;
+            pHPV_CIN3 = 0;
+            break;
+        }
+    }
+
+    for (auto & CIN3Lesion : Data.CIN3Lesions){
+        if(CIN3Lesion == genotype){
+            pHPV_CIN2 = 0;
+            pHPV_CIN3 = 0;
+            break;
+        }
+    }
+}
+
+void StateMachine::GetHPVClearanceRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype) {
+
+    switch(genotype){
+        case Woman::No:break;
+        case Woman::Low:
+            pHPV_NL = Tables.pHPV_LR_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::otherHR:
+            pHPV_NL = Tables.pHPV_otherHR_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High16:
+            pHPV_NL = Tables.pHPV_16_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High18:
+            pHPV_NL = Tables.pHPV_18_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High31:
+            pHPV_NL = Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High33:
+            pHPV_NL = Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High45:
+            pHPV_NL = Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High52:
+            pHPV_NL = Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]];
+            break;
+        case Woman::High58:
+            pHPV_NL = Tables.pHPV_high5_NL[Data.HPVinfectionTimer[i]];
+            break;
+    }
+
+    for (auto & CIN2Lesion : Data.CIN2Lesions){
+        if(CIN2Lesion == genotype){
+            pHPV_NL = 0;
+            break;
+        }
+    }
+    for (auto & CIN3Lesion : Data.CIN3Lesions){
+        if(CIN3Lesion == genotype){
+            pHPV_NL = 0;
+            break;
+        }
+    }
+}
+
+void StateMachine::GetCIN2Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype) {
+
+    if(!Data.CIN2Lesions.empty()){
+        switch(genotype){
+            case Woman::No:break;
+            case Woman::Low:
+                pCIN2_HPV = Tables.pCIN2_NL_LR[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::otherHR:
+                pCIN2_HPV = Tables.pCIN2_NL_oHR[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_oHR[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::High16:
+                pCIN2_HPV = Tables.pCIN2_NL_16[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_16[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::High18:
+                pCIN2_HPV = Tables.pCIN2_NL_18[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_18[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::High31:
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::High33:
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::High45:
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::High52:
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]];
+                break;
+            case Woman::High58:
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
+                pCIN2_CA = Tables.pCIN2_CA1_high5[Data.CIN2LesionTimer[i]];
+                break;
+        }
+    }
+}
+
+void StateMachine::GetCIN3Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype) {
+
+    if(!Data.CIN3Lesions.empty()){
+        switch(genotype){
+            case Woman::No:break;
+            case Woman::Low:
+                pCIN3_HPV = Tables.pCIN3_NL_LR[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::otherHR:
+                pCIN3_HPV = Tables.pCIN3_NL_oHR[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_oHR[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::High16:
+                pCIN3_HPV = Tables.pCIN3_NL_16[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_16[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::High18:
+                pCIN3_HPV = Tables.pCIN3_NL_18[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_18[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::High31:
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::High33:
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::High45:
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::High52:
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]];
+                break;
+            case Woman::High58:
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
+                pCIN3_CA = Tables.pCIN3_CA1_high5[Data.CIN3LesionTimer[i]];
+                break;
+        }
+    }
+}
+
+void StateMachine::CountDetectedCancer(Woman &Data, Output &Count) {
+    Count.TotalDetectedCancer[Data.CurrentAge]++;
+    Count.DetectedCAcount[Data.CurrentAge]++;
+}
+
+void StateMachine::CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype) {
+
+    Count.TotalCancer[Data.CurrentAge]++;
+    Count.CAcount[Data.CurrentAge]++;
+    Count.cancerHIVneg++;
+    switch(genotype){
+        case Woman::No:break;
+        case Woman::Low:break;
+        case Woman::otherHR:
+            Count.CAotherHR++;
+            break;
+        case Woman::High16:
+            Count.CA16++;
+            break;
+        case Woman::High18:
+            Count.CA18++;
+            break;
+        case Woman::High31:
+            Count.CA31++;
+            break;
+        case Woman::High33:
+            Count.CA33++;
+            break;
+        case Woman::High45:
+            Count.CA45++;
+            break;
+        case Woman::High52:
+            Count.CA52++;
+            break;
+        case Woman::High58:
+            Count.CA58++;
+            break;
+    }
+}
+
+void StateMachine::CountCIN3(Woman &Data, Output &Count) {
+
+    Count.CIN3total++;
+    if(Data.hpv16){
+        Count.CIN316++;
+    }
+    if(Data.hpv18){
+        Count.CIN318++;
+    }
+    if(Data.hpv31){
+        Count.CIN331++;
+    }
+    if(Data.hpv33){
+        Count.CIN333++;
+    }
+    if(Data.hpv45){
+        Count.CIN345++;
+    }
+    if(Data.hpv52){
+        Count.CIN352++;
+    }
+    if(Data.hpv58){
+        Count.CIN358++;
+    }
+    if(Data.hpvotherHR){
+        Count.CIN3otherHR++;
+    }
+}
+
+void StateMachine::CountCIN2(Woman &Data, Output &Count) {
+
+    Count.CIN2total++;
+    if(Data.hpv16){
+        Count.CIN216++;
+    }
+    if(Data.hpv18){
+        Count.CIN218++;
+    }
+    if(Data.hpv31){
+        Count.CIN231++;
+    }
+    if(Data.hpv33){
+        Count.CIN233++;
+    }
+    if(Data.hpv45){
+        Count.CIN245++;
+    }
+    if(Data.hpv52){
+        Count.CIN252++;
+    }
+    if(Data.hpv58){
+        Count.CIN258++;
+    }
+    if(Data.hpvotherHR){
+        Count.CIN2otherHR++;
+    }
+
+}
+
+void StateMachine::Vaccinate(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
+    if(Data.CurrentAge >= Tables.VaccineStartAge){
+        if (!Data.completevaccine) {
+            if(Data.vaccinedoses == 0){
+                rand = help.getrand ();
+                if (rand < Tables.VaccineCoverage) {
+                    /*Count.cost[y] += Tables.cVaccine;*/
+                    Data.vaccineage = Data.CurrentAge;
+                    Data.vaccinedoses++;
+                    /*Count.cost[y] += Tables.cVaccine;*/
+                    Data.vaccineage = Data.CurrentAge;
+                    Data.vaccinedoses++;
+                    if(Data.vaccinedoses >= 2){
+                        Data.completevaccine = true;
+                    }
+
+                }
+            } else {
+                /*Count.cost[y] += Tables.cVaccine;*/
+                Data.vaccineage = Data.CurrentAge;
+                Data.vaccinedoses++;
+                if(Data.vaccinedoses >= 2){
+                    Data.completevaccine = true;
+                }
+            }
+        }
+    }
+}
+
+double StateMachine::CalcEff(double wanetime, int age, int waneage, double starteff) {
     double slope = -starteff / wanetime;
     double efficacy = (slope * (age - waneage)) + starteff;
 
@@ -1677,542 +1743,676 @@ double StateMachine::GetEff(double wanetime, int age, int waneage, double starte
     return (efficacy);
 }
 
-void StateMachine::AcquireHPV16(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+void StateMachine::GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype) {
 
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_1618[Data.CurrentAge] * immune_deg_16 * vaccine_deg_1618) {
-                Data.hpv = true;
-                Data.hpv16 = true;
-                Data.HPVinfections.push_back (Woman::High16);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpv16) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_1618[Data.CurrentAge] * immune_deg_16 * vaccine_deg_1618) {
-                Data.hpv = true;
-                Data.hpv16 = true;
-                Data.HPVinfections.push_back (Woman::High16);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-}
-
-void StateMachine::AcquireHPV18(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_1618[Data.CurrentAge] * immune_deg_18 * vaccine_deg_1618) {
-                Data.hpv = true;
-                Data.hpv18 = true;
-                Data.HPVinfections.push_back (Woman::High18);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpv18) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_1618[Data.CurrentAge] * immune_deg_18 * vaccine_deg_1618) {
-                Data.hpv = true;
-                Data.hpv18 = true;
-                Data.HPVinfections.push_back (Woman::High18);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-
-}
-
-void StateMachine::AcquireHPV31(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_31 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv31 = true;
-                Data.HPVinfections.push_back (Woman::High31);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpv31) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_31 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv31 = true;
-                Data.HPVinfections.push_back (Woman::High31);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-
-}
-
-void StateMachine::AcquireHPV33(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_33 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv33 = true;
-                Data.HPVinfections.push_back (Woman::High33);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpv33) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_33 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv33 = true;
-                Data.HPVinfections.push_back (Woman::High33);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-
-}
-
-void StateMachine::AcquireHPV45(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_45 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv45 = true;
-                Data.HPVinfections.push_back (Woman::High45);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpv45) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_45 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv45 = true;
-                Data.HPVinfections.push_back (Woman::High45);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-
-}
-
-void StateMachine::AcquireHPV52(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_52 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv52 = true;
-                Data.HPVinfections.push_back (Woman::High52);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpv52) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_52 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv52 = true;
-                Data.HPVinfections.push_back (Woman::High52);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-}
-
-void StateMachine::AcquireHPV58(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_58 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv58 = true;
-                Data.HPVinfections.push_back (Woman::High58);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpv58) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_high5[Data.CurrentAge] * immune_deg_58 * vaccine_deg_high5) {
-                Data.hpv = true;
-                Data.hpv58 = true;
-                Data.HPVinfections.push_back (Woman::High58);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-
-}
-
-void StateMachine::AcquireHPVoHR(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_otherHR[Data.CurrentAge] * immune_deg_otherHR) {
-                Data.hpv = true;
-                Data.hpvotherHR = true;
-                Data.HPVinfections.push_back (Woman::otherHR);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpvotherHR) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_otherHR[Data.CurrentAge] * immune_deg_otherHR) {
-                Data.hpv = true;
-                Data.hpvotherHR = true;
-                Data.HPVinfections.push_back (Woman::otherHR);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-}
-
-void StateMachine::AcquireHPVLow(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    if(!Tables.multiple_infections){
-        if(Data.HPVinfections.empty()){
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_LR[Data.CurrentAge] * immune_deg_LR) {
-                Data.hpv = true;
-                Data.hpvlo = true;
-                Data.HPVinfections.push_back (Woman::Low);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    } else {
-        if (!Data.hpvlo) {
-            rand = help.getrand ();
-            if (rand < Tables.pHPV_LR[Data.CurrentAge] * immune_deg_LR) {
-                Data.hpv = true;
-                Data.hpvlo = true;
-                Data.HPVinfections.push_back (Woman::Low);
-                Data.HPVinfectionTimer.push_back (1);
-                Count.HIVHPVcount[Data.CurrentAge]++;
-            }
-        }
-    }
-
-}
-
-double StateMachine::GetLesionRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype) {
-    if(!Tables.multiple_lesions){
-        if(Data.CIN2Lesions.empty()){
-            switch(genotype){
-                case Woman::No:
-                    break;
-                case Woman::Low:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_LR_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_LR_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::otherHR:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_otherHR_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_otherHR_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High16:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High18:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High31:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High33:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High45:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High52:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High58:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[0]];
-                    } else {
-                        pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
-                    }
-                    break;
-            }
-        } else {
-            pHPV_CIN2 = 0;
-        }
-
-        if(Tables.lesion_progression){
-            if(Data.CIN3Lesions.empty()){
-                switch(genotype){
-                    case Woman::No:
-                        break;
-                    case Woman::Low:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_LR_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_LR_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::otherHR:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_otherHR_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_otherHR_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::High16:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::High18:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::High31:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::High33:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::High45:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::High52:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                    case Woman::High58:
-                        if(Tables.duration_based_persistence){
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[0]];
-                        } else {
-                            pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                        }
-                        break;
-                }
+    switch(genotype){
+        case Woman::No:
+            break;
+        case Woman::Low:
+            if (!Data.hpvlo) {
+                pHPV_LR = Tables.pHPV_LR[Data.CurrentAge] * immune_deg_LR;
             } else {
-                pHPV_CIN3 = 0;
+                pHPV_LR = 0;
             }
-        } else {
-            pHPV_CIN3 = 0;
-        }
-    } else {
-        if(Tables.lesion_progression){
-            switch(genotype){
-                case Woman::No:
-                    break;
-                case Woman::Low:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_LR_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_LR_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::otherHR:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_otherHR_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_otherHR_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High16:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High18:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_1618_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High31:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High33:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High45:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High52:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                    }
-                    break;
-                case Woman::High58:
-                    if(Tables.duration_based_persistence){
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.HPVinfectionTimer[i]];
-                    } else {
-                        pHPV_CIN3 = Tables.pHPV_high5_CIN3[Data.CurrentAge];
-                    }
-                    break;
+            break;
+        case Woman::otherHR:
+            if (!Data.hpvotherHR) {
+                pHPV_oHR = Tables.pHPV_otherHR[Data.CurrentAge] * immune_deg_otherHR;
+            } else {
+                pHPV_oHR = 0;
             }
-        } else {
-            pHPV_CIN3 = 0;
-        }
-        switch(genotype){
+            break;
+        case Woman::High16:
+            if (!Data.hpv16) {
+                pHPV_16 = Tables.pHPV_16[Data.CurrentAge] * immune_deg_16 * vaccine_deg_1618;
+            } else {
+                pHPV_16 = 0;
+            }
+            break;
+        case Woman::High18:
+            if (!Data.hpv18) {
+                pHPV_18 = Tables.pHPV_18[Data.CurrentAge] * immune_deg_18 * vaccine_deg_1618;
+            } else {
+                pHPV_18 = 0;
+            }
+            break;
+        case Woman::High31:
+            if (!Data.hpv31) {
+                pHPV_31 = Tables.pHPV_31[Data.CurrentAge] * immune_deg_31 * vaccine_deg_high5;
+            } else {
+                pHPV_31 = 0;
+            }
+            break;
+        case Woman::High33:
+            if (!Data.hpv33) {
+                pHPV_33 = Tables.pHPV_33[Data.CurrentAge] * immune_deg_33 * vaccine_deg_high5;
+            } else {
+                pHPV_33 = 0;
+            }
+            break;
+        case Woman::High45:
+            if (!Data.hpv45) {
+                pHPV_45 = Tables.pHPV_45[Data.CurrentAge] * immune_deg_45 * vaccine_deg_high5;
+            } else {
+                pHPV_45 = 0;
+            }
+            break;
+        case Woman::High52:
+            if (!Data.hpv52) {
+                pHPV_52 = Tables.pHPV_52[Data.CurrentAge] * immune_deg_52 * vaccine_deg_high5;
+            } else {
+                pHPV_52 = 0;
+            }
+            break;
+        case Woman::High58:
+            if (!Data.hpv58) {
+                pHPV_58 = Tables.pHPV_58[Data.CurrentAge] * immune_deg_58 * vaccine_deg_high5;
+            } else {
+                pHPV_58 = 0;
+            }
+            break;
+    }
+}
+
+void StateMachine::CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help) {
+    for (int i = 0; i < Data.HPVinfections.size (); i++) {
+        switch (Data.HPVinfections[i]) {
             case Woman::No:
                 break;
             case Woman::Low:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_LR_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_LR_CIN2[Data.CurrentAge];
+                if(!Data.hpvlo_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
+                        Data.hpvlo_seropos = true;
+                        Data.hpvlo_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::otherHR:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_otherHR_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_otherHR_CIN2[Data.CurrentAge];
+                if(!Data.hpvotherHR_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
+                        Data.hpvotherHR_seropos = true;
+                        Data.hpvotherHR_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::High16:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.CurrentAge];
+                if(!Data.hpv16_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_16[Data.HPVinfectionTimer[i]]){
+                        Data.hpv16_seropos = true;
+                        Data.hpv16_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::High18:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_1618_CIN2[Data.CurrentAge];
+                if(!Data.hpv18_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_18[Data.HPVinfectionTimer[i]]){
+                        Data.hpv18_seropos = true;
+                        Data.hpv18_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::High31:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
+                if(!Data.hpv31_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
+                        Data.hpv31_seropos = true;
+                        Data.hpv31_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::High33:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
+                if(!Data.hpv33_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
+                        Data.hpv33_seropos = true;
+                        Data.hpv33_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::High45:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
+                if(!Data.hpv45_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
+                        Data.hpv45_seropos = true;
+                        Data.hpv45_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::High52:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
+                if(!Data.hpv52_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
+                        Data.hpv52_seropos = true;
+                        Data.hpv52_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
             case Woman::High58:
-                if(Tables.duration_based_persistence){
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.HPVinfectionTimer[i]];
-                } else {
-                    pHPV_CIN2 = Tables.pHPV_high5_CIN2[Data.CurrentAge];
+                if(!Data.hpv58_seropos){
+                    rand = help.getrand ();
+                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
+                        Data.hpv58_seropos = true;
+                        Data.hpv58_ageseroconvert = Data.CurrentAge;
+                    }
                 }
                 break;
+        }
+    }
+}
+
+void StateMachine::GetImmuneDeg(Woman &Data, Inputs &Tables) {
+
+    // Homogenous Immunity vs. Individual-level
+    // Immune after clearance vs. seropositivity
+
+    if(Tables.HomogenousImmunity){
+        if(Tables.ImmuneAfterClearance){
+            if (Data.wasHPVloflag) {
+                immune_deg_LR = Tables.ImmuneDegree;
+            } else {
+                immune_deg_LR = 1.00;
+            }
+            if (Data.wasHPVotherHRflag) {
+                immune_deg_otherHR = Tables.ImmuneDegree;
+            } else {
+                immune_deg_otherHR = 1.00;
+            }
+            if (Data.wasHPV16flag) {
+                immune_deg_16 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_16 = 1.00;
+            }
+            if (Data.wasHPV18flag) {
+                immune_deg_18 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_18 = 1.00;
+            }
+            if (Data.wasHPV31flag) {
+                immune_deg_31 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_31 = 1.00;
+            }
+            if (Data.wasHPV33flag) {
+                immune_deg_33 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_33 = 1.00;
+            }
+            if (Data.wasHPV45flag) {
+                immune_deg_45 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_45 = 1.00;
+            }
+            if (Data.wasHPV52flag) {
+                immune_deg_52 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_52 = 1.00;
+            }
+            if (Data.wasHPV58flag) {
+                immune_deg_58 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_58 = 1.00;
+            }
+        } else {
+            if (Data.hpvlo_seropos) {
+                immune_deg_LR = Tables.ImmuneDegree;
+            } else {
+                immune_deg_LR = 1.00;
+            }
+            if (Data.hpvotherHR_seropos) {
+                immune_deg_otherHR = Tables.ImmuneDegree;
+            } else {
+                immune_deg_otherHR = 1.00;
+            }
+            if (Data.hpv16_seropos) {
+                immune_deg_16 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_16 = 1.00;
+            }
+            if (Data.hpv18_seropos) {
+                immune_deg_18 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_18 = 1.00;
+            }
+            if (Data.hpv31_seropos) {
+                immune_deg_31 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_31 = 1.00;
+            }
+            if (Data.hpv33_seropos) {
+                immune_deg_33 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_33 = 1.00;
+            }
+            if (Data.hpv45_seropos) {
+                immune_deg_45 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_45 = 1.00;
+            }
+            if (Data.hpv52_seropos) {
+                immune_deg_52 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_52 = 1.00;
+            }
+            if (Data.hpv58_seropos) {
+                immune_deg_58 = Tables.ImmuneDegree;
+            } else {
+                immune_deg_58 = 1.00;
+            }
+        }
+    } else {
+        if(Tables.ImmuneAfterClearance){
+            if (Data.wasHPVloflag) {
+                immune_deg_LR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_LR = 1.00;
+            }
+            if (Data.wasHPVotherHRflag) {
+                immune_deg_otherHR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_otherHR = 1.00;
+            }
+            if (Data.wasHPV16flag) {
+                immune_deg_16 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_16 = 1.00;
+            }
+            if (Data.wasHPV18flag) {
+                immune_deg_18 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_18 = 1.00;
+            }
+            if (Data.wasHPV31flag) {
+                immune_deg_31 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_31 = 1.00;
+            }
+            if (Data.wasHPV33flag) {
+                immune_deg_33 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_33 = 1.00;
+            }
+            if (Data.wasHPV45flag) {
+                immune_deg_45 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_45 = 1.00;
+            }
+            if (Data.wasHPV52flag) {
+                immune_deg_52 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_52 = 1.00;
+            }
+            if (Data.wasHPV58flag) {
+                immune_deg_58 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_58 = 1.00;
+            }
+        } else {
+            if (Data.hpvlo_seropos) {
+                immune_deg_LR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_LR = 1.00;
+            }
+            if (Data.hpvotherHR_seropos) {
+                immune_deg_otherHR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_otherHR = 1.00;
+            }
+            if (Data.hpv16_seropos) {
+                immune_deg_16 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_16 = 1.00;
+            }
+            if (Data.hpv18_seropos) {
+                immune_deg_18 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_18 = 1.00;
+            }
+            if (Data.hpv31_seropos) {
+                immune_deg_31 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_31 = 1.00;
+            }
+            if (Data.hpv33_seropos) {
+                immune_deg_33 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_33 = 1.00;
+            }
+            if (Data.hpv45_seropos) {
+                immune_deg_45 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_45 = 1.00;
+            }
+            if (Data.hpv52_seropos) {
+                immune_deg_52 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_52 = 1.00;
+            }
+            if (Data.hpv58_seropos) {
+                immune_deg_58 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
+            } else {
+                immune_deg_58 = 1.00;
+            }
+        }
+    }
+
+    if(Tables.WaningImmunity){
+        // waning immunity
+        if(Tables.ImmuneAfterClearance){
+            if(immune_deg_LR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageimmunity)) {
+                    immune_deg_LR = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpvlo_ageimmunity), immune_deg_LR);
+                }
+            }
+            if(immune_deg_otherHR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvotherHR_ageimmunity)) {
+                    immune_deg_otherHR = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                      (Tables.ImmuneDuration + Data.hpvotherHR_ageimmunity), immune_deg_otherHR);
+                }
+            }
+            if(immune_deg_16 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv16_ageimmunity)) {
+                    immune_deg_16 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv16_ageimmunity), immune_deg_16);
+                }
+            }
+            if(immune_deg_18 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv18_ageimmunity)) {
+                    immune_deg_18 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv18_ageimmunity), immune_deg_18);
+                }
+            }
+            if(immune_deg_31 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv31_ageimmunity)) {
+                    immune_deg_31 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv31_ageimmunity), immune_deg_31);
+                }
+            }
+            if(immune_deg_33 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv33_ageimmunity)) {
+                    immune_deg_33 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv33_ageimmunity), immune_deg_33);
+                }
+            }
+            if(immune_deg_45 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv45_ageimmunity)) {
+                    immune_deg_45 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv45_ageimmunity), immune_deg_45);
+                }
+            }
+            if(immune_deg_52 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv52_ageimmunity)) {
+                    immune_deg_52 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv52_ageimmunity), immune_deg_52);
+                }
+            }
+            if(immune_deg_58 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv58_ageimmunity)) {
+                    immune_deg_58 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv58_ageimmunity), immune_deg_58);
+                }
+            }
+
+        } else {
+            // seroconvert
+            if(immune_deg_LR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageseroconvert)) {
+                    immune_deg_LR = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpvlo_ageseroconvert), immune_deg_LR);
+                }
+            }
+            if(immune_deg_otherHR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvotherHR_ageseroconvert)) {
+                    immune_deg_otherHR = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                      (Tables.ImmuneDuration + Data.hpvotherHR_ageseroconvert), immune_deg_otherHR);
+                }
+            }
+            if(immune_deg_16 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv16_ageseroconvert)) {
+                    immune_deg_16 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv16_ageseroconvert), immune_deg_16);
+                }
+            }
+            if(immune_deg_18 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv18_ageseroconvert)) {
+                    immune_deg_18 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv18_ageseroconvert), immune_deg_18);
+                }
+            }
+            if(immune_deg_31 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv31_ageseroconvert)) {
+                    immune_deg_31 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv31_ageseroconvert), immune_deg_31);
+                }
+            }
+            if(immune_deg_33 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv33_ageseroconvert)) {
+                    immune_deg_33 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv33_ageseroconvert), immune_deg_33);
+                }
+            }
+            if(immune_deg_45 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv45_ageseroconvert)) {
+                    immune_deg_45 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv45_ageseroconvert), immune_deg_45);
+                }
+            }
+            if(immune_deg_52 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv52_ageseroconvert)) {
+                    immune_deg_52 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv52_ageseroconvert), immune_deg_52);
+                }
+            }
+            if(immune_deg_58 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv58_ageseroconvert)) {
+                    immune_deg_58 = 1 - CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                 (Tables.ImmuneDuration + Data.hpv58_ageseroconvert), immune_deg_58);
+                }
+            }
+        }
+    } else {
+        // accruing immunity
+        if(Tables.ImmuneAfterClearance){
+            if(immune_deg_LR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageimmunity)) {
+                    immune_deg_LR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpvlo_ageimmunity), immune_deg_LR);
+                }
+            }
+            if(immune_deg_otherHR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvotherHR_ageimmunity)) {
+                    immune_deg_otherHR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                  (Tables.ImmuneDuration + Data.hpvotherHR_ageimmunity), immune_deg_otherHR);
+                }
+            }
+            if(immune_deg_16 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv16_ageimmunity)) {
+                    immune_deg_16 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv16_ageimmunity), immune_deg_16);
+                }
+            }
+            if(immune_deg_18 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv18_ageimmunity)) {
+                    immune_deg_18 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv18_ageimmunity), immune_deg_18);
+                }
+            }
+            if(immune_deg_31 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv31_ageimmunity)) {
+                    immune_deg_31 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv31_ageimmunity), immune_deg_31);
+                }
+            }
+            if(immune_deg_33 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv33_ageimmunity)) {
+                    immune_deg_33 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv33_ageimmunity), immune_deg_33);
+                }
+            }
+            if(immune_deg_45 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv45_ageimmunity)) {
+                    immune_deg_45 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv45_ageimmunity), immune_deg_45);
+                }
+            }
+            if(immune_deg_52 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv52_ageimmunity)) {
+                    immune_deg_52 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv52_ageimmunity), immune_deg_52);
+                }
+            }
+            if(immune_deg_58 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv58_ageimmunity)) {
+                    immune_deg_58 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv58_ageimmunity), immune_deg_58);
+                }
+            }
+
+        } else {
+            // seroconvert
+            if(immune_deg_LR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageseroconvert)) {
+                    immune_deg_LR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpvlo_ageseroconvert), immune_deg_LR);
+                }
+            }
+            if(immune_deg_otherHR < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvotherHR_ageseroconvert)) {
+                    immune_deg_otherHR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                                  (Tables.ImmuneDuration + Data.hpvotherHR_ageseroconvert), immune_deg_otherHR);
+                }
+            }
+            if(immune_deg_16 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv16_ageseroconvert)) {
+                    immune_deg_16 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv16_ageseroconvert), immune_deg_16);
+                }
+            }
+            if(immune_deg_18 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv18_ageseroconvert)) {
+                    immune_deg_18 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv18_ageseroconvert), immune_deg_18);
+                }
+            }
+            if(immune_deg_31 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv31_ageseroconvert)) {
+                    immune_deg_31 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv31_ageseroconvert), immune_deg_31);
+                }
+            }
+            if(immune_deg_33 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv33_ageseroconvert)) {
+                    immune_deg_33 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv33_ageseroconvert), immune_deg_33);
+                }
+            }
+            if(immune_deg_45 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv45_ageseroconvert)) {
+                    immune_deg_45 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv45_ageseroconvert), immune_deg_45);
+                }
+            }
+            if(immune_deg_52 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv52_ageseroconvert)) {
+                    immune_deg_52 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv52_ageseroconvert), immune_deg_52);
+                }
+            }
+            if(immune_deg_58 < 1){
+                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv58_ageseroconvert)) {
+                    immune_deg_58 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
+                                             (Tables.ImmuneDuration + Data.hpv58_ageseroconvert), immune_deg_58);
+                }
+            }
+        }
+
+    }
+
+}
+
+void StateMachine::GetBackgroundMortality(Woman &Data, Inputs &Tables, int CurrentModelYear) {
+    int index;
+    if (CurrentModelYear < 1950) {
+        index = 0;
+    } else if (CurrentModelYear < 2085) {
+        index = CurrentModelYear - 1950;
+    } else {
+        index = 134;
+    }
+
+    if (Data.CurrentAge < Tables.ModelStopAge) {
+        mASR = Tables.ASRMortality[Data.CurrentAge][index];
+    } else {
+        mASR = 1;
+    }
+}
+
+void StateMachine::SendforTreatment(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help) {
+
+    if(Data.cancer){
+        switch (Data.cancerstage) {
+            case Woman::Stage0:
+                break;
+            case Woman::Stage1:
+                Data.cancerstage = Data.Stage1d;
+                Count.cost[y] += Tables.cStage1Ca;
+                Count.costs[y][11]++;
+                break;
+            case Woman::Stage2:
+                Data.cancerstage = Data.Stage2d;
+                Count.cost[y] += Tables.cStage2Ca;
+                Count.costs[y][12]++;
+                break;
+            case Woman::Stage3:
+                Data.cancerstage = Data.Stage3d;
+                Count.cost[y] += Tables.cStage3Ca;
+                Count.costs[y][13]++;
+                break;
+            case Woman::Stage1d:break;
+            case Woman::Stage2d:break;
+            case Woman::Stage3d:break;
+        }
+    } else {
+        if (!Data.CIN3Lesions.empty ()) {
+            rand = help.getrand();
+            if(rand < Tables.CryoAvail){
+                rand = help.getrand();
+                if (rand < Tables.cryoelig_CIN3) {
+                    StateMachine::Cryo (Data, Tables,  Count, y, help);
+                } else {
+                    StateMachine::LLETZ (Data, Tables,  Count, y, help);
+                }
+            } else {
+                StateMachine::LLETZ (Data, Tables,  Count, y, help);
+            }
+        } else if (!Data.CIN2Lesions.empty ()) {
+            rand = help.getrand();
+            if(rand < Tables.CryoAvail){
+                rand = help.getrand();
+                if (rand < Tables.cryoelig_CIN2) {
+                    StateMachine::Cryo (Data, Tables,  Count, y, help);
+                } else {
+                    StateMachine::LLETZ (Data, Tables,  Count, y, help);
+                }
+            } else {
+                StateMachine::LLETZ (Data, Tables,  Count, y, help);
+            }
+        } else {
+            rand = help.getrand();
+            if(rand < Tables.CryoAvail){
+                rand = help.getrand();
+                if (rand < Tables.cryoelig_NL) {
+                    StateMachine::Cryo (Data, Tables,  Count, y, help);
+                } else {
+                    StateMachine::LLETZ (Data, Tables,  Count, y, help);
+                }
+            } else {
+                StateMachine::LLETZ (Data, Tables,  Count, y, help);
+            }
         }
     }
 }

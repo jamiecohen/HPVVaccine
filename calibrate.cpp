@@ -40,45 +40,43 @@ calibrate::~calibrate(void) {
 
 }
 
-void calibrate::CalculateGOF(int n_sims) {
-
+void calibrate::CalculateGOF(int n_sims, double tuning_factor, double rand) {
     GOF.push_back (WeightedDistance (saved_output[n_sims][0], calib_targs[0], calib_targs_SD[0]));
     for (int i = 1; i < calib_targs.size(); i ++){
         GOF[n_sims] += WeightedDistance (saved_output[n_sims][i], calib_targs[i], calib_targs_SD[i]);
     }
-
-
     if (n_sims == 0){
         GOF_min = GOF[0];
         best_params = calib_params[0];
         best_output = saved_output[0];
-
     } else {
-
         auto it = std::min_element(std::begin(GOF), std::end(GOF));
         int index = distance(GOF.begin(), it);
         GOF_min_run = GOF[index];
-        if (GOF_min_run < GOF_min){
+        if (GOF_min_run <= GOF_min){
             GOF_min = GOF_min_run;
             best_params = calib_params[index];
             best_output = saved_output[index];
+        } else {
+            calibrate::GetProbAcceptance (GOF_min_run, GOF_min, n_sims, tuning_factor);
+            if (rand < ProbAcceptance){
+                GOF_min = GOF_min_run;
+                best_params = calib_params[index];
+                best_output = saved_output[index];
+            }
         }
     }
 }
 
-std::vector<double> calibrate::loadCalibData(int n_params, int n_sim, int tuning_factor) {
+std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
 
     if(n_sim == 0){
-
-        for (int i = 0; i < n_params; i ++ ){
+        for (int i = 0; i < n_params; i++){
             calib_params[n_sim][i] = rnormal_trunc (multipliers[i][0], multipliers[i][3], multipliers[i][2], multipliers[i][1]);
         }
-
     } else {
-        tuned_SD = tuningparam (n_sim, n_params, tuning_factor);
-
-        for (int i = 0; i < n_params; i ++ ){
-            calib_params[n_sim][i] = rnormal_trunc (best_params[i], tuned_SD[i], multipliers[i][2], multipliers[i][1]);
+        for (int i = 0; i < n_params; i++){
+            calib_params[n_sim][i] = rnormal_trunc (best_params[i], multipliers[i][3], multipliers[i][2], multipliers[i][1]);
         }
     }
 
@@ -105,11 +103,7 @@ double calibrate::rnormal_trunc(double mu, double sigma, double upper, double lo
     return(prob);
 }
 
-vector<double> calibrate::tuningparam(int n_sims, int n_param, int tuning_factor) {
-    vector<double> newSD;
-    for (int i = 0; i < n_param; i++){
-        newSD.push_back (multipliers[i][3]/pow(tuning_factor,n_sims));
-    }
-
-    return newSD;
+void calibrate::GetProbAcceptance(double neighbor, double current, int n_sims, double temp) {
+    double temperature = pow(temp,n_sims);
+    ProbAcceptance = exp((current - neighbor) / temperature);
 }
