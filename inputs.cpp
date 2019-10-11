@@ -149,8 +149,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string MultipliersFileName = "MultipliersFile";
     string MultipliersNamesFileName = "MultipliersNamesFile";
     string SimulationsName = "Simulations";
-    string HomogenousImmunityName = "HomogenousImmunity";
-    string ImmuneReduxFileName = "ImmuneReduxFile";
     string ImmuneAfterClearanceName = "ImmuneAfterClearance";
     string SeroConversionFileName = "SeroConversionFile";
 
@@ -370,19 +368,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
-    ImmuneReduxFile.append(DataFolder);
-    ImmuneReduxFile.append(RunsFile.GetValue(CurKey, ImmuneReduxFileName));
-    Infile.open(ImmuneReduxFile, ios::in);
-    if(Infile.fail())
-    {
-        cerr << "\nError: Unable to open file: " << ImmuneReduxFile << endl;
-        exit(1);
-    }
-
-    loadData (Infile, ImmuneRedux);
-    Infile.close();
-    Infile.clear();
-
     SeroConversionFile.append(DataFolder);
     SeroConversionFile.append(RunsFile.GetValue(CurKey, SeroConversionFileName));
     Infile.open(SeroConversionFile, ios::in);
@@ -396,7 +381,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
-    HomogenousImmunity = RunsFile.GetValueI (CurKey, HomogenousImmunityName);
     ImmuneAfterClearance = RunsFile.GetValueI(CurKey, ImmuneAfterClearanceName);
     ScreenStartAge = RunsFile.GetValueI(CurKey, ScreenStartAgeName);
     ScreenStopAge = RunsFile.GetValueI(CurKey, ScreenStopAgeName);
@@ -573,12 +557,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
 }
 
 void Inputs::loadVariables() {
-
-    ImmuneRedux_c200 = ImmuneRedux[0][0];
-    ImmuneRedux_c200350 = ImmuneRedux[1][0];
-    ImmuneRedux_c350500 = ImmuneRedux[2][0];
-    ImmuneRedux_c500 = ImmuneRedux[3][0];
-    ImmuneRedux_uninfected = ImmuneRedux[4][0];
 
     for(int j = 0; j < 5; j++) {
         pSeroConvert_16[j] = SeroConversion[j][0];

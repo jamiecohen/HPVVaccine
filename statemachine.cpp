@@ -1906,201 +1906,102 @@ void StateMachine::CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help
 
 void StateMachine::GetImmuneDeg(Woman &Data, Inputs &Tables) {
 
-    // Homogenous Immunity vs. Individual-level
     // Immune after clearance vs. seropositivity
-
-    if(Tables.HomogenousImmunity){
-        if(Tables.ImmuneAfterClearance){
-            if (Data.wasHPVloflag) {
-                immune_deg_LR = Tables.ImmuneDegree;
-            } else {
-                immune_deg_LR = 1.00;
-            }
-            if (Data.wasHPVotherHRflag) {
-                immune_deg_otherHR = Tables.ImmuneDegree;
-            } else {
-                immune_deg_otherHR = 1.00;
-            }
-            if (Data.wasHPV16flag) {
-                immune_deg_16 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_16 = 1.00;
-            }
-            if (Data.wasHPV18flag) {
-                immune_deg_18 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_18 = 1.00;
-            }
-            if (Data.wasHPV31flag) {
-                immune_deg_31 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_31 = 1.00;
-            }
-            if (Data.wasHPV33flag) {
-                immune_deg_33 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_33 = 1.00;
-            }
-            if (Data.wasHPV45flag) {
-                immune_deg_45 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_45 = 1.00;
-            }
-            if (Data.wasHPV52flag) {
-                immune_deg_52 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_52 = 1.00;
-            }
-            if (Data.wasHPV58flag) {
-                immune_deg_58 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_58 = 1.00;
-            }
+    if (Tables.ImmuneAfterClearance) {
+        if (Data.wasHPVloflag) {
+            immune_deg_LR = Tables.ImmuneDegree;
         } else {
-            if (Data.hpvlo_seropos) {
-                immune_deg_LR = Tables.ImmuneDegree;
-            } else {
-                immune_deg_LR = 1.00;
-            }
-            if (Data.hpvotherHR_seropos) {
-                immune_deg_otherHR = Tables.ImmuneDegree;
-            } else {
-                immune_deg_otherHR = 1.00;
-            }
-            if (Data.hpv16_seropos) {
-                immune_deg_16 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_16 = 1.00;
-            }
-            if (Data.hpv18_seropos) {
-                immune_deg_18 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_18 = 1.00;
-            }
-            if (Data.hpv31_seropos) {
-                immune_deg_31 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_31 = 1.00;
-            }
-            if (Data.hpv33_seropos) {
-                immune_deg_33 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_33 = 1.00;
-            }
-            if (Data.hpv45_seropos) {
-                immune_deg_45 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_45 = 1.00;
-            }
-            if (Data.hpv52_seropos) {
-                immune_deg_52 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_52 = 1.00;
-            }
-            if (Data.hpv58_seropos) {
-                immune_deg_58 = Tables.ImmuneDegree;
-            } else {
-                immune_deg_58 = 1.00;
-            }
+            immune_deg_LR = 1.00;
+        }
+        if (Data.wasHPVotherHRflag) {
+            immune_deg_otherHR = Tables.ImmuneDegree;
+        } else {
+            immune_deg_otherHR = 1.00;
+        }
+        if (Data.wasHPV16flag) {
+            immune_deg_16 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_16 = 1.00;
+        }
+        if (Data.wasHPV18flag) {
+            immune_deg_18 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_18 = 1.00;
+        }
+        if (Data.wasHPV31flag) {
+            immune_deg_31 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_31 = 1.00;
+        }
+        if (Data.wasHPV33flag) {
+            immune_deg_33 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_33 = 1.00;
+        }
+        if (Data.wasHPV45flag) {
+            immune_deg_45 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_45 = 1.00;
+        }
+        if (Data.wasHPV52flag) {
+            immune_deg_52 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_52 = 1.00;
+        }
+        if (Data.wasHPV58flag) {
+            immune_deg_58 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_58 = 1.00;
         }
     } else {
-        if(Tables.ImmuneAfterClearance){
-            if (Data.wasHPVloflag) {
-                immune_deg_LR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_LR = 1.00;
-            }
-            if (Data.wasHPVotherHRflag) {
-                immune_deg_otherHR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_otherHR = 1.00;
-            }
-            if (Data.wasHPV16flag) {
-                immune_deg_16 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_16 = 1.00;
-            }
-            if (Data.wasHPV18flag) {
-                immune_deg_18 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_18 = 1.00;
-            }
-            if (Data.wasHPV31flag) {
-                immune_deg_31 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_31 = 1.00;
-            }
-            if (Data.wasHPV33flag) {
-                immune_deg_33 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_33 = 1.00;
-            }
-            if (Data.wasHPV45flag) {
-                immune_deg_45 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_45 = 1.00;
-            }
-            if (Data.wasHPV52flag) {
-                immune_deg_52 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_52 = 1.00;
-            }
-            if (Data.wasHPV58flag) {
-                immune_deg_58 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_58 = 1.00;
-            }
+        if (Data.hpvlo_seropos) {
+            immune_deg_LR = Tables.ImmuneDegree;
         } else {
-            if (Data.hpvlo_seropos) {
-                immune_deg_LR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_LR = 1.00;
-            }
-            if (Data.hpvotherHR_seropos) {
-                immune_deg_otherHR = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_otherHR = 1.00;
-            }
-            if (Data.hpv16_seropos) {
-                immune_deg_16 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_16 = 1.00;
-            }
-            if (Data.hpv18_seropos) {
-                immune_deg_18 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_18 = 1.00;
-            }
-            if (Data.hpv31_seropos) {
-                immune_deg_31 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_31 = 1.00;
-            }
-            if (Data.hpv33_seropos) {
-                immune_deg_33 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_33 = 1.00;
-            }
-            if (Data.hpv45_seropos) {
-                immune_deg_45 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_45 = 1.00;
-            }
-            if (Data.hpv52_seropos) {
-                immune_deg_52 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_52 = 1.00;
-            }
-            if (Data.hpv58_seropos) {
-                immune_deg_58 = Tables.ImmuneDegree * Tables.ImmuneRedux_uninfected;
-            } else {
-                immune_deg_58 = 1.00;
-            }
+            immune_deg_LR = 1.00;
+        }
+        if (Data.hpvotherHR_seropos) {
+            immune_deg_otherHR = Tables.ImmuneDegree;
+        } else {
+            immune_deg_otherHR = 1.00;
+        }
+        if (Data.hpv16_seropos) {
+            immune_deg_16 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_16 = 1.00;
+        }
+        if (Data.hpv18_seropos) {
+            immune_deg_18 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_18 = 1.00;
+        }
+        if (Data.hpv31_seropos) {
+            immune_deg_31 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_31 = 1.00;
+        }
+        if (Data.hpv33_seropos) {
+            immune_deg_33 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_33 = 1.00;
+        }
+        if (Data.hpv45_seropos) {
+            immune_deg_45 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_45 = 1.00;
+        }
+        if (Data.hpv52_seropos) {
+            immune_deg_52 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_52 = 1.00;
+        }
+        if (Data.hpv58_seropos) {
+            immune_deg_58 = Tables.ImmuneDegree;
+        } else {
+            immune_deg_58 = 1.00;
         }
     }
 
     if(Tables.WaningImmunity){
-        // waning immunity
         if(Tables.ImmuneAfterClearance){
             if(immune_deg_LR < 1){
                 if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageimmunity)) {
@@ -2214,124 +2115,7 @@ void StateMachine::GetImmuneDeg(Woman &Data, Inputs &Tables) {
                 }
             }
         }
-    } else {
-        // accruing immunity
-        if(Tables.ImmuneAfterClearance){
-            if(immune_deg_LR < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageimmunity)) {
-                    immune_deg_LR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpvlo_ageimmunity), immune_deg_LR);
-                }
-            }
-            if(immune_deg_otherHR < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvotherHR_ageimmunity)) {
-                    immune_deg_otherHR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                                  (Tables.ImmuneDuration + Data.hpvotherHR_ageimmunity), immune_deg_otherHR);
-                }
-            }
-            if(immune_deg_16 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv16_ageimmunity)) {
-                    immune_deg_16 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv16_ageimmunity), immune_deg_16);
-                }
-            }
-            if(immune_deg_18 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv18_ageimmunity)) {
-                    immune_deg_18 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv18_ageimmunity), immune_deg_18);
-                }
-            }
-            if(immune_deg_31 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv31_ageimmunity)) {
-                    immune_deg_31 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv31_ageimmunity), immune_deg_31);
-                }
-            }
-            if(immune_deg_33 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv33_ageimmunity)) {
-                    immune_deg_33 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv33_ageimmunity), immune_deg_33);
-                }
-            }
-            if(immune_deg_45 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv45_ageimmunity)) {
-                    immune_deg_45 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv45_ageimmunity), immune_deg_45);
-                }
-            }
-            if(immune_deg_52 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv52_ageimmunity)) {
-                    immune_deg_52 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv52_ageimmunity), immune_deg_52);
-                }
-            }
-            if(immune_deg_58 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv58_ageimmunity)) {
-                    immune_deg_58 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv58_ageimmunity), immune_deg_58);
-                }
-            }
-
-        } else {
-            // seroconvert
-            if(immune_deg_LR < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageseroconvert)) {
-                    immune_deg_LR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpvlo_ageseroconvert), immune_deg_LR);
-                }
-            }
-            if(immune_deg_otherHR < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvotherHR_ageseroconvert)) {
-                    immune_deg_otherHR = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                                  (Tables.ImmuneDuration + Data.hpvotherHR_ageseroconvert), immune_deg_otherHR);
-                }
-            }
-            if(immune_deg_16 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv16_ageseroconvert)) {
-                    immune_deg_16 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv16_ageseroconvert), immune_deg_16);
-                }
-            }
-            if(immune_deg_18 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv18_ageseroconvert)) {
-                    immune_deg_18 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv18_ageseroconvert), immune_deg_18);
-                }
-            }
-            if(immune_deg_31 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv31_ageseroconvert)) {
-                    immune_deg_31 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv31_ageseroconvert), immune_deg_31);
-                }
-            }
-            if(immune_deg_33 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv33_ageseroconvert)) {
-                    immune_deg_33 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv33_ageseroconvert), immune_deg_33);
-                }
-            }
-            if(immune_deg_45 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv45_ageseroconvert)) {
-                    immune_deg_45 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv45_ageseroconvert), immune_deg_45);
-                }
-            }
-            if(immune_deg_52 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv52_ageseroconvert)) {
-                    immune_deg_52 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv52_ageseroconvert), immune_deg_52);
-                }
-            }
-            if(immune_deg_58 < 1){
-                if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpv58_ageseroconvert)) {
-                    immune_deg_58 = CalcEff (Tables.ImmuneWaneTime, Data.CurrentAge,
-                                             (Tables.ImmuneDuration + Data.hpv58_ageseroconvert), immune_deg_58);
-                }
-            }
-        }
-
     }
-
 }
 
 void StateMachine::GetBackgroundMortality(Woman &Data, Inputs &Tables, int CurrentModelYear) {

@@ -89,7 +89,6 @@ public:
     double VaccineEfficacySexualHIV;
     double VaccineWaneTime;
     int VaccineDose;
-    bool HomogenousImmunity;
     bool ImmuneAfterClearance;
     bool WaningImmunity;
     int ImmuneDuration;
@@ -98,9 +97,6 @@ public:
     double pSeroConvert_16[5];
     double pSeroConvert_18[5];
     double pSeroConvert_high5[5];
-
-    std::string ImmuneReduxFile;
-    std::vector< std::vector<double> > ImmuneRedux;
 
     std::string SeroConversionFile;
     std::vector< std::vector<double> > SeroConversion;
@@ -152,11 +148,6 @@ public:
     //[Multipliers] variable names
     //[NaturalImmunity Multipliers] variable names
     double ImmuneDegree;
-    double ImmuneRedux_uninfected;
-    double ImmuneRedux_c200;
-    double ImmuneRedux_c200350;
-    double ImmuneRedux_c350500;
-    double ImmuneRedux_c500;
 
     // new parameters
 
