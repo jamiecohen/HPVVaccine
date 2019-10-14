@@ -1931,88 +1931,173 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help) {
             immune_deg_LR = 1.00;
         }
         if (Data.wasHPVotherHRflag) {
-            immune_deg_otherHR = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_otherHR = 0;
+            } else {
+                immune_deg_otherHR = 1.00;
+            }
         } else {
             immune_deg_otherHR = 1.00;
         }
         if (Data.wasHPV16flag) {
-            immune_deg_16 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_16 = 0;
+            } else {
+                immune_deg_16 = 1.00;
+            }
         } else {
             immune_deg_16 = 1.00;
         }
         if (Data.wasHPV18flag) {
-            immune_deg_18 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_18 = 0;
+            } else {
+                immune_deg_18 = 1.00;
+            }
         } else {
             immune_deg_18 = 1.00;
         }
         if (Data.wasHPV31flag) {
-            immune_deg_31 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_31 = 0;
+            } else {
+                immune_deg_31 = 1.00;
+            }
         } else {
             immune_deg_31 = 1.00;
         }
         if (Data.wasHPV33flag) {
-            immune_deg_33 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_33 = 0;
+            } else {
+                immune_deg_33 = 1.00;
+            }
         } else {
             immune_deg_33 = 1.00;
         }
         if (Data.wasHPV45flag) {
-            immune_deg_45 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_45 = 0;
+            } else {
+                immune_deg_45 = 1.00;
+            }
         } else {
             immune_deg_45 = 1.00;
         }
         if (Data.wasHPV52flag) {
-            immune_deg_52 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_52 = 0;
+            } else {
+                immune_deg_52 = 1.00;
+            }
         } else {
             immune_deg_52 = 1.00;
         }
         if (Data.wasHPV58flag) {
-            immune_deg_58 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_58 = 0;
+            } else {
+                immune_deg_58 = 1.00;
+            }
         } else {
             immune_deg_58 = 1.00;
         }
     } else {
         if (Data.hpvlo_seropos) {
-            immune_deg_LR = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_LR = 0;
+            } else {
+                immune_deg_LR = 1.00;
+            }
         } else {
             immune_deg_LR = 1.00;
         }
         if (Data.hpvotherHR_seropos) {
-            immune_deg_otherHR = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_otherHR = 0;
+            } else {
+                immune_deg_otherHR = 1.00;
+            }
         } else {
             immune_deg_otherHR = 1.00;
         }
         if (Data.hpv16_seropos) {
-            immune_deg_16 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_16 = 0;
+            } else {
+                immune_deg_16 = 1.00;
+            }
         } else {
             immune_deg_16 = 1.00;
         }
         if (Data.hpv18_seropos) {
-            immune_deg_18 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_18 = 0;
+            } else {
+                immune_deg_18 = 1.00;
+            }
         } else {
             immune_deg_18 = 1.00;
         }
         if (Data.hpv31_seropos) {
-            immune_deg_31 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_31 = 0;
+            } else {
+                immune_deg_31 = 1.00;
+            }
         } else {
             immune_deg_31 = 1.00;
         }
         if (Data.hpv33_seropos) {
-            immune_deg_33 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_33 = 0;
+            } else {
+                immune_deg_33 = 1.00;
+            }
         } else {
             immune_deg_33 = 1.00;
         }
         if (Data.hpv45_seropos) {
-            immune_deg_45 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_45 = 0;
+            } else {
+                immune_deg_45 = 1.00;
+            }
         } else {
             immune_deg_45 = 1.00;
         }
         if (Data.hpv52_seropos) {
-            immune_deg_52 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_52 = 0;
+            } else {
+                immune_deg_52 = 1.00;
+            }
         } else {
             immune_deg_52 = 1.00;
         }
         if (Data.hpv58_seropos) {
-            immune_deg_58 = Tables.ImmuneDegree;
+            rand = help.getrand ();
+            if (rand < Tables.ImmuneDegree){
+                immune_deg_58 = 0;
+            } else {
+                immune_deg_58 = 1.00;
+            }
         } else {
             immune_deg_58 = 1.00;
         }
