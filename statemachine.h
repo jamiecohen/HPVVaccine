@@ -5,8 +5,6 @@
 #ifndef HPVVaccine_STATEMACHINE_H
 #define HPVVaccine_STATEMACHINE_H
 
-
-
 #include <vector>
 #include "woman.h"
 #include "inputs.h"
@@ -18,7 +16,6 @@
 #include <future>
 #include "helper.h"
 
-
 class StateMachine {
 public:
 
@@ -27,37 +24,15 @@ public:
     double pHPV_CIN2;
     double pHPV_CIN3;
     double pCIN3_HPV;
-    double pCIN3_CIN2;
     double pCIN2_HPV;
     double pCIN3_CA;
     double pCIN2_CA;
-    double pCIN2_CIN3;
     double mASR;
     double rand;
-    double immune_deg_LR;
-    double immune_deg_otherHR;
-    double immune_deg_16;
-    double immune_deg_18;
-    double immune_deg_31;
-    double immune_deg_33;
-    double immune_deg_45;
-    double immune_deg_52;
-    double immune_deg_58;
     double vaccine_deg_1618;
     double vaccine_deg_high5;
-
-    double immune_eff_LR;
-    double immune_eff_otherHR;
-    double immune_eff_16;
-    double immune_eff_18;
-    double immune_eff_31;
-    double immune_eff_33;
-    double immune_eff_45;
-    double immune_eff_52;
-    double immune_eff_58;
     double vaccine_eff_1618;
     double vaccine_eff_high5;
-
     int ScreenFrequency;
     double pHPV_16;
     double pHPV_18;
@@ -80,13 +55,13 @@ public:
     void runPopulationYear(Woman &Data, Inputs &Tables, Output &Count,  int y, int CurrentModelYear, bool burnin, helper &help);
     void HPVScreen(Woman &Data, Inputs &Tables, Output &Count, int y, helper &help);
     void CytoScreen(Woman &Data, Inputs &Tables,  Output &Count, int y, helper &help);
-    static void ClearHPV(Woman &Data, Woman::hpvT genotype);
+    void ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hpvT genotype);
     void StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help);
     void GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
-    void GetImmuneDeg(Woman &Data, Inputs &Tables);
-    void GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help);
-    void CheckWaningImmunity(Woman &Data, Inputs &Tables);
-    void UpdateNaturalImmunity(Woman &Data, Inputs &Tables, helper &help);
+    static void GetImmuneDeg(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
+    void GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Woman::hpvT genotype);
+    static void GetSeropositivity(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
+    static void CheckWaningImmunity(Woman &Data, Inputs &Tables);
     void CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help);
     void AcquireHPV16(Woman &Data, Output &Count, Inputs &Tables, helper &help);
     void AcquireHPV18(Woman &Data, Output &Count, Inputs &Tables, helper &help);

@@ -13,7 +13,7 @@ using namespace std;
 
 //Value constructor
 
-Woman::Woman(int Age, int StartYear, double rand) {
+Woman::Woman(int Age, int StartYear) {
 
     CIN16 = 0;
     CIN18 = 0;
@@ -48,15 +48,6 @@ Woman::Woman(int Age, int StartYear, double rand) {
     hpv52_ageimmunity = 0;
     hpv58_ageimmunity = 0;
     hpvotherHR_ageimmunity = 0;
-    hpvlo_ageseroconvert = 0;
-    hpv16_ageseroconvert = 0;
-    hpv18_ageseroconvert = 0;
-    hpv31_ageseroconvert = 0;
-    hpv33_ageseroconvert = 0;
-    hpv45_ageseroconvert = 0;
-    hpv52_ageseroconvert = 0;
-    hpv58_ageseroconvert = 0;
-    hpvotherHR_ageseroconvert = 0;
     hpvlo = false;
     hpv16 = false;
     hpv18 = false;
@@ -84,6 +75,15 @@ Woman::Woman(int Age, int StartYear, double rand) {
     wasHPV58flag = false;
     wasHPVloflag = false;
     wasHPVotherHRflag = false;
+    immune_deg_LR = 1;
+    immune_deg_otherHR = 1;
+    immune_deg_16 = 1;
+    immune_deg_18 = 1;
+    immune_deg_31 = 1;
+    immune_deg_33 = 1;
+    immune_deg_45 = 1;
+    immune_deg_52 = 1;
+    immune_deg_58 = 1;
     HPVinfections.clear();
     HPVinfectionTimer.clear();
     CIN2Lesions.clear();
@@ -161,6 +161,24 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int Va
     wasHPV58flag = false;
     wasHPVloflag = false;
     wasHPVotherHRflag = false;
+    immune_deg_LR = 1;
+    immune_deg_otherHR = 1;
+    immune_deg_16 = 1;
+    immune_deg_18 = 1;
+    immune_deg_31 = 1;
+    immune_deg_33 = 1;
+    immune_deg_45 = 1;
+    immune_deg_52 = 1;
+    immune_deg_58 = 1;
+    hpvlo_ageimmunity = 0;
+    hpv16_ageimmunity = 0;
+    hpv18_ageimmunity = 0;
+    hpv31_ageimmunity = 0;
+    hpv33_ageimmunity = 0;
+    hpv45_ageimmunity = 0;
+    hpv52_ageimmunity = 0;
+    hpv58_ageimmunity = 0;
+    hpvotherHR_ageimmunity = 0;
     HPVinfections.clear();
     HPVinfectionTimer.clear();
     CIN2Lesions.clear();

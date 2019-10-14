@@ -58,7 +58,6 @@ public:
     std::string HPVIncidenceFile;
     std::vector< std::vector<double> > HPVInc;
 
-
     std::string SymptomDetectionFile;
     std::vector< std::vector<double> > sympdet;
 
@@ -87,8 +86,7 @@ public:
     int VaccineStartAge;
     double VaccineWaneTime;
     int VaccineDose;
-    bool HomogenousImmunity;
-    bool ImmuneAfterClearance;
+    std::string MechanismofImmunity;
     bool WaningImmunity;
     int ImmuneDuration;
     int ImmuneWaneTime;
@@ -145,6 +143,9 @@ public:
     //[NaturalImmunity Multipliers] variable names
     double ImmuneDegree;
     double ImmuneFactor;
+
+    enum Immunity {Degree, Factor, Seropositivity};
+    Immunity ImmuneMechanism;
 
     // new parameters
 

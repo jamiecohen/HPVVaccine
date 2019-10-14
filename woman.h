@@ -58,16 +58,6 @@ public:
     int hpv58_ageimmunity;
     int hpvotherHR_ageimmunity;
 
-    int hpvlo_ageseroconvert;
-    int hpv16_ageseroconvert;
-    int hpv18_ageseroconvert;
-    int hpv31_ageseroconvert;
-    int hpv33_ageseroconvert;
-    int hpv45_ageseroconvert;
-    int hpv52_ageseroconvert;
-    int hpv58_ageseroconvert;
-    int hpvotherHR_ageseroconvert;
-
     bool wasHPVloflag;
     bool wasHPVotherHRflag;
     bool wasHPV16flag;
@@ -77,6 +67,17 @@ public:
     bool wasHPV45flag;
     bool wasHPV52flag;
     bool wasHPV58flag;
+
+    double immune_deg_LR;
+    double immune_deg_otherHR;
+    double immune_deg_16;
+    double immune_deg_18;
+    double immune_deg_31;
+    double immune_deg_33;
+    double immune_deg_45;
+    double immune_deg_52;
+    double immune_deg_58;
+
     int CurrentYear;
     int CurrentAge;
     bool    Alive;
@@ -121,7 +122,7 @@ public:
     int ageoHR;
     double rand;
 
-    Woman(int Age, int StartYear, double rand); // constructor used for calibration
+    Woman(int Age, int StartYear); // constructor used for calibration
     Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, std::vector<std::vector<double> > screenstats, double colpocov, double vaccinecov); // constructor used for analysis
     ~Woman();
 

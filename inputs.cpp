@@ -69,7 +69,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string ScreenCoverageName = "ScreenCoverage";
     string ScreenComplianceName = "ScreenCompliance";
     string VaccineCoverageName = "VaccineCoverage";
-    string HomogenousImmunityName = "HomogenousImmunity";
+    string MechanismofImmunityName = "MechanismofImmunity";
     string WaningImmunityName = "WaningImmunity";
     string ImmuneDurationName = "ImmuneDuration";
     string ImmuneWaneTimeName = "ImmuneWaneTime";
@@ -148,7 +148,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string MultipliersFileName = "MultipliersFile";
     string MultipliersNamesFileName = "MultipliersNamesFile";
     string SimulationsName = "Simulations";
-    string ImmuneAfterClearanceName = "ImmuneAfterClearance";
     string SeroConversionFileName = "SeroConversionFile";
 
     //READ IN DATA FROM INPUT FILE HERE FIRST
@@ -380,7 +379,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
-    ImmuneAfterClearance = RunsFile.GetValueI(CurKey, ImmuneAfterClearanceName);
     ScreenStartAge = RunsFile.GetValueI(CurKey, ScreenStartAgeName);
     ScreenStopAge = RunsFile.GetValueI(CurKey, ScreenStopAgeName);
     ScreenFrequency = RunsFile.GetValueI(CurKey, ScreenFrequencyName);
@@ -488,7 +486,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     ImmuneFactor = RunsFile.GetValueF(CurKey, ImmuneFactorName);
     ImmuneWaneTime = RunsFile.GetValueI(CurKey, ImmuneWaneTimeName);
     ImmuneDuration = RunsFile.GetValueI(CurKey, ImmuneDurationName);
-    HomogenousImmunity = RunsFile.GetValueI (CurKey, HomogenousImmunityName);
+    MechanismofImmunity = RunsFile.GetValue (CurKey, MechanismofImmunityName);
     CA1_CA2 = RunsFile.GetValueF(CurKey, CA1_CA2Name);
     CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
     // NEW PARAMETERS
@@ -849,6 +847,14 @@ void Inputs::loadVariables() {
         vaccinetype = VxType::Nonavalent;
         VE_1618 = vaccineefficacy[0][1];
         VE_high5 = vaccineefficacy[1][1];
+    }
+
+    if(MechanismofImmunity == "Degree"){
+        ImmuneMechanism = Immunity::Degree;
+    } else if(MechanismofImmunity == "Factor"){
+        ImmuneMechanism = Immunity::Factor;
+    } else if(MechanismofImmunity == "Seropositivity"){
+        ImmuneMechanism = Immunity::Seropositivity;
     }
 }
 

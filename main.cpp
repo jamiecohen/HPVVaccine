@@ -174,8 +174,7 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
     helper help;
     double rand;
     for (int j = 0; j < tables.CohortSize; j++) {
-        rand = help.getrand();
-        Woman newWoman (tables.ModelStartAge, CurrentModelYear, rand);
+        Woman newWoman (tables.ModelStartAge, CurrentModelYear);
         women.push_back (newWoman);
     }
     Output trace_burnin (tables, tables.SimulationYears);
