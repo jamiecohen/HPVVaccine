@@ -19,7 +19,6 @@ public:
 
     enum caT {Stage0, Stage1, Stage2, Stage3, Stage1d, Stage2d, Stage3d};
     enum hpvT {No, Low, otherHR, High16, High18, High31, High33, High45, High52, High58};
-    enum cd4cat {uninfected, c200, c200350, c350500, c500};
     enum screenmethod {LBC = 0, CC = 1, HPVColpo = 2, HPVsnt = 3};
     screenmethod screenstrat;
     caT cancerstage;
@@ -78,9 +77,7 @@ public:
     bool wasHPV45flag;
     bool wasHPV52flag;
     bool wasHPV58flag;
-    int CurrentMonthAge;
     int CurrentYear;
-    int CurrentMonth;
     int CurrentAge;
     bool    Alive;
     int Cycle;

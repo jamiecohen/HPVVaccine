@@ -85,10 +85,9 @@ public:
     double VaccineCoverage;
     int VaccineDuration;
     int VaccineStartAge;
-    double VaccineEfficacyPerinatalHIV;
-    double VaccineEfficacySexualHIV;
     double VaccineWaneTime;
     int VaccineDose;
+    bool HomogenousImmunity;
     bool ImmuneAfterClearance;
     bool WaningImmunity;
     int ImmuneDuration;
@@ -106,9 +105,6 @@ public:
 
     std::string CytoSensFile;
     std::vector< std::vector<double> > cytosens;
-
-    std::string CytoSensHIVFile;
-    std::vector< std::vector<double> > cytosens_HIV;
 
     std::string CalibTargsFile;
     std::vector< std::vector<double> > CalibTargs;
@@ -148,6 +144,7 @@ public:
     //[Multipliers] variable names
     //[NaturalImmunity Multipliers] variable names
     double ImmuneDegree;
+    double ImmuneFactor;
 
     // new parameters
 

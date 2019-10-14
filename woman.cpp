@@ -92,8 +92,6 @@ Woman::Woman(int Age, int StartYear, double rand) {
     CIN3LesionTimer.clear();
     CurrentAge = Age;
     CurrentYear = StartYear;
-    CurrentMonthAge = Age*12;
-    CurrentMonth = StartYear*12;
     Alive = true;
     cancer = false;
     ca1Timer = 0;
@@ -171,8 +169,6 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int Va
     CIN3LesionTimer.clear();
     CurrentAge = Age;
     CurrentYear = StartYear;
-    CurrentMonthAge = Age*12;
-    CurrentMonth = StartYear*12;
     Alive = true;
     cancerstage = caT::Stage0;
     cancer = false;

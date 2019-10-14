@@ -84,6 +84,9 @@ public:
     void StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help);
     void GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     void GetImmuneDeg(Woman &Data, Inputs &Tables);
+    void GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help);
+    void CheckWaningImmunity(Woman &Data, Inputs &Tables);
+    void UpdateNaturalImmunity(Woman &Data, Inputs &Tables, helper &help);
     void CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help);
     void AcquireHPV16(Woman &Data, Output &Count, Inputs &Tables, helper &help);
     void AcquireHPV18(Woman &Data, Output &Count, Inputs &Tables, helper &help);

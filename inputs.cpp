@@ -69,6 +69,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string ScreenCoverageName = "ScreenCoverage";
     string ScreenComplianceName = "ScreenCompliance";
     string VaccineCoverageName = "VaccineCoverage";
+    string HomogenousImmunityName = "HomogenousImmunity";
     string WaningImmunityName = "WaningImmunity";
     string ImmuneDurationName = "ImmuneDuration";
     string ImmuneWaneTimeName = "ImmuneWaneTime";
@@ -78,10 +79,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string VaccineEfficacyFileName = "VaccineEfficacyFile";
     string VaccineDurationName = "VaccineDuration";
     string VaccineWaneTimeName = "VaccineWaneTime";
-    string VaccineEfficacyPerinatalHIVName = "VE_perinatalHIV";
-    string VaccineEfficacySexualHIVName = "VE_sexualHIV";
     string CytoSensFileName = "CytoSensFile";
-    string CytoSensHIVFileName = "CytoSensHIVFile";
     string HPVSensFileName = "HPVSensFile";
     string ColpoSensFileName = "ColpoSensFile";
     string CryoEligibilityFileName = "CryoEligibilityFile";
@@ -97,6 +95,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     //[Multipliers] variable names
     //[NaturalImmunity Multipliers] variable names
     string ImmuneDegreeName = "ImmuneDegree";
+    string ImmuneFactorName = "ImmuneFactor";
     string CIN2_NL_1_5Name = "CIN2_NL_1_5";
     string CIN2_NL_6_10Name = "CIN2_NL_6_10";
     string CIN2_NL_11_20Name = "CIN2_NL_11_20";
@@ -435,19 +434,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
-    CytoSensHIVFile.append(DataFolder);
-    CytoSensHIVFile.append(RunsFile.GetValue(CurKey, CytoSensHIVFileName));
-    Infile.open(CytoSensHIVFile, ios::in);
-    if(Infile.fail())
-    {
-        cerr << "\nError: Unable to open file: " << CytoSensHIVFile << endl;
-        exit(1);
-    }
-
-    loadData (Infile, cytosens_HIV);
-    Infile.close();
-    Infile.clear();
-
     HPVSensFile.append(DataFolder);
     HPVSensFile.append(RunsFile.GetValue(CurKey, HPVSensFileName));
     Infile.open(HPVSensFile, ios::in);
@@ -499,10 +485,10 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     // todo-Jamie Figure out what cryo success rate for HPV should be? Currently set to 0.5
 
     ImmuneDegree = RunsFile.GetValueF(CurKey, ImmuneDegreeName);
+    ImmuneFactor = RunsFile.GetValueF(CurKey, ImmuneFactorName);
     ImmuneWaneTime = RunsFile.GetValueI(CurKey, ImmuneWaneTimeName);
     ImmuneDuration = RunsFile.GetValueI(CurKey, ImmuneDurationName);
-    VaccineEfficacyPerinatalHIV = RunsFile.GetValueF (CurKey, VaccineEfficacyPerinatalHIVName);
-    VaccineEfficacySexualHIV = RunsFile.GetValueF (CurKey, VaccineEfficacySexualHIVName);
+    HomogenousImmunity = RunsFile.GetValueI (CurKey, HomogenousImmunityName);
     CA1_CA2 = RunsFile.GetValueF(CurKey, CA1_CA2Name);
     CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
     // NEW PARAMETERS
