@@ -19,11 +19,13 @@ public:
 
     enum caT {Stage0, Stage1, Stage2, Stage3, Stage1d, Stage2d, Stage3d};
     enum hpvT {No, Low, otherHR, High16, High18, High31, High33, High45, High52, High58};
-    enum screenmethod {LBC = 0, CC = 1, HPVColpo = 2, HPVsnt = 3};
-    screenmethod screenstrat;
     caT cancerstage;
     std::vector<hpvT> HPVinfections;
     std::vector<int> HPVinfectionTimer;
+
+    std::vector<hpvT> HPVLatentinfections;
+    std::vector<int> HPVLatentinfectionTimer;
+
     std::vector<hpvT> CIN2Lesions;
     std::vector<hpvT> CIN3Lesions;
     std::vector<int> CIN2LesionTimer;
@@ -123,7 +125,7 @@ public:
     double rand;
 
     Woman(int Age, int StartYear); // constructor used for calibration
-    Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, std::vector<std::vector<double> > screenstats, double colpocov, double vaccinecov); // constructor used for analysis
+    Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov); // constructor used for analysis
     ~Woman();
 
 };

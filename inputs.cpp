@@ -57,7 +57,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string HPVIncidenceFileName = "HPVIncidenceFile";
     string CaMortalityFileName = "CaMortalityFile";
     string SymptomDetectionFileName = "SymptomDetectionFile";
-    string ScreenDistFileName = "ScreenDistFile";
 
     // Interventions
     string CostsFileName = "CostsFile";
@@ -70,6 +69,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string ScreenComplianceName = "ScreenCompliance";
     string VaccineCoverageName = "VaccineCoverage";
     string MechanismofImmunityName = "MechanismofImmunity";
+    string LatencyTimeName = "LatencyTime";
     string WaningImmunityName = "WaningImmunity";
     string ImmuneDurationName = "ImmuneDuration";
     string ImmuneWaneTimeName = "ImmuneWaneTime";
@@ -385,19 +385,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     ScreenCoverage = RunsFile.GetValueF(CurKey, ScreenCoverageName);
     ScreenCompliance = RunsFile.GetValueF(CurKey, ScreenComplianceName);
 
-    ScreenDistFile.append(DataFolder);
-    ScreenDistFile.append(RunsFile.GetValue(CurKey, ScreenDistFileName));
-    Infile.open(ScreenDistFile, ios::in);
-    if(Infile.fail())
-    {
-        cerr << "\nError: Unable to open file: " << ScreenDistFile << endl;
-        exit(1);
-    }
-
-    loadData (Infile, ScreenDist);
-    Infile.close();
-    Infile.clear();
-
     VaccineCoverage = RunsFile.GetValueF(CurKey, VaccineCoverageName);
     VaccineType = RunsFile.GetValue(CurKey, VaccineTypeName);
     VaccineDose = RunsFile.GetValueI(CurKey, VaccineDoseName);
@@ -487,6 +474,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     ImmuneWaneTime = RunsFile.GetValueI(CurKey, ImmuneWaneTimeName);
     ImmuneDuration = RunsFile.GetValueI(CurKey, ImmuneDurationName);
     MechanismofImmunity = RunsFile.GetValue (CurKey, MechanismofImmunityName);
+    LatencyTime = RunsFile.GetValueI (CurKey, LatencyTimeName);
     CA1_CA2 = RunsFile.GetValueF(CurKey, CA1_CA2Name);
     CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
     // NEW PARAMETERS

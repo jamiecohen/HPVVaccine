@@ -204,8 +204,7 @@ Output RunVaccineCohort(string RunsFileName, string CurKey, string OutputFolder,
     vector<Woman> women;
     women.reserve(tables.CohortSize);
     for (int j = 0; j < tables.CohortSize; j++) {
-        Woman newWoman(tables.ModelStartAge, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge,
-                       tables.ScreenDist, tables.ColpoAvail, tables.VaccineCoverage);
+        Woman newWoman(tables.ModelStartAge, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
         women.push_back (newWoman);
     }
     Output trace (tables, tables.SimulationYears);

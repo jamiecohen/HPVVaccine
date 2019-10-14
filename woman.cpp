@@ -84,6 +84,8 @@ Woman::Woman(int Age, int StartYear) {
     immune_deg_45 = 1;
     immune_deg_52 = 1;
     immune_deg_58 = 1;
+    HPVLatentinfections.clear();
+    HPVLatentinfectionTimer.clear();
     HPVinfections.clear();
     HPVinfectionTimer.clear();
     CIN2Lesions.clear();
@@ -108,8 +110,7 @@ Woman::Woman(int Age, int StartYear) {
     cancerstage = caT::Stage0;
 }
 
-Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge,
-             std::vector<std::vector<double> > screenstats, double colpocov, double vaccinecov) {
+Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov) {
     CIN16 = 0;
     CIN18 = 0;
     CIN31 = 0;
@@ -179,6 +180,8 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int Va
     hpv52_ageimmunity = 0;
     hpv58_ageimmunity = 0;
     hpvotherHR_ageimmunity = 0;
+    HPVLatentinfections.clear();
+    HPVLatentinfectionTimer.clear();
     HPVinfections.clear();
     HPVinfectionTimer.clear();
     CIN2Lesions.clear();
@@ -200,19 +203,6 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int Va
     nextscreenage = 0;
     rand = help.getrand ();
     ScreenAccess = rand < ScreenCoverage;
-    rand = help.getrand ();
-    if (rand < screenstats[0][0]){
-        screenstrat = Woman::CC;
-    } else if (rand < screenstats[0][0] + screenstats[1][0]){
-        screenstrat = Woman::LBC;
-    } else {
-        rand = help.getrand ();
-        if(rand < colpocov){
-            screenstrat = Woman::HPVColpo;
-        } else {
-            screenstrat = Woman::HPVsnt;
-        }
-    }
     rand = help.getrand ();
     if (rand < vaccinecov){
         completevaccine = true;

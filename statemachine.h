@@ -62,6 +62,7 @@ public:
     void GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Woman::hpvT genotype);
     static void GetSeropositivity(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     static void CheckWaningImmunity(Woman &Data, Inputs &Tables);
+    static void CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     void CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help);
     void AcquireHPV16(Woman &Data, Output &Count, Inputs &Tables, helper &help);
     void AcquireHPV18(Woman &Data, Output &Count, Inputs &Tables, helper &help);

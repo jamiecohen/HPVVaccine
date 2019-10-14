@@ -47,7 +47,6 @@ public:
     std::string InitialPopulationFile;
     std::vector<std::vector<double> > InitialPopulation;
 
-    //[NaturalHistory] variable names
 
     std::string ASRMortalityFile;
     std::vector< std::vector<double> > ASRMortality;
@@ -60,8 +59,6 @@ public:
 
     std::string SymptomDetectionFile;
     std::vector< std::vector<double> > sympdet;
-
-    // [Intervention] variable names
 
     std::string CostsFile;
     std::vector< std::vector<double> > costs;
@@ -87,19 +84,16 @@ public:
     double VaccineWaneTime;
     int VaccineDose;
     std::string MechanismofImmunity;
+    bool LatencyTime;
     bool WaningImmunity;
     int ImmuneDuration;
     int ImmuneWaneTime;
-
     double pSeroConvert_16[5];
     double pSeroConvert_18[5];
     double pSeroConvert_high5[5];
 
     std::string SeroConversionFile;
     std::vector< std::vector<double> > SeroConversion;
-
-    std::string ScreenDistFile;
-    std::vector< std::vector<double> > ScreenDist;
 
     std::string CytoSensFile;
     std::vector< std::vector<double> > cytosens;
@@ -139,15 +133,11 @@ public:
     std::string HPVSensFile;
     std::vector< std::vector<double> > hpvsens;
 
-    //[Multipliers] variable names
-    //[NaturalImmunity Multipliers] variable names
     double ImmuneDegree;
     double ImmuneFactor;
 
     enum Immunity {Degree, Factor, Seropositivity};
     Immunity ImmuneMechanism;
-
-    // new parameters
 
     double CIN2_NL_1_5;
     double CIN2_NL_6_10;
@@ -195,7 +185,6 @@ public:
     double CIN3_CA_mult;
     double CIN2_NL_mult;
     double HPV_CIN2_mult;
-
     double cryoelig_NL;
     double cryoelig_CIN2;
     double cryoelig_CIN3;
@@ -215,7 +204,6 @@ public:
     double cCryoVisit;
     double cCryoCIN23;
     double cLLETZ;
-
     double utilityHealthy;
     double utilityHPV;
     double utilityCIN2;
@@ -223,27 +211,11 @@ public:
     double utilityCA1;
     double utilityCA2;
     double utilityCA3;
-
-
     double disabilityCA12;
     double disabilityCA34;
-
-    void loadData(ifstream &Infile, vector< vector<double> > &VariableName);
-    void loadStringData(ifstream &Infile, std::string &VariableName);
-    void loadRFG(std::string& RunsFileName, std::string& CurKey);
-    void loadVariables();
-    double ApplyMult(double, double);
-    void loadCalibParams(vector<double> calib_params);
-
-    //Symptom Detection
-
     double pCA1_CA1D;
     double pCA2_CA2D;
     double pCA3_CA3D;
-
-    // HPV  incidence
-
-
     double pHPV_LR[100];
     double pHPV_otherHR[100];
     double pHPV_16[100];
@@ -253,9 +225,6 @@ public:
     double pHPV_45[100];
     double pHPV_52[100];
     double pHPV_58[100];
-
-    // CIN/Ca progression
-
     double pCIN2_CA1_16[100];
     double pCIN3_CA1_16[100];
     double pCIN2_CA1_18[100];
@@ -264,9 +233,6 @@ public:
     double pCIN3_CA1_oHR[100];
     double pCIN2_CA1_high5[100];
     double pCIN3_CA1_high5[100];
-
-    // HPV progression
-
     double pHPV_LR_CIN2[100];
     double pHPV_otherHR_CIN2[100];
     double pHPV_16_CIN2[100];
@@ -277,29 +243,21 @@ public:
     double pHPV_16_CIN3[100];
     double pHPV_18_CIN3[100];
     double pHPV_high5_CIN3[100];
-
-    // regression
-
     double pCIN3_NL_16[100];
     double pCIN3_NL_18[100];
     double pCIN3_NL_LR[100];
     double pCIN3_NL_oHR[100];
     double pCIN3_NL_high5[100];
-
     double pCIN2_NL_16[100];
     double pCIN2_NL_18[100];
     double pCIN2_NL_LR[100];
     double pCIN2_NL_oHR[100];
     double pCIN2_NL_high5[100];
-
     double pHPV_LR_NL[100];
     double pHPV_otherHR_NL[100];
     double pHPV_16_NL[100];
     double pHPV_18_NL[100];
     double pHPV_high5_NL[100];
-
-
-
     double mCA1[100];
     double mCA2[100];
     double mCA3[100];
@@ -309,7 +267,6 @@ public:
     double mCA1dsc[100];
     double mCA2dsc[100];
     double mCA3dsc[100];
-
     double hpvsens_NL;
     double hpvsens_CIN;
     double hpvsens_Ca;
@@ -317,7 +274,12 @@ public:
     double cytosens_CIN;
     double cytosens_Ca;
     double pRegresstoHPV;
-
+    void loadData(ifstream &Infile, vector< vector<double> > &VariableName);
+    void loadStringData(ifstream &Infile, std::string &VariableName);
+    void loadRFG(std::string& RunsFileName, std::string& CurKey);
+    void loadVariables();
+    double ApplyMult(double, double);
+    void loadCalibParams(vector<double> calib_params);
 
 };
 
