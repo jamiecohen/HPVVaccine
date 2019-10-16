@@ -15,6 +15,12 @@ double helper::getrand() {
     return x;
 }
 
+double helper::ratetoprob(double rate) {
+    double prob;
+    prob = 1 - exp(-rate);
+    return(prob);
+}
+
 double helper::rbeta(int alpha, int beta) {
 
     double randFromUnif = getrand();

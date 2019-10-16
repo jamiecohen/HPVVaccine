@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("screentest.ini");
+        RunsFileName.append("test.ini");
         FileName = "test.ini";
     }
     else if(argc > 1){
@@ -166,7 +166,6 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
     vector<double> calib_params (n_params);
     calib_params = calib.loadCalibData (n_params, i);
     tables.loadCalibParams (calib_params);
-
     tables.loadVariables ();
     int CurrentModelYear = tables.StartYear;
     vector<Woman> women;
@@ -182,11 +181,10 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
 
     for (int y = 0; y < tables.SimulationYears; y++) {
         for (int k = 0; k < tables.CohortSize; k++) {
-            Machine.runPopulationYear (women[k], tables, trace_burnin, y, CurrentModelYear, true, help);
+            Machine.runPopulationYear (women[k], tables, trace_burnin,true, help);
         }
         CurrentModelYear++;
     }
-    trace_burnin.createInc (tables);
     trace_burnin.createCalibOutput ();
     calib.saved_output[i] = trace_burnin.calib;
     rand = help.getrand ();
@@ -211,15 +209,11 @@ Output RunVaccineCohort(string RunsFileName, string CurKey, string OutputFolder,
     int SimYear = 0;
     for(int y = 0; y < tables.SimulationYears; y++){
         for (int k = 0; k < tables.CohortSize; k++) {
-            Machine.runPopulationYear (women[k], tables, trace, y, CurrentModelYear, false, help);
+            Machine.runPopulationYear (women[k], tables, trace, false, help);
         }
         CurrentModelYear++;
-        trace.discDALY += (trace.YLL[y] + trace.YLD[y])/ pow ((1 + trace.discountrate), static_cast<double>(SimYear));
-        trace.discQALY += trace.LE[y]/pow((1+trace.discountrate),static_cast<double>(SimYear));
-        trace.TotalCost += trace.cost[y]/pow((1+trace.discountrate),static_cast<double>(SimYear));
         SimYear++;
     }
-    trace.createInc (tables);
     trace.createCalibOutput ();
     for (int j = 0; j < tables.CohortSize; j++) {
         trace.calcDwellTime(women[j]);

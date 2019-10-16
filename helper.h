@@ -24,6 +24,7 @@ public:
 // Generate pseudo-random number.
 
     double getrand();
+    double ratetoprob(double rate);
 
     double rbeta(int alpha, int beta);
 

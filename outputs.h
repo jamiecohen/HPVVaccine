@@ -19,8 +19,6 @@ typedef vector<vector<double> > DoubleMatrix;
 class Output {
 public:
 
-    IntMatrix costs;
-    double discountrate;
     IntMatrix trace;
     DoubleMatrix inc;
     vector<double> prev;
@@ -35,10 +33,6 @@ public:
     vector<int> TotalHPV;
     vector<int> total_alive;
     vector<double> LE;
-    vector<double> cost;
-    vector<double> DALY;
-    vector<double> YLL;
-    vector<double> YLD;
     vector<double> calib;
     vector<double> CaIncStandardized;
     DoubleMatrix totalcancer_mort;
@@ -61,7 +55,7 @@ public:
     vector<int> CAdenom;
     vector<int> CIN2HIVneg;
     vector<int> CIN3HIVneg;
-    unsigned int cancerHIVneg;
+    unsigned int cancer;
     unsigned int CAotherHR;
     unsigned int CA16;
     unsigned int CA18;
@@ -125,18 +119,12 @@ public:
     int causalHPV52age;
     int causalHPV58age;
     int causalHPVoHRage;
-    double QALY;
-    double discQALY;
-    double TotalCost;
-    double discDALY;
 
     Output(Inputs &Tables, int y);
     ~Output(void);
 
     void createTrace(Woman &Datath);
-    void createInc(Inputs &Tables);
     void writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int SimStartYear, int SimYears);
-    void calcLE(Woman &Data, Inputs &Tables, int y);
     void createCalibOutput();
     void calcDwellTime(Woman &Data);
     void writeDwellTime(std::string *Outdir);
