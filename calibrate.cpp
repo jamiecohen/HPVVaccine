@@ -70,13 +70,17 @@ void calibrate::CalculateGOF(int n_sims, double tuning_factor, double rand) {
 
 std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
 
+    double logmean;
+
     if(n_sim == 0){
         for (int i = 0; i < n_params; i++){
-            calib_params[n_sim][i] = rnormal_trunc (multipliers[i][0], multipliers[i][3], multipliers[i][2], multipliers[i][1]);
+            logmean = log(multipliers[i][0]);
+            calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
         }
     } else {
         for (int i = 0; i < n_params; i++){
-            calib_params[n_sim][i] = rnormal_trunc (best_params[i], multipliers[i][3], multipliers[i][2], multipliers[i][1]);
+            logmean = log(best_params[i]);
+            calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
         }
     }
 
@@ -88,18 +92,22 @@ double calibrate::WeightedDistance(double data, double mean, double SD) {
     return distance;
 }
 
+double calibrate::rlognormal(double mu, double sigma) {
+    std::random_device rdev{};
+    std::default_random_engine generator{rdev()};
+    std::lognormal_distribution<double> distribution(mu, sigma);
+    double mult = distribution(generator);
+    return(mult);
+}
+
 double calibrate::rnormal_trunc(double mu, double sigma, double upper, double lower) {
     std::random_device rdev{};
     std::default_random_engine generator{rdev()};
-
     std::normal_distribution<double> distribution(mu, sigma);
-
     double prob = distribution(generator);
-
     while (prob < lower || prob > upper){
         prob = distribution(generator);
     }
-
     return(prob);
 }
 

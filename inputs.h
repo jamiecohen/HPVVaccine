@@ -53,6 +53,9 @@ public:
     std::string CINProgressionFile;
     std::vector< std::vector<double> > CINProgression;
 
+    std::string CINRegressionFile;
+    std::vector< std::vector<double> > CINRegression;
+
     std::string SymptomDetectionFile;
     std::vector< std::vector<double> > sympdet;
 
@@ -115,12 +118,9 @@ public:
 
     double ImmuneDegree;
     double ImmuneDegree16;
-    double ImmuneFactor;
-    double ImmuneFactor16;
 
     enum Immunity {Degree, Factor, Seropositivity};
     Immunity ImmuneMechanism;
-
     double CIN2_NL;
     double CIN2_NL_LR;
     double CIN2_NL_high5;

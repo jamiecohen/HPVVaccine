@@ -55,6 +55,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string HPVProgressionFileName = "HPVProgressionFile";
     string HPVClearanceFileName = "HPVClearanceFile";
     string CINProgressionFileName = "CINProgressionFile";
+    string CINRegressionFileName = "CINRegressionFile";
     string CaMortalityFileName = "CaMortalityFile";
     string SymptomDetectionFileName = "SymptomDetectionFile";
 
@@ -87,9 +88,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     //[NaturalImmunity Multipliers] variable names
     string ImmuneDegreeName = "ImmuneDegree";
     string ImmuneDegree16Name = "ImmuneDegree16";
-    string ImmuneFactorName = "ImmuneFactor";
-    string ImmuneFactor16Name = "ImmuneFactor16";
-    string CIN2_NLName = "CIN2_NL";
     string CIN2_NL_LRName = "CIN2_NL_LR";
     string CIN2_NL_high5Name = "CIN2_NL_high5";
     string CIN2_NL_16Name = "CIN2_NL_16";
@@ -253,6 +251,19 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
+    CINRegressionFile.append(DataFolder);
+    CINRegressionFile.append(RunsFile.GetValue(CurKey, CINRegressionFileName));
+    Infile.open(CINRegressionFile, ios::in);
+    if(Infile.fail())
+    {
+        cerr << "\nError: Unable to open file: " << CINRegressionFile << endl;
+        exit(1);
+    }
+
+    loadData (Infile, CINRegression);
+    Infile.close();
+    Infile.clear();
+
     ASRMortalityFile.append(DataFolder);
     ASRMortalityFile.append(RunsFile.GetValue(CurKey, ASRMortalityFileName));
     Infile.open(ASRMortalityFile, ios::in);
@@ -368,9 +379,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     // todo-Jamie Figure out what cryo success rate for HPV should be? Currently set to 0.5
 
     ImmuneDegree = RunsFile.GetValueF(CurKey, ImmuneDegreeName);
-    ImmuneFactor = RunsFile.GetValueF(CurKey, ImmuneFactorName);
     ImmuneDegree16 = RunsFile.GetValueF(CurKey, ImmuneDegree16Name);
-    ImmuneFactor16 = RunsFile.GetValueF(CurKey, ImmuneFactor16Name);
     ImmuneWaneTime = RunsFile.GetValueI(CurKey, ImmuneWaneTimeName);
     ImmuneDuration = RunsFile.GetValueI(CurKey, ImmuneDurationName);
     MechanismofImmunity = RunsFile.GetValue (CurKey, MechanismofImmunityName);
@@ -379,7 +388,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
     // NEW PARAMETERS
 
-    CIN2_NL = RunsFile.GetValueF(CurKey, CIN2_NLName);
     CIN2_NL_LR = RunsFile.GetValueF(CurKey, CIN2_NL_LRName);
     CIN2_NL_high5 = RunsFile.GetValueF(CurKey, CIN2_NL_high5Name);
     CIN2_NL_16 = RunsFile.GetValueF(CurKey, CIN2_NL_16Name);
@@ -410,6 +418,7 @@ void Inputs::loadVariables() {
         pSeroConvert_high5[j] = SeroConversion[j][2];
     }
 
+    CIN2_NL = CINRegression[0][0];
     pCIN2_NL_16 = ApplyMult (CIN2_NL, CIN2_NL_16);
     pCIN3_NL_16 = ApplyMult (pCIN2_NL_16, CIN3_NL);
     pCIN2_NL_18 = ApplyMult (CIN2_NL, CIN2_NL_18);
@@ -420,7 +429,6 @@ void Inputs::loadVariables() {
     pCIN3_NL_oHR = ApplyMult (pCIN3_NL_oHR, CIN3_NL);
     pCIN2_NL_LR = ApplyMult (CIN2_NL, CIN2_NL_LR);
     pCIN3_NL_LR = ApplyMult (pCIN3_NL_LR, CIN3_NL);
-
     pRegresstoHPV = 0.5;
     pCA1_CA1D = sympdet[0][0];
     pCA2_CA2D = sympdet[1][0];
@@ -511,26 +519,25 @@ double Inputs::ApplyMult(double prob, double mult){
 
 void Inputs::loadCalibParams(vector<double> calib_params) {
 
-    CIN2_NL = calib_params[0];
-    CIN2_NL_LR = calib_params[1];
-    CIN2_NL_high5 = calib_params[2];
-    CIN2_NL_16 = calib_params[3];
-    CIN2_NL_18 = calib_params[4];
-    CIN2_NL_otherHR = calib_params[5];
-    HPV_NL_LR = calib_params[6];
-    HPV_NL_16 = calib_params[7];
-    HPV_NL_18 = calib_params[8];
-    HPV_NL_high5 = calib_params[9];
-    HPV_NL_otherHR = calib_params[10];
-    HPV_CIN_LR = calib_params[11];
-    HPV_CIN_high5 = calib_params[12];
-    HPV_CIN_otherHR = calib_params[13];
-    HPV_CIN_16 = calib_params[14];
-    HPV_CIN_18 = calib_params[15];
-    CIN3_CA_16 = calib_params[16];
-    CIN3_CA_18 = calib_params[17];
-    CIN3_CA_otherHR = calib_params[18];
-    CIN3_CA_high5 = calib_params[19];
+    CIN2_NL_LR = calib_params[0];
+    CIN2_NL_high5 = calib_params[1];
+    CIN2_NL_16 = calib_params[2];
+    CIN2_NL_18 = calib_params[3];
+    CIN2_NL_otherHR = calib_params[4];
+    HPV_NL_LR = calib_params[5];
+    HPV_NL_16 = calib_params[6];
+    HPV_NL_18 = calib_params[7];
+    HPV_NL_high5 = calib_params[8];
+    HPV_NL_otherHR = calib_params[9];
+    HPV_CIN_LR = calib_params[10];
+    HPV_CIN_high5 = calib_params[11];
+    HPV_CIN_otherHR = calib_params[12];
+    HPV_CIN_16 = calib_params[13];
+    HPV_CIN_18 = calib_params[14];
+    CIN3_CA_16 = calib_params[15];
+    CIN3_CA_18 = calib_params[16];
+    CIN3_CA_otherHR = calib_params[17];
+    CIN3_CA_high5 = calib_params[18];
 
 }
 

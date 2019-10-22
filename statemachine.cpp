@@ -1360,7 +1360,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::Low:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor){
+            if (rand < Tables.ImmuneDegree){
                 Data.immune_deg_LR = 0;
                 Data.hpvlo_ageimmunity = Data.CurrentAge;
             } else {
@@ -1369,7 +1369,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::otherHR:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor){
+            if (rand < Tables.ImmuneDegree){
                 Data.immune_deg_otherHR = 0;
                 Data.hpvotherHR_ageimmunity = Data.CurrentAge;
             } else {
@@ -1378,7 +1378,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::High16:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor16){
+            if (rand < Tables.ImmuneDegree16){
                 Data.immune_deg_16 = 0;
                 Data.hpv16_ageimmunity = Data.CurrentAge;
             } else {
@@ -1387,7 +1387,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::High18:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor){
+            if (rand < Tables.ImmuneDegree){
                 Data.immune_deg_18 = 0;
                 Data.hpv18_ageimmunity = Data.CurrentAge;
             } else {
@@ -1396,7 +1396,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::High31:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor){
+            if (rand < Tables.ImmuneDegree){
                 Data.immune_deg_31 = 0;
                 Data.hpv31_ageimmunity = Data.CurrentAge;
             } else {
@@ -1414,7 +1414,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::High45:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor){
+            if (rand < Tables.ImmuneDegree){
                 Data.immune_deg_45 = 0;
                 Data.hpv45_ageimmunity = Data.CurrentAge;
             } else {
@@ -1423,7 +1423,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::High52:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor){
+            if (rand < Tables.ImmuneDegree){
                 Data.immune_deg_52 = 0;
                 Data.hpv52_ageimmunity = Data.CurrentAge;
             } else {
@@ -1432,7 +1432,7 @@ void StateMachine::GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Wo
             break;
         case Woman::High58:
             rand = help.getrand ();
-            if (rand < Tables.ImmuneFactor){
+            if (rand < Tables.ImmuneDegree){
                 Data.immune_deg_58 = 0;
                 Data.hpv58_ageimmunity = Data.CurrentAge;
             } else {

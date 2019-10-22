@@ -145,22 +145,43 @@ void Output::createCalibOutput() {
 
     int HPVHIVneg = 0;
     int HIVneg = 0;
-    for(int i = 17; i < 25; i++){
+    for(int i = 15; i < 21; i++){
         HPVHIVneg += trace[i][4];
         HIVneg += trace[i][3];
     }
     calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
 
-    for(int j = 0; j <8; j++){
-        HPVHIVneg = 0;
-        HIVneg = 0;
-        for(int i = 25 + 5*j; i < 30 + 5*j; i++){
-            HPVHIVneg += trace[i][4];
-            HIVneg += trace[i][3];
-        }
-        calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
+    HPVHIVneg = 0;
+    HIVneg = 0;
+    for(int i = 21; i < 25; i++){
+        HPVHIVneg += trace[i][4];
+        HIVneg += trace[i][3];
     }
+    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
 
+    HPVHIVneg = 0;
+    HIVneg = 0;
+    for(int i = 25; i < 30; i++){
+        HPVHIVneg += trace[i][4];
+        HIVneg += trace[i][3];
+    }
+    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
+
+    HPVHIVneg = 0;
+    HIVneg = 0;
+    for(int i = 30; i < 50; i++){
+        HPVHIVneg += trace[i][4];
+        HIVneg += trace[i][3];
+    }
+    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
+
+    HPVHIVneg = 0;
+    HIVneg = 0;
+    for(int i = 50; i < 90; i++){
+        HPVHIVneg += trace[i][4];
+        HIVneg += trace[i][3];
+    }
+    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
     calib.push_back(static_cast<double>(CIN216) / CIN2total );
     calib.push_back(static_cast<double>(CIN218) / CIN2total );
     calib.push_back(static_cast<double>(CIN231) / CIN2total );
@@ -168,8 +189,6 @@ void Output::createCalibOutput() {
     calib.push_back(static_cast<double>(CIN245) / CIN2total );
     calib.push_back(static_cast<double>(CIN252) / CIN2total );
     calib.push_back(static_cast<double>(CIN258) / CIN2total );
-    calib.push_back(static_cast<double>(CIN2otherHR) / CIN2total );
-
     calib.push_back(static_cast<double>(CIN316) / CIN3total );
     calib.push_back(static_cast<double>(CIN318) / CIN3total );
     calib.push_back(static_cast<double>(CIN331) / CIN3total );
@@ -177,26 +196,8 @@ void Output::createCalibOutput() {
     calib.push_back(static_cast<double>(CIN345) / CIN3total );
     calib.push_back(static_cast<double>(CIN352) / CIN3total );
     calib.push_back(static_cast<double>(CIN358) / CIN3total );
-    calib.push_back(static_cast<double>(CIN3otherHR) / CIN3total );
-
     calib.push_back(static_cast<double>(CA16) / cancer );
     calib.push_back(static_cast<double>(CA18) / cancer );
-    calib.push_back(static_cast<double>(CA31) / cancer );
-    calib.push_back(static_cast<double>(CA33) / cancer );
-    calib.push_back(static_cast<double>(CA45) / cancer );
-    calib.push_back(static_cast<double>(CA52) / cancer );
-    calib.push_back(static_cast<double>(CA58) / cancer );
-    calib.push_back(static_cast<double>(CAotherHR) / cancer );
-
-    /*for (int j = 0; j < 12; j++){
-        int CAinc = 0;
-        int CAtotal = 0;
-        for (int i = 15 + 5*j; i < 20 + 5*j; i++){
-            CAinc += DetectedCAcount[i];
-            CAtotal += CAdenom[i];
-        }
-        calib.push_back (100000* static_cast<double>(CAinc)/CAtotal);
-    }*/
 }
 
 void Output::writeCalibOutput(std::string *Outdir) {

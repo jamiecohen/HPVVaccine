@@ -29,6 +29,7 @@ public:
     void CalculateGOF(int n_sims, double tuning_factor, double rand);
     double WeightedDistance(double data, double mean, double SD);
     double rnormal_trunc (double mu, double sigma, double upper, double lower);
+    double rlognormal (double mu, double sigma);
     void GetProbAcceptance(double neighbor, double current, int n_sims, double temp);
 
     double tune_factor;
