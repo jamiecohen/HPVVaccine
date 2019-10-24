@@ -23,6 +23,8 @@ class Inputs{
 public:
     Inputs(std::string Output, std::string Data);
 
+    std::vector<int> burnin;
+
     std::string OutputFolder;
     std::string DataFolder;
 
@@ -61,6 +63,9 @@ public:
 
     std::string VaccineEfficacyFile;
     std::vector< std::vector<double> > vaccineefficacy;
+
+    std::string InitialPopulationFile;
+    std::vector<std::vector<double> > InitialPopulation;
 
     int ScreenStartAge;
     int ScreenStopAge;

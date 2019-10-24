@@ -6,9 +6,12 @@
 
 using namespace std;
 
-StateMachine::StateMachine() = default;
+StateMachine::StateMachine() {
+    genotypes = {Woman::Low, Woman::High16, Woman::High18, Woman::High31, Woman::High33, Woman::High45,
+                 Woman::High52, Woman::High58, Woman::otherHR};
+};
 
-void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
+void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
     if (Data.Alive) {
         StateMachine::GetMortality (Data, Tables);
         switch (Data.cancerstage) {
@@ -24,7 +27,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                     Data.cancerstage = Data.Stage1d;
                     Count.DwellTime_CA_detected_num += Data.ca1Timer;
                     Count.DwellTime_CA_detected_denom++;
-                    StateMachine::CountDetectedCancer (Data, Count);
+                    StateMachine::CountDetectedCancer (Data, Count, y);
                     Data.ca1Timer++;
                     StateMachine::Colpo (Data, Tables, Count, help);
                 } else {
@@ -41,7 +44,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                     Count.totaldeadcancer++;
                 } else if (rand < (Tables.CA2_CA3 + mCA + Tables.pCA2_CA2D)) {
                     Data.cancerstage = Data.Stage2d;
-                    StateMachine::CountDetectedCancer (Data, Count);
+                    StateMachine::CountDetectedCancer (Data, Count, y);
                     Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer;
                     Count.DwellTime_CA_detected_denom++;
                     Data.ca2Timer++;
@@ -57,7 +60,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                     Count.totaldeadcancer++;
                 } else if (rand < (mCA + Tables.pCA3_CA3D)) {
                     Data.cancerstage = Data.Stage3d;
-                    StateMachine::CountDetectedCancer (Data, Count);
+                    StateMachine::CountDetectedCancer (Data, Count, y);
                     Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer + Data.ca3Timer;
                     Count.DwellTime_CA_detected_denom++;
                     Data.ca3Timer++;
@@ -69,7 +72,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
             case Woman::Stage1d:
                 rand = help.getrand ();
                 if (rand < mCA) {
-                    Count.CAdead[Data.CurrentAge]++;
+                    Count.CAdead[Data.CurrentAge][y]++;
                     Count.totaldeadcancer++;
                     Data.Alive = false;
                 } else {
@@ -79,7 +82,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
             case Woman::Stage2d:
                 rand = help.getrand ();
                 if (rand < mCA) {
-                    Count.CAdead[Data.CurrentAge]++;
+                    Count.CAdead[Data.CurrentAge][y]++;
                     Count.totaldeadcancer++;
                     Data.Alive = false;
                 } else {
@@ -89,7 +92,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
             case Woman::Stage3d:
                 rand = help.getrand ();
                 if (rand < mCA) {
-                    Count.CAdead[Data.CurrentAge]++;
+                    Count.CAdead[Data.CurrentAge][y]++;
                     Count.totaldeadcancer++;
                     Data.Alive = false;
                 } else {
@@ -102,7 +105,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
     }
 }
 
-void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
+void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
 
     if (Data.Alive) {
         StateMachine::CheckSeropositivity (Data, Tables, help);
@@ -316,10 +319,10 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
     }
 }
 
-void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
+void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
     if (Data.Alive) {
         if (Data.cancer) {
-            CancerNatHistory (Data, Tables, Count, help);
+            CancerNatHistory (Data, Tables, Count, help, y);
         } else {
             if(Tables.WaningImmunity){
                 CheckWaningImmunity (Data, Tables);
@@ -329,12 +332,12 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper
             }
             StateMachine::GetVaccineEff (Data, Tables);
             if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
-                StateMachine::StartCIN (Data, Count, Tables, help);
+                StateMachine::StartCIN (Data, Count, Tables, help, y);
             }
             if (!Data.HPVinfections.empty ()) {
-                StateMachine::HPVNatHistory (Data, Tables, Count, help);
+                StateMachine::HPVNatHistory (Data, Tables, Count, help, y);
             }
-            StateMachine::AcquireHPVLow (Data, Count, Tables, help);
+            StateMachine::AcquireHPV (Data, Count, Tables, help, y);
         }
     }
 }
@@ -457,7 +460,7 @@ void StateMachine::ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hp
 
 }
 
-void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y) {
 
     if(!Data.cancer){
         for (int i = 0; i < Data.CIN3Lesions.size (); i++) {
@@ -467,7 +470,7 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &
                 Data.cancer = true;
                 Data.cancerstage = Data.Stage1;
                 Data.ca1Timer++;
-                StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i], Data.CIN3LesionTimer[i]);
+                StateMachine::CountCancer (Data, Count, Data.CIN3Lesions[i], Data.CIN3LesionTimer[i], y);
                 Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
                 Data.CIN3LesionTimer.erase (Data.CIN3LesionTimer.begin () + i);
                 break;
@@ -492,7 +495,7 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &
                 Data.cancer = true;
                 Data.cancerstage = Data.Stage1;
                 Data.ca1Timer++;
-                StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i], Data.CIN2LesionTimer[i]);
+                StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i], Data.CIN2LesionTimer[i], y);
                 Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
                 Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
                 break;
@@ -511,10 +514,10 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &
     }
 }
 
-void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool calib, helper &help) {
+void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool calib, helper &help, int y) {
 
     if (Data.Alive) {
-        StateMachine::GetBackgroundMortality (Data, Tables, help);
+        StateMachine::GetBackgroundMortality (Data, Tables, help, y);
         rand = help.getrand ();
         if (rand < mASR) {
             Data.Alive = false;
@@ -524,13 +527,13 @@ void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count,
                     StateMachine::CytoScreen (Data, Tables, Count, help);
                 }
             }
-            StateMachine::NatHistory (Data, Tables, Count, help);
+            StateMachine::NatHistory (Data, Tables, Count, help, y);
         }
 
-        Count.createTrace (Data);
+        Count.createTrace (Data, y);
 
         if (Data.Alive) {
-            Count.total_alive[Data.CurrentAge]++;
+            Count.total_alive[Data.CurrentAge][y]++;
             Data.CurrentAge++;
             Data.CurrentYear++;
             Data.Cycle++;
@@ -726,175 +729,62 @@ void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotyp
     }
 }
 
-void StateMachine::AcquireHPV16(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
+void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y) {
 
-    StateMachine::GetHPVRisk (Data, Tables, Woman::High16);
-    rand = help.getrand ();
-    if (rand < pHPV_16) {
-        Data.hpv16 = true;
-        Data.age16 = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::High16);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::High16);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
+    for (auto &genotype : genotypes) {
+        StateMachine::GetHPVRisk (Data, Tables, genotype);
+        rand = help.getrand ();
+        if (rand < pHPV) {
+            Data.HPVinfections.push_back (genotype);
+            if (Tables.LatencyTime) {
+                StateMachine::CheckLatency (Data, Tables, genotype);
+            } else {
+                Data.HPVinfectionTimer.push_back (1);
+            }
+            Count.HPVcount[Data.CurrentAge][y]++;
+            switch (genotype) {
+                case Woman::No:
+                    break;
+                case Woman::Low:
+                    Data.hpvlo = true;
+                    break;
+                case Woman::otherHR:
+                    Data.hpvotherHR = true;
+                    Data.ageoHR = Data.CurrentAge;
+                    break;
+                case Woman::High16:
+                    Data.hpv16 = true;
+                    Data.age16 = Data.CurrentAge;
+                    Count.HPV16count[Data.CurrentAge][y]++;
+                    break;
+                case Woman::High18:
+                    Data.hpv18 = true;
+                    Data.age18 = Data.CurrentAge;
+                    Count.HPV18count[Data.CurrentAge][y]++;
+                    break;
+                case Woman::High31:
+                    Data.hpv31 = true;
+                    Data.age31 = Data.CurrentAge;
+                    break;
+                case Woman::High33:
+                    Data.hpv33 = true;
+                    Data.age33 = Data.CurrentAge;
+                    break;
+                case Woman::High45:
+                    Data.hpv45 = true;
+                    Data.age45 = Data.CurrentAge;
+                    break;
+                case Woman::High52:
+                    Data.hpv52 = true;
+                    Data.age52 = Data.CurrentAge;
+                    break;
+                case Woman::High58:
+                    Data.hpv58 = true;
+                    Data.age58 = Data.CurrentAge;
+                    break;
+            }
+            break;
         }
-        Count.HPVcount[Data.CurrentAge]++;
-        Count.HPV16count[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPVoHR (Data, Count, Tables, help);
-    }
-}
-
-void StateMachine::AcquireHPV18(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::High18);
-    rand = help.getrand ();
-    if (rand < pHPV_18) {
-        Data.hpv18 = true;
-        Data.age18 = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::High18);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::High18);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-        Count.HPV18count[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPV31 (Data, Count, Tables, help);
-    }
-}
-
-void StateMachine::AcquireHPV31(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::High31);
-    rand = help.getrand ();
-    if (rand < pHPV_31) {
-        Data.hpv31 = true;
-        Data.age31 = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::High31);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::High31);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPV33 (Data, Count, Tables, help);
-    }
-}
-
-void StateMachine::AcquireHPV33(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::High33);
-    rand = help.getrand ();
-    if (rand < pHPV_33) {
-        Data.hpv33 = true;
-        Data.age33 = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::High33);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::High33);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPV45 (Data, Count, Tables, help);
-    }
-
-}
-
-void StateMachine::AcquireHPV45(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::High45);
-    rand = help.getrand ();
-    if (rand < pHPV_45) {
-        Data.hpv45 = true;
-        Data.age45 = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::High45);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::High45);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPV52 (Data, Count, Tables, help);
-    }
-
-}
-
-void StateMachine::AcquireHPV52(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::High52);
-    rand = help.getrand ();
-    if (rand < pHPV_52) {
-        Data.hpv52 = true;
-        Data.age52 = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::High52);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::High52);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPV58 (Data, Count, Tables, help);
-    }
-}
-
-void StateMachine::AcquireHPV58(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::High58);
-    rand = help.getrand ();
-    if (rand < pHPV_58) {
-        Data.hpv58 = true;
-        Data.age58 = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::High58);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::High58);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-    }
-}
-
-void StateMachine::AcquireHPVoHR(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::otherHR);
-    rand = help.getrand ();
-    if (rand < pHPV_oHR) {
-        Data.hpvotherHR = true;
-        Data.ageoHR = Data.CurrentAge;
-        Data.HPVinfections.push_back (Woman::otherHR);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::otherHR);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPV18 (Data, Count, Tables, help);
-    }
-}
-
-void StateMachine::AcquireHPVLow(Woman &Data, Output &Count, Inputs &Tables, helper &help) {
-
-    StateMachine::GetHPVRisk (Data, Tables, Woman::Low);
-    rand = help.getrand ();
-    if (rand < pHPV_LR) {
-        Data.hpvlo = true;
-        Data.HPVinfections.push_back (Woman::Low);
-        if(Tables.LatencyTime){
-            StateMachine::CheckLatency (Data, Tables, Woman::Low);
-        } else {
-            Data.HPVinfectionTimer.push_back (1);
-        }
-        Count.HPVcount[Data.CurrentAge]++;
-    } else {
-        StateMachine::AcquireHPV16 (Data, Count, Tables, help);
     }
 
 }
@@ -1084,15 +974,15 @@ void StateMachine::GetCIN3Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT g
     }
 }
 
-void StateMachine::CountDetectedCancer(Woman &Data, Output &Count) {
-    Count.TotalDetectedCancer[Data.CurrentAge]++;
-    Count.DetectedCAcount[Data.CurrentAge]++;
+void StateMachine::CountDetectedCancer(Woman &Data, Output &Count, int y) {
+    Count.TotalDetectedCancer[Data.CurrentAge][y]++;
+    Count.DetectedCAcount[Data.CurrentAge][y]++;
 }
 
-void StateMachine::CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype, int i) {
+void StateMachine::CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype, int i, int y) {
 
-    Count.TotalCancer[Data.CurrentAge]++;
-    Count.CAcount[Data.CurrentAge]++;
+    Count.TotalCancer[Data.CurrentAge][y]++;
+    Count.CAcount[Data.CurrentAge][y]++;
     Count.cancer++;
     switch(genotype){
         case Woman::No:break;
@@ -1208,65 +1098,65 @@ void StateMachine::GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype)
             break;
         case Woman::Low:
             if (!Data.hpvlo) {
-                pHPV_LR = Tables.pHPV_LR[Data.CurrentAge] * Data.immune_deg_LR;
+                pHPV = Tables.pHPV_LR[Data.CurrentAge] * Data.immune_deg_LR;
             } else {
-                pHPV_LR = 0;
+                pHPV = 0;
             }
             break;
         case Woman::otherHR:
             if (!Data.hpvotherHR) {
-                pHPV_oHR = Tables.pHPV_otherHR[Data.CurrentAge] * Data.immune_deg_otherHR;
+                pHPV = Tables.pHPV_otherHR[Data.CurrentAge] * Data.immune_deg_otherHR;
             } else {
-                pHPV_oHR = 0;
+                pHPV = 0;
             }
             break;
         case Woman::High16:
             if (!Data.hpv16) {
-                pHPV_16 = Tables.pHPV_16[Data.CurrentAge] * Data.immune_deg_16 * vaccine_deg_1618;
+                pHPV = Tables.pHPV_16[Data.CurrentAge] * Data.immune_deg_16 * vaccine_deg_1618;
             } else {
-                pHPV_16 = 0;
+                pHPV = 0;
             }
             break;
         case Woman::High18:
             if (!Data.hpv18) {
-                pHPV_18 = Tables.pHPV_18[Data.CurrentAge] * Data.immune_deg_18 * vaccine_deg_1618;
+                pHPV = Tables.pHPV_18[Data.CurrentAge] * Data.immune_deg_18 * vaccine_deg_1618;
             } else {
-                pHPV_18 = 0;
+                pHPV = 0;
             }
             break;
         case Woman::High31:
             if (!Data.hpv31) {
-                pHPV_31 = Tables.pHPV_31[Data.CurrentAge] * Data.immune_deg_31 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_31[Data.CurrentAge] * Data.immune_deg_31 * vaccine_deg_high5;
             } else {
-                pHPV_31 = 0;
+                pHPV = 0;
             }
             break;
         case Woman::High33:
             if (!Data.hpv33) {
-                pHPV_33 = Tables.pHPV_33[Data.CurrentAge] * Data.immune_deg_33 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_33[Data.CurrentAge] * Data.immune_deg_33 * vaccine_deg_high5;
             } else {
-                pHPV_33 = 0;
+                pHPV = 0;
             }
             break;
         case Woman::High45:
             if (!Data.hpv45) {
-                pHPV_45 = Tables.pHPV_45[Data.CurrentAge] * Data.immune_deg_45 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_45[Data.CurrentAge] * Data.immune_deg_45 * vaccine_deg_high5;
             } else {
-                pHPV_45 = 0;
+                pHPV = 0;
             }
             break;
         case Woman::High52:
             if (!Data.hpv52) {
-                pHPV_52 = Tables.pHPV_52[Data.CurrentAge] * Data.immune_deg_52 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_52[Data.CurrentAge] * Data.immune_deg_52 * vaccine_deg_high5;
             } else {
-                pHPV_52 = 0;
+                pHPV = 0;
             }
             break;
         case Woman::High58:
             if (!Data.hpv58) {
-                pHPV_58 = Tables.pHPV_58[Data.CurrentAge] * Data.immune_deg_58 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_58[Data.CurrentAge] * Data.immune_deg_58 * vaccine_deg_high5;
             } else {
-                pHPV_58 = 0;
+                pHPV = 0;
             }
             break;
     }
@@ -1605,10 +1495,10 @@ void StateMachine::CheckWaningImmunity(Woman &Data, Inputs &Tables) {
 
 }
 
-void StateMachine::GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help) {
+void StateMachine::GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help, int y) {
 
     if (Data.CurrentAge < Tables.ModelStopAge) {
-        mASR = help.ratetoprob(Tables.ASRMortality[Data.CurrentAge][0]);
+        mASR = help.ratetoprob(Tables.ASRMortality[Data.CurrentAge][y]);
     } else {
         mASR = 1;
     }

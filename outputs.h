@@ -15,46 +15,49 @@
 typedef vector<vector<int> > IntMatrix;
 typedef vector<vector<double> > DoubleMatrix;
 
+typedef vector<vector<vector<int> > > Int3DMatrix;
+typedef vector<vector<vector<double> > > Double3DMatrix;
+
 
 class Output {
 public:
 
-    IntMatrix trace;
-    DoubleMatrix inc;
-    vector<double> prev;
-    vector<int> TotalPrevCancer;
-    vector<int> TotalCancer;
-    vector<int> TotalDetectedCancer;
-    vector<int> TotalCancer_1618;
-    vector<int> TotalCancer_nonavalent;
-    vector<int> TotalCancer_allother;
-    vector<int> TotalCancerDenom;
+    Int3DMatrix trace;
+    Double3DMatrix inc;
+    DoubleMatrix prev;
+    IntMatrix TotalPrevCancer;
+    IntMatrix TotalCancer;
+    IntMatrix TotalDetectedCancer;
+    IntMatrix TotalCancer_1618;
+    IntMatrix TotalCancer_nonavalent;
+    IntMatrix TotalCancer_allother;
+    IntMatrix TotalCancerDenom;
     int totaldeadcancer;
-    vector<int> TotalHPV;
-    vector<int> total_alive;
-    vector<double> LE;
-    vector<double> calib;
-    vector<double> CaIncStandardized;
+    IntMatrix TotalHPV;
+    IntMatrix total_alive;
+    DoubleMatrix LE;
+    vector<double > calib;
+    DoubleMatrix CaIncStandardized;
     DoubleMatrix totalcancer_mort;
-    vector<int> HPV16count;
-    vector<int> HPV18count;
-    vector<int> HPVcount;
-    vector<int> HPV16denom;
-    vector<int> HPV18denom;
-    vector<int> HPVdenom;
+    IntMatrix HPV16count;
+    IntMatrix HPV18count;
+    IntMatrix HPVcount;
+    IntMatrix HPV16denom;
+    IntMatrix HPV18denom;
+    IntMatrix HPVdenom;
 
-    vector<int> CAdead;
-    vector<int> count;
-    vector<int> CIN2count;
-    vector<int> CIN3count;
-    vector<int> CAcount;
-    vector<int> DetectedCAcount;
-    vector<int> denom;
-    vector<int> CIN2denom;
-    vector<int> CIN3denom;
-    vector<int> CAdenom;
-    vector<int> CIN2HIVneg;
-    vector<int> CIN3HIVneg;
+    IntMatrix CAdead;
+    IntMatrix count;
+    IntMatrix CIN2count;
+    IntMatrix CIN3count;
+    IntMatrix CAcount;
+    IntMatrix DetectedCAcount;
+    IntMatrix denom;
+    IntMatrix CIN2denom;
+    IntMatrix CIN3denom;
+    IntMatrix CAdenom;
+    IntMatrix CIN2HIVneg;
+    IntMatrix CIN3HIVneg;
     unsigned int cancer;
     unsigned int CAotherHR;
     unsigned int CA16;
@@ -82,9 +85,9 @@ public:
     unsigned int CIN2otherHR;
     unsigned int CIN2total;
     unsigned int CIN3total;
-    vector<int> hpvscreens;
-    vector<int> papscreens;
-    vector<unsigned int> vaccines;
+    IntMatrix hpvscreens;
+    IntMatrix papscreens;
+    IntMatrix vaccines;
     int DwellTime_HPV_CIN_16_num;
     int DwellTime_HPV_CIN_18_num;
     int DwellTime_HPV_CIN_31_num;
@@ -123,9 +126,9 @@ public:
     Output(Inputs &Tables, int y);
     ~Output(void);
 
-    void createTrace(Woman &Datath);
-    void writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int SimStartYear, int SimYears);
-    void createCalibOutput();
+    void createTrace(Woman &Data, int y);
+    void writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int SimYears);
+    void createCalibOutput(int y);
     void calcDwellTime(Woman &Data);
     void writeDwellTime(std::string *Outdir);
     void writeCalibOutput(std::string *Outdir);

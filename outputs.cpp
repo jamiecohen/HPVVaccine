@@ -10,47 +10,154 @@ const string extension = ".txt";
 
 Output::Output(Inputs &Tables, int y) {
 
-    hpvscreens.resize(y + 1);
-    papscreens.resize(y + 1);
-    vaccines.resize(y+1);
-    CaIncStandardized.resize(Tables.ModelStopAge + 1);
+    // 2Dmatrices: [age][simyear]
+
     trace.resize(Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        trace[i].resize(6);
+        trace[i].resize(y);
+        for (int j = 0; j < y; ++j)
+            trace[i][j].resize(4);
     }
-    prev.resize(Tables.ModelStopAge + 1);
-    inc.resize(Tables.ModelStopAge + 1);
+
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        inc[i].resize(5);
+        inc[i].resize(y);
+        for(int j = 0; j < y; j++)
+            inc[i][j].resize(5);
     }
+
+    hpvscreens.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        hpvscreens[i].resize (y);
+    }
+    papscreens.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        papscreens[i].resize (y);
+    }
+    vaccines.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        vaccines[i].resize (y);
+    }
+
+    CaIncStandardized.resize(Tables.ModelStopAge + 1);
+
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CaIncStandardized[i].resize (y);
+    }
+
+    prev.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        prev[i].resize (y);
+    }
+
     total_alive.resize (Tables.ModelStopAge+1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        total_alive[i].resize (y);
+    }
     totaldeadcancer = 0;
-    TotalHPV.resize(y+1);
+    TotalHPV.resize(Tables.ModelStopAge+1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalHPV[i].resize (y);
+    }
     totalcancer_mort.resize (Tables.ModelStopAge + 1);
-    LE.resize (y + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        totalcancer_mort[i].resize (y);
+    }
+    LE.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        LE[i].resize (y);
+    }
     TotalPrevCancer.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalPrevCancer[i].resize (y);
+    }
     TotalCancer.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalCancer[i].resize (y);
+    }
     TotalDetectedCancer.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalDetectedCancer[i].resize (y);
+    }
     TotalCancer_1618.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalCancer_1618[i].resize (y);
+    }
     TotalCancer_nonavalent.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalCancer_nonavalent[i].resize (y);
+    }
     TotalCancer_allother.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalCancer_allother[i].resize (y);
+    }
     TotalCancerDenom.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        TotalCancerDenom[i].resize (y);
+    }
     HPVcount.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        HPVcount[i].resize (y);
+    }
     HPV16count.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        HPV16count[i].resize (y);
+    }
     HPV18count.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        HPV18count[i].resize (y);
+    }
     CIN2count.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CIN2count[i].resize (y);
+    }
     CIN3count.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CIN3count[i].resize (y);
+    }
     CAcount.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CAcount[i].resize (y);
+    }
     DetectedCAcount.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        DetectedCAcount[i].resize (y);
+    }
     CAdead.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CAdead[i].resize (y);
+    }
     HPVdenom.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        HPVdenom[i].resize (y);
+    }
     HPV16denom.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        HPV16denom[i].resize (y);
+    }
     HPV18denom.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        HPV18denom[i].resize (y);
+    }
     CIN2denom.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CIN2denom[i].resize (y);
+    }
     CIN3denom.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CIN3denom[i].resize (y);
+    }
     CAdenom.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CAdenom[i].resize (y);
+    }
     CIN2HIVneg.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CIN2HIVneg[i].resize (y);
+    }
     CIN3HIVneg.resize (Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        CIN3HIVneg[i].resize (y);
+    }
     cancer = 0;
     CA16 = 0;
     CA18 = 0;
@@ -112,74 +219,73 @@ Output::Output(Inputs &Tables, int y) {
     causalHPV52age = 0;
     causalHPV58age = 0;
     causalHPVoHRage = 0;
-
 }
 
-void Output::createTrace(Woman &Data) {
+void Output::createTrace(Woman &Data, int y) {
     
     if(!Data.cancer){
         if(Data.CurrentAge >= 15){
-            TotalCancerDenom[Data.CurrentAge]++;
+            TotalCancerDenom[Data.CurrentAge][y]++;
         }
         if(!Data.hpv16){
-            HPV16denom[Data.CurrentAge]++;
+            HPV16denom[Data.CurrentAge][y]++;
         }
         if(!Data.hpv18){
-            HPV18denom[Data.CurrentAge]++;
+            HPV18denom[Data.CurrentAge][y]++;
         }
         if(Data.HPVinfections.empty()){
-            HPVdenom[Data.CurrentAge]++;
+            HPVdenom[Data.CurrentAge][y]++;
         }
-        trace[Data.CurrentAge][3]++; // HIVneg, no cancer (prev DENOM)
-        CAdenom[Data.CurrentAge]++;
+        trace[Data.CurrentAge][y][3]++; // HIVneg, no cancer (prev DENOM)
+        CAdenom[Data.CurrentAge][y]++;
         if (Data.hpv16 || Data.hpv18 || Data.hpv31 || Data.hpv33 || Data.hpv45 || Data.hpv52 || Data.hpv58 || Data.hpvotherHR) {
-            trace[Data.CurrentAge][4]++; // all prevalent HIVpos hr-HPV
+            trace[Data.CurrentAge][y][4]++; // all prevalent HIVpos hr-HPV
             if(!Data.CIN2Lesions.empty () || !Data.CIN3Lesions.empty ()){
-                trace[Data.CurrentAge][5]++; // all prevalent CIN2+
+                trace[Data.CurrentAge][y][5]++; // all prevalent CIN2+
             }
         }
     }
 }
 
-void Output::createCalibOutput() {
+void Output::createCalibOutput(int y) {
 
     int HPVHIVneg = 0;
     int HIVneg = 0;
     for(int i = 15; i < 21; i++){
-        HPVHIVneg += trace[i][4];
-        HIVneg += trace[i][3];
+        HPVHIVneg += trace[i][y][4];
+        HIVneg += trace[i][y][3];
     }
     calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
 
     HPVHIVneg = 0;
     HIVneg = 0;
     for(int i = 21; i < 25; i++){
-        HPVHIVneg += trace[i][4];
-        HIVneg += trace[i][3];
+        HPVHIVneg += trace[i][y][4];
+        HIVneg += trace[i][y][3];
     }
     calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
 
     HPVHIVneg = 0;
     HIVneg = 0;
     for(int i = 25; i < 30; i++){
-        HPVHIVneg += trace[i][4];
-        HIVneg += trace[i][3];
+        HPVHIVneg += trace[i][y][4];
+        HIVneg += trace[i][y][3];
     }
     calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
 
     HPVHIVneg = 0;
     HIVneg = 0;
     for(int i = 30; i < 50; i++){
-        HPVHIVneg += trace[i][4];
-        HIVneg += trace[i][3];
+        HPVHIVneg += trace[i][y][4];
+        HIVneg += trace[i][y][3];
     }
     calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
 
     HPVHIVneg = 0;
     HIVneg = 0;
     for(int i = 50; i < 90; i++){
-        HPVHIVneg += trace[i][4];
-        HIVneg += trace[i][3];
+        HPVHIVneg += trace[i][y][4];
+        HIVneg += trace[i][y][3];
     }
     calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
     calib.push_back(static_cast<double>(CIN216) / CIN2total );
@@ -222,7 +328,7 @@ void Output::writeCalibOutput(std::string *Outdir) {
 
 }
 
-void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int SimStartYear, int SimYears) {
+void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int SimYears) {
 
     ofstream output;
     string OutputFileName;
@@ -238,14 +344,11 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        output << "TotalCA" << '\t';
         for(int j = 15; j < ModelStopAge; j++) {
-            output << 100000*static_cast<double>(TotalCancer[j])/TotalCancerDenom[j] << '\t';
-        }
-        output << endl;
-        output << "TotalDetectedCA" << '\t';
-        for(int j = 15; j < ModelStopAge; j++) {
-            output << 100000*static_cast<double>(TotalDetectedCancer[j])/TotalCancerDenom[j] << '\t';
+            for(int i = 0; j < SimYears; j++) {
+                output << "SimYear" << i << '\t';
+                output << 100000*static_cast<double>(TotalDetectedCancer[j][i])/TotalCancerDenom[j][i] << '\t';
+            }
         }
         output << endl;
 
@@ -268,9 +371,11 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        output << "TotalCAmort" << '\t';
         for(int j = 15; j < ModelStopAge; j++) {
-            output << 100000*static_cast<double>(CAdead[j] )/total_alive[j] << '\t';
+            for (int i = 0; j < SimYears; j++) {
+                output << "SimYear" << i << '\t';
+                output << 100000 * static_cast<double>(CAdead[j][i]) / total_alive[j][i] << '\t';
+            }
         }
         output << endl;
     }
@@ -292,20 +397,13 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        output << "HPV16" << '\t';
-        for(int j = ModelStartAge; j < ModelStopAge; j++) {
-            output << static_cast<double>(HPV16count[j])/HPV16denom[j] << '\t';
+        for(int j = 15; j < ModelStopAge; j++) {
+            for (int i = 0; j < SimYears; j++) {
+                output << "SimYear" << i << '\t';
+                output << static_cast<double>(HPVcount[j][i])/HPVdenom[j][i] << '\t';
+            }
         }
-        output << endl;
-        output << "HPV18" << '\t';
-        for(int j = ModelStartAge; j < ModelStopAge; j++) {
-            output << static_cast<double>(HPV18count[j])/HPV18denom[j] << '\t';
-        }
-        output << endl;
-        output << "HPV" << '\t';
-        for(int j = ModelStartAge; j < ModelStopAge; j++) {
-            output << static_cast<double>(HPVcount[j])/HPVdenom[j] << '\t';
-        }
+
         output << endl;
     }
     else

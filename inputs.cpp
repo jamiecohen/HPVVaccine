@@ -45,6 +45,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string StartYearName = "StartYear";
     string SimulationYearsName = "SimulationYears";
     string TuningFactorName = "TuningFactor";
+    string InitialPopulationFileName = "InitialPopulationFile";
 
     //[NaturalHistory] variable names
     //Natural History related distributions
@@ -144,6 +145,19 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     StartYear = RunsFile.GetValueI(CurKey, StartYearName);
     SimulationYears = RunsFile.GetValueI (CurKey, SimulationYearsName);
     Tuning_Factor = RunsFile.GetValueI (CurKey, TuningFactorName);
+
+    InitialPopulationFile.append(DataFolder);
+    InitialPopulationFile.append(RunsFile.GetValue(CurKey, InitialPopulationFileName));
+    Infile.open(InitialPopulationFile, ios::in);
+    if(Infile.fail())
+    {
+        cerr << "\nError: Unable to open file: " << InitialPopulationFile << endl;
+        exit(1);
+    }
+
+    loadData (Infile, InitialPopulation);
+    Infile.close();
+    Infile.clear();
 
     CalibTargsFile.append(DataFolder);
     CalibTargsFile.append(RunsFile.GetValue(CurKey, CalibTargsFileName));
@@ -375,9 +389,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     LLETZSuccessRateHPV = RunsFile.GetValueF(CurKey, LLETZSuccessRateHPVName);
     AdequacyLBC = RunsFile.GetValueF (CurKey, AdequacyLBCName);
     ColpoAvail = RunsFile.GetValueF (CurKey, ColpoAvailName);
-
-    // todo-Jamie Figure out what cryo success rate for HPV should be? Currently set to 0.5
-
     ImmuneDegree = RunsFile.GetValueF(CurKey, ImmuneDegreeName);
     ImmuneDegree16 = RunsFile.GetValueF(CurKey, ImmuneDegree16Name);
     ImmuneWaneTime = RunsFile.GetValueI(CurKey, ImmuneWaneTimeName);
@@ -387,7 +398,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CA1_CA2 = RunsFile.GetValueF(CurKey, CA1_CA2Name);
     CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
     // NEW PARAMETERS
-
     CIN2_NL_LR = RunsFile.GetValueF(CurKey, CIN2_NL_LRName);
     CIN2_NL_high5 = RunsFile.GetValueF(CurKey, CIN2_NL_high5Name);
     CIN2_NL_16 = RunsFile.GetValueF(CurKey, CIN2_NL_16Name);
@@ -407,7 +417,10 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CIN3_CA_18 = RunsFile.GetValueF(CurKey, CIN3_CA_18Name);
     CIN3_CA_otherHR = RunsFile.GetValueF(CurKey, CIN3_CA_otherHRName);
     CIN3_CA_high5 = RunsFile.GetValueF(CurKey, CIN3_CA_high5Name);
-
+    burnin.clear();
+    for(int i = 0; i < ModelStopAge; i++){
+        burnin.push_back (CohortSize*InitialPopulation[i][0]);
+    }
 }
 
 void Inputs::loadVariables() {

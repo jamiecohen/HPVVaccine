@@ -18,7 +18,7 @@ class Woman {
 public:
 
     enum caT {Stage0, Stage1, Stage2, Stage3, Stage1d, Stage2d, Stage3d};
-    enum hpvT {No, Low, otherHR, High16, High18, High31, High33, High45, High52, High58};
+    enum hpvT {No = 0, Low = 1, otherHR = 2, High16 = 3, High18 = 4, High31 = 5, High33 = 6, High45 = 7, High52 = 8, High58 = 9};
     caT cancerstage;
     std::vector<hpvT> HPVinfections;
     std::vector<int> HPVinfectionTimer;
@@ -126,6 +126,7 @@ public:
 
     Woman(int Age, int StartYear); // constructor used for calibration
     Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov); // constructor used for analysis
+    void reset(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov);
     ~Woman();
 
 };

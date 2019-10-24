@@ -19,6 +19,8 @@
 class StateMachine {
 public:
 
+    vector<Woman::hpvT> genotypes;
+    double pHPV;
     double mCA;
     double pHPV_NL;
     double pHPV_CIN;
@@ -33,27 +35,18 @@ public:
     double vaccine_eff_1618;
     double vaccine_eff_high5;
     int ScreenFrequency;
-    double pHPV_16;
-    double pHPV_18;
-    double pHPV_31;
-    double pHPV_33;
-    double pHPV_45;
-    double pHPV_52;
-    double pHPV_58;
-    double pHPV_oHR;
-    double pHPV_LR;
     double Adequacy;
 
     StateMachine();
     ~StateMachine();
 
-    void NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help);
-    void HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help);
-    void CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help);
-    void runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool burnin, helper &help);
+    void NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
+    void HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
+    void CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
+    void runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool burnin, helper &help, int y);
     void CytoScreen(Woman &Data, Inputs &Tables,  Output &Count, helper &help);
     void ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hpvT genotype);
-    void StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help);
+    void StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y);
     void GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     static void GetImmuneDeg(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     void GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Woman::hpvT genotype);
@@ -61,15 +54,7 @@ public:
     static void CheckWaningImmunity(Woman &Data, Inputs &Tables);
     static void CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     void CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help);
-    void AcquireHPV16(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPV18(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPV31(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPV33(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPV45(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPV52(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPV58(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPVoHR(Woman &Data, Output &Count, Inputs &Tables, helper &help);
-    void AcquireHPVLow(Woman &Data, Output &Count, Inputs &Tables, helper &help);
+    void AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y);
     void Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &help);
     void LLETZ(Woman &Data, Inputs &Tables, Output &Count, helper &help);
     void SendforTreatment(Woman &Data, Inputs &Tables, Output &Count, helper &help);
@@ -79,12 +64,12 @@ public:
     void GetHPVClearanceRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);
     void GetCIN2Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);
     void GetCIN3Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);
-    static void CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype, int i);
-    static void CountDetectedCancer(Woman &Data, Output &Count);
+    static void CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype, int i, int y);
+    static void CountDetectedCancer(Woman &Data, Output &Count, int y);
     void GetMortality(Woman &Data, Inputs &Tables);
     static void CountCIN2(Woman &Data, Output &Count);
     static void CountCIN3(Woman &Data, Output &Count);
-    void GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help);
+    void GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help, int y);
 };
 
 #endif //HPVVaccine_STATEMACHINE_H

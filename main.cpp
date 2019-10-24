@@ -16,7 +16,8 @@
 
 using namespace std;
 
-Output RunVaccineCohort(string, string, string, string);
+Output RunBirthCohort(string, string, string, string);
+Output RunPopulation(string, string, string, string);
 void RunCalibration(calibrate &calib, Inputs &tables, int i);
 
 int main(int argc, char* argv[]) {
@@ -146,14 +147,45 @@ int main(int argc, char* argv[]) {
         for (run = 0; run < RunsFile.GetNumKeys (); run++) {
             cout << "Running Strat " << run << endl;
             CurKey.push_back (RunsFile.GetKeyName (run));
-            modeloutputs.push_back(RunVaccineCohort (RunsFileName, CurKey[run], OutputFolder, DataFolder));
+            modeloutputs.push_back(RunBirthCohort (RunsFileName, CurKey[run], OutputFolder, DataFolder));
         }
         for (int i = 0; i < modeloutputs.size(); i++){
             string OutputDir (OutputFolder);
             OutputDir.append (RunsFile.GetValue (CurKey[i], "OutputDir"));
             const boost::filesystem::path dir (OutputDir);
             boost::filesystem::create_directories (dir);
-            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, StartYear, SimulationYears);
+            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
+            modeloutputs[i].writeDwellTime (&OutputDir);
+        }
+    } else if (RunsFile.GetValue(RunType, "RunType") == "Population") {
+
+        cout << "Running " << FileName << endl;
+        int numruns = 0;
+        for (run = 0; run < RunsFile.GetNumKeys (); run++) {
+            numruns++;
+        }
+        Inputs tables(OutputFolder, DataFolder);
+        tables.loadRFG (RunsFileName, RunType);
+        int ModelStartAge = tables.ModelStartAge;
+        int ModelStopAge = tables.ModelStopAge;
+        int SimulationYears = tables.SimulationYears;
+        int StartYear = tables.StartYear;
+        vector<Output> modeloutputs;
+        modeloutputs.reserve(numruns);
+        vector<string> CurKey;
+        CurKey.reserve(numruns);
+
+        for (run = 0; run < RunsFile.GetNumKeys (); run++) {
+            cout << "Running Strat " << run << endl;
+            CurKey.push_back (RunsFile.GetKeyName (run));
+            modeloutputs.push_back(RunPopulation (RunsFileName, CurKey[run], OutputFolder, DataFolder));
+        }
+        for (int i = 0; i < modeloutputs.size(); i++){
+            string OutputDir (OutputFolder);
+            OutputDir.append (RunsFile.GetValue (CurKey[i], "OutputDir"));
+            const boost::filesystem::path dir (OutputDir);
+            boost::filesystem::create_directories (dir);
+            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
             modeloutputs[i].writeDwellTime (&OutputDir);
         }
     }
@@ -181,18 +213,18 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
 
     for (int y = 0; y < tables.SimulationYears; y++) {
         for (int k = 0; k < tables.CohortSize; k++) {
-            Machine.runPopulationYear (women[k], tables, trace_burnin,true, help);
+            Machine.runPopulationYear (women[k], tables, trace_burnin,true, help, y);
         }
         CurrentModelYear++;
     }
-    trace_burnin.createCalibOutput ();
+    trace_burnin.createCalibOutput (tables.SimulationYears);
     calib.saved_output[i] = trace_burnin.calib;
     rand = help.getrand ();
     calib.CalculateGOF (i, tables.Tuning_Factor, rand);
     women.clear();
 }
 
-Output RunVaccineCohort(string RunsFileName, string CurKey, string OutputFolder, string DataFolder){
+Output RunBirthCohort(string RunsFileName, string CurKey, string OutputFolder, string DataFolder){
     helper help;
     StateMachine Machine;
     Inputs tables(std::move(OutputFolder), std::move(DataFolder));
@@ -209,14 +241,46 @@ Output RunVaccineCohort(string RunsFileName, string CurKey, string OutputFolder,
     int SimYear = 0;
     for(int y = 0; y < tables.SimulationYears; y++){
         for (int k = 0; k < tables.CohortSize; k++) {
-            Machine.runPopulationYear (women[k], tables, trace, false, help);
+            Machine.runPopulationYear (women[k], tables, trace, false, help, y);
         }
         CurrentModelYear++;
         SimYear++;
     }
-    trace.createCalibOutput ();
     for (int j = 0; j < tables.CohortSize; j++) {
         trace.calcDwellTime(women[j]);
+    }
+    women.clear();
+    return(trace);
+}
+
+Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, string DataFolder){
+    helper help;
+    StateMachine Machine;
+    Inputs tables(std::move(OutputFolder), std::move(DataFolder));
+    tables.loadRFG (RunsFileName, CurKey);
+    tables.loadVariables ();
+    int CurrentModelYear = tables.StartYear;
+    vector<Woman> women;
+    women.reserve(tables.CohortSize);
+
+    for (int j = 0; j < tables.ModelStopAge; j++) {
+        for (int k = 0; k < tables.burnin[j]; k++) {
+            Woman newWoman(j, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+            women.push_back(newWoman);
+        }
+    }
+    Output trace (tables, tables.SimulationYears);
+    for(int y = 0; y < tables.SimulationYears; y++){
+        for (auto & k : women) {
+            Machine.runPopulationYear (k, tables, trace, false, help, y);
+            if (!k.Alive) {
+                k.reset(0, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+            }
+        }
+        CurrentModelYear++;
+    }
+    for (auto & j : women) {
+        trace.calcDwellTime(j);
     }
     women.clear();
     return(trace);
