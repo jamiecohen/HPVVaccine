@@ -138,7 +138,6 @@ int main(int argc, char* argv[]) {
         int ModelStartAge = tables.ModelStartAge;
         int ModelStopAge = tables.ModelStopAge;
         int SimulationYears = tables.SimulationYears;
-        int StartYear = tables.StartYear;
         vector<Output> modeloutputs;
         modeloutputs.reserve(numruns);
         vector<string> CurKey;
@@ -168,8 +167,7 @@ int main(int argc, char* argv[]) {
         tables.loadRFG (RunsFileName, RunType);
         int ModelStartAge = tables.ModelStartAge;
         int ModelStopAge = tables.ModelStopAge;
-        int SimulationYears = tables.SimulationYears;
-        int StartYear = tables.StartYear;
+        int TotalSimYears = tables.BurnInYears + tables.SimulationYears;
         vector<Output> modeloutputs;
         modeloutputs.reserve(numruns);
         vector<string> CurKey;
@@ -185,7 +183,7 @@ int main(int argc, char* argv[]) {
             OutputDir.append (RunsFile.GetValue (CurKey[i], "OutputDir"));
             const boost::filesystem::path dir (OutputDir);
             boost::filesystem::create_directories (dir);
-            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
+            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
             modeloutputs[i].writeDwellTime (&OutputDir);
         }
     }
@@ -200,24 +198,35 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
     tables.loadCalibParams (calib_params);
     tables.loadVariables ();
     int CurrentModelYear = tables.StartYear;
+    int ModelStartAge = tables.ModelStartAge;
+    int ModelStopAge = tables.ModelStopAge;
+    int SimulationYears = tables.BurnInYears;
     vector<Woman> women;
     women.reserve (tables.CohortSize);
     helper help;
     double rand;
-    for (int j = 0; j < tables.CohortSize; j++) {
-        Woman newWoman (tables.ModelStartAge, CurrentModelYear);
-        women.push_back (newWoman);
+    for (int j = ModelStartAge; j < ModelStopAge; j++) {
+        for (int k = 0; k < tables.burnin[j]; k++) {
+            Woman newWoman(j, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+            women.push_back(newWoman);
+        }
     }
-    Output trace_burnin (tables, tables.SimulationYears);
+
+    Output trace_burnin (tables, SimulationYears);
     StateMachine Machine;
 
-    for (int y = 0; y < tables.SimulationYears; y++) {
-        for (int k = 0; k < tables.CohortSize; k++) {
-            Machine.runPopulationYear (women[k], tables, trace_burnin,true, help, y);
+    for(int y = 0; y < SimulationYears; y++){
+        for (auto & k : women) {
+            Machine.runPopulationYear (k, tables, trace_burnin, true, help, y);
+            if (!k.Alive) {
+                k.reset(ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
+                        tables.VaccineCoverage);
+            }
         }
         CurrentModelYear++;
     }
-    trace_burnin.createCalibOutput (tables.SimulationYears);
+
+    trace_burnin.createCalibOutput (SimulationYears);
     calib.saved_output[i] = trace_burnin.calib;
     rand = help.getrand ();
     calib.CalculateGOF (i, tables.Tuning_Factor, rand);

@@ -26,8 +26,6 @@ public:
     double getrand();
     double ratetoprob(double rate);
 
-    double rbeta(int alpha, int beta);
-
     helper();
     ~helper();
 

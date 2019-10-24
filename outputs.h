@@ -127,7 +127,7 @@ public:
     ~Output(void);
 
     void createTrace(Woman &Data, int y);
-    void writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int SimYears);
+    void writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears);
     void createCalibOutput(int y);
     void calcDwellTime(Woman &Data);
     void writeDwellTime(std::string *Outdir);

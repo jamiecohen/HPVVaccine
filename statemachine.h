@@ -69,7 +69,7 @@ public:
     void GetMortality(Woman &Data, Inputs &Tables);
     static void CountCIN2(Woman &Data, Output &Count);
     static void CountCIN3(Woman &Data, Output &Count);
-    void GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help, int y);
+    void GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help);
 };
 
 #endif //HPVVaccine_STATEMACHINE_H

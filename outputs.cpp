@@ -19,6 +19,7 @@ Output::Output(Inputs &Tables, int y) {
             trace[i][j].resize(8);
     }
 
+    inc.resize(Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         inc[i].resize(y);
         for(int j = 0; j < y; j++)
@@ -348,7 +349,7 @@ void Output::writeCalibOutput(std::string *Outdir) {
 
 }
 
-void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int SimYears) {
+void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears) {
 
     ofstream output;
     string OutputFileName;
@@ -364,14 +365,13 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        for(int j = 15; j < ModelStopAge; j++) {
-            for(int i = 0; j < SimYears; j++) {
-                output << "SimYear" << i << '\t';
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 15; j < ModelStopAge; j++) {
                 output << 100000*static_cast<double>(TotalDetectedCancer[j][i])/TotalCancerDenom[j][i] << '\t';
             }
+            output << endl;
         }
-        output << endl;
-
     }
     else
         cerr << "Warning: Unable to open " << OutputFileName << endl;
@@ -391,13 +391,14 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        for(int j = 15; j < ModelStopAge; j++) {
-            for (int i = 0; j < SimYears; j++) {
-                output << "SimYear" << i << '\t';
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 15; j < ModelStopAge; j++) {
                 output << 100000 * static_cast<double>(CAdead[j][i]) / total_alive[j][i] << '\t';
             }
+            output << endl;
         }
-        output << endl;
+
     }
     else
         cerr << "Warning: Unable to open " << OutputFileName << endl;
@@ -417,14 +418,13 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        for(int j = 15; j < ModelStopAge; j++) {
-            for (int i = 0; j < SimYears; j++) {
-                output << "SimYear" << i << '\t';
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 15; j < ModelStopAge; j++) {
                 output << static_cast<double>(HPVcount[j][i])/HPVdenom[j][i] << '\t';
             }
+            output << endl;
         }
-
-        output << endl;
     }
     else
         cerr << "Warning: Unable to open " << OutputFileName << endl;

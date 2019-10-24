@@ -21,15 +21,5 @@ double helper::ratetoprob(double rate) {
     return(prob);
 }
 
-double helper::rbeta(int alpha, int beta) {
-
-    double randFromUnif = getrand();
-
-    beta_distribution<> distr(alpha,beta);
-
-    double randFromDist = quantile(distr, randFromUnif);
-
-    return(randFromDist);
-}
 
 helper::~helper() = default;

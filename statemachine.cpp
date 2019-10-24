@@ -9,7 +9,7 @@ using namespace std;
 StateMachine::StateMachine() {
     genotypes = {Woman::Low, Woman::High16, Woman::High18, Woman::High31, Woman::High33, Woman::High45,
                  Woman::High52, Woman::High58, Woman::otherHR};
-};
+}
 
 void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
     if (Data.Alive) {
@@ -520,7 +520,7 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &
 void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool calib, helper &help, int y) {
 
     if (Data.Alive) {
-        StateMachine::GetBackgroundMortality (Data, Tables, help, y);
+        StateMachine::GetBackgroundMortality (Data, Tables, help);
         rand = help.getrand ();
         if (rand < mASR) {
             Data.Alive = false;
@@ -1505,10 +1505,10 @@ void StateMachine::CheckWaningImmunity(Woman &Data, Inputs &Tables) {
 
 }
 
-void StateMachine::GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help, int y) {
+void StateMachine::GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help) {
 
     if (Data.CurrentAge < Tables.ModelStopAge) {
-        mASR = help.ratetoprob(Tables.ASRMortality[Data.CurrentAge][y]);
+        mASR = help.ratetoprob(Tables.ASRMortality[Data.CurrentAge][0]);
     } else {
         mASR = 1;
     }

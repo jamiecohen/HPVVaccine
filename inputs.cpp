@@ -421,7 +421,11 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CIN3_CA_high5 = RunsFile.GetValueF(CurKey, CIN3_CA_high5Name);
     burnin.clear();
     for(int i = 0; i < ModelStopAge; i++){
-        burnin.push_back (CohortSize*InitialPopulation[i][0]);
+        if(i < ModelStartAge){
+            burnin.push_back(0);
+        } else {
+            burnin.push_back (CohortSize*InitialPopulation[i][0]);
+        }
     }
 }
 
