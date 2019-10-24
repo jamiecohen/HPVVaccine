@@ -319,7 +319,7 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
     }
 }
 
-void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
+void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y, bool burnin) {
     if (Data.Alive) {
         if (Data.cancer) {
             CancerNatHistory (Data, Tables, Count, help, y);
@@ -330,7 +330,7 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper
             for(int i = 0; i < Data.HPVLatentinfections.size (); i ++) {
                 Data.HPVLatentinfectionTimer[i]++;
             }
-            StateMachine::GetVaccineEff (Data, Tables);
+            StateMachine::GetVaccineEff (Data, Tables, burnin);
             if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
                 StateMachine::StartCIN (Data, Count, Tables, help, y);
             }
@@ -527,7 +527,7 @@ void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count,
                     StateMachine::CytoScreen (Data, Tables, Count, help);
                 }
             }
-            StateMachine::NatHistory (Data, Tables, Count, help, y);
+            StateMachine::NatHistory (Data, Tables, Count, help, y, calib);
         }
 
         Count.createTrace (Data, y);
@@ -693,24 +693,31 @@ void StateMachine::GetMortality(Woman &Data, Inputs &Tables) {
     }
 }
 
-void StateMachine::GetVaccineEff(Woman &Data, Inputs &Tables) {
-    if (Data.completevaccine) {
-        vaccine_eff_1618 = Tables.VE_1618;
-        vaccine_eff_high5 = Tables.VE_high5;
-        if (Data.CurrentAge > (Tables.VaccineDuration + Tables.VaccineStartAge)) {
-            vaccine_eff_1618 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
-                                        (Tables.VaccineDuration + Data.vaccineage),
-                                        vaccine_eff_1618);
-            vaccine_eff_high5 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
-                                         (Tables.VaccineDuration + Data.vaccineage),
-                                         vaccine_eff_high5);
-        }
-    } else {
+void StateMachine::GetVaccineEff(Woman &Data, Inputs &Tables, bool burnin) {
+    if(burnin){
         vaccine_eff_1618 = 0;
         vaccine_eff_high5 = 0;
+        vaccine_deg_1618 = 1 - vaccine_eff_1618;
+        vaccine_deg_high5 = 1 - vaccine_eff_high5;
+    } else{
+        if (Data.completevaccine) {
+            vaccine_eff_1618 = Tables.VE_1618;
+            vaccine_eff_high5 = Tables.VE_high5;
+            if (Data.CurrentAge > (Tables.VaccineDuration + Tables.VaccineStartAge)) {
+                vaccine_eff_1618 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                            (Tables.VaccineDuration + Data.vaccineage),
+                                            vaccine_eff_1618);
+                vaccine_eff_high5 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                             (Tables.VaccineDuration + Data.vaccineage),
+                                             vaccine_eff_high5);
+            }
+        } else {
+            vaccine_eff_1618 = 0;
+            vaccine_eff_high5 = 0;
+        }
+        vaccine_deg_1618 = 1 - vaccine_eff_1618;
+        vaccine_deg_high5 = 1 - vaccine_eff_high5;
     }
-    vaccine_deg_1618 = 1 - vaccine_eff_1618;
-    vaccine_deg_high5 = 1 - vaccine_eff_high5;
 }
 
 void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotype) {

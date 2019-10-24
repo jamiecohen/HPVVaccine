@@ -33,6 +33,7 @@ public:
     int ModelStartAge;
     int ModelStopAge;
     int SimulationYears;
+    int BurnInYears;
     int StartYear;
     int Simulations;
     int Tuning_Factor;

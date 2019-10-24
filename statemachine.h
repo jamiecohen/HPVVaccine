@@ -40,7 +40,7 @@ public:
     StateMachine();
     ~StateMachine();
 
-    void NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
+    void NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y, bool burnin);
     void HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
     void CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
     void runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool burnin, helper &help, int y);
@@ -58,7 +58,7 @@ public:
     void Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &help);
     void LLETZ(Woman &Data, Inputs &Tables, Output &Count, helper &help);
     void SendforTreatment(Woman &Data, Inputs &Tables, Output &Count, helper &help);
-    void GetVaccineEff(Woman &Data, Inputs &Tables);
+    void GetVaccineEff(Woman &Data, Inputs &Tables, bool burnin);
     static double CalcEff(double wanetime, int age, int waneage, double starteff);
     void GetLesionRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);
     void GetHPVClearanceRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);

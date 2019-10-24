@@ -259,26 +259,45 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
     Inputs tables(std::move(OutputFolder), std::move(DataFolder));
     tables.loadRFG (RunsFileName, CurKey);
     tables.loadVariables ();
-    int CurrentModelYear = tables.StartYear;
+    int BurnInModelYear = tables.StartYear - tables.BurnInYears;
+    int TotalSimYears = tables.BurnInYears + tables.SimulationYears;
     vector<Woman> women;
     women.reserve(tables.CohortSize);
 
     for (int j = 0; j < tables.ModelStopAge; j++) {
         for (int k = 0; k < tables.burnin[j]; k++) {
-            Woman newWoman(j, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+            Woman newWoman(j, BurnInModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
             women.push_back(newWoman);
         }
     }
-    Output trace (tables, tables.SimulationYears);
-    for(int y = 0; y < tables.SimulationYears; y++){
+    Output trace (tables, TotalSimYears);
+
+    // Start running burn-in period
+
+    for(int y = 0; y < tables.BurnInYears; y++){
         for (auto & k : women) {
+            Machine.runPopulationYear (k, tables, trace, true, help, y);
+            if (!k.Alive) {
+                k.reset(0, BurnInModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
+                        tables.VaccineCoverage);
+            }
+        }
+        BurnInModelYear++;
+    }
+
+    // Now start running simulation from time 0
+    int CurrentModelYear = tables.StartYear;
+    for (int y = tables.BurnInYears; y < TotalSimYears; y++) {
+        for (auto &k : women) {
             Machine.runPopulationYear (k, tables, trace, false, help, y);
             if (!k.Alive) {
-                k.reset(0, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+                k.reset (0, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
+                         tables.VaccineCoverage);
             }
         }
         CurrentModelYear++;
     }
+
     for (auto & j : women) {
         trace.calcDwellTime(j);
     }

@@ -44,6 +44,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string ModelStopAgeName = "ModelStopAge";
     string StartYearName = "StartYear";
     string SimulationYearsName = "SimulationYears";
+    string BurnInYearsName = "BurnInYears";
     string TuningFactorName = "TuningFactor";
     string InitialPopulationFileName = "InitialPopulationFile";
 
@@ -144,6 +145,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     ModelStopAge = RunsFile.GetValueI(CurKey, ModelStopAgeName);
     StartYear = RunsFile.GetValueI(CurKey, StartYearName);
     SimulationYears = RunsFile.GetValueI (CurKey, SimulationYearsName);
+    BurnInYears = RunsFile.GetValueI (CurKey, BurnInYearsName);
     Tuning_Factor = RunsFile.GetValueI (CurKey, TuningFactorName);
 
     InitialPopulationFile.append(DataFolder);
