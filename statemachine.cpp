@@ -462,7 +462,7 @@ void StateMachine::ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hp
 
 void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y) {
 
-    if(!Data.cancer){
+    if(!Data.CIN3Lesions.empty()){
         for (int i = 0; i < Data.CIN3Lesions.size (); i++) {
             StateMachine::GetCIN3Risk (Data, Tables, i, Data.CIN3Lesions[i]);
             rand = help.getrand ();
@@ -476,7 +476,7 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &
                 break;
             } else if (rand < (pCIN3_CA + pCIN3_HPV)) {
                 rand = help.getrand ();
-                if (rand > Tables.pRegresstoHPV){
+                if (rand > Tables.pRegresstoHPV) {
                     StateMachine::ClearHPV (Data, Tables, help, Data.CIN3Lesions[i]);
                 }
                 Data.CIN3Lesions.erase (Data.CIN3Lesions.begin () + i);
@@ -487,28 +487,31 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &
             }
         }
     }
+
     if(!Data.cancer){
-        for (int i = 0; i < Data.CIN2Lesions.size (); i++) {
-            StateMachine::GetCIN2Risk (Data, Tables, i, Data.CIN2Lesions[i]);
-            rand = help.getrand ();
-            if (rand < pCIN2_CA) {
-                Data.cancer = true;
-                Data.cancerstage = Data.Stage1;
-                Data.ca1Timer++;
-                StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i], Data.CIN2LesionTimer[i], y);
-                Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                break;
-            } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
+        if(!Data.CIN2Lesions.empty()){
+            for (int i = 0; i < Data.CIN2Lesions.size (); i++) {
+                StateMachine::GetCIN2Risk (Data, Tables, i, Data.CIN2Lesions[i]);
                 rand = help.getrand ();
-                if (rand > Tables.pRegresstoHPV){
-                    StateMachine::ClearHPV (Data, Tables, help, Data.CIN2Lesions[i]);
+                if (rand < pCIN2_CA) {
+                    Data.cancer = true;
+                    Data.cancerstage = Data.Stage1;
+                    Data.ca1Timer++;
+                    StateMachine::CountCancer (Data, Count, Data.CIN2Lesions[i], Data.CIN2LesionTimer[i], y);
+                    Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                    Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                    break;
+                } else if (rand < (pCIN2_CA + pCIN2_HPV)) {
+                    rand = help.getrand ();
+                    if (rand > Tables.pRegresstoHPV){
+                        StateMachine::ClearHPV (Data, Tables, help, Data.CIN2Lesions[i]);
+                    }
+                    Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
+                    Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
+                    i--;
+                } else {
+                    Data.CIN2LesionTimer[i]++;
                 }
-                Data.CIN2Lesions.erase (Data.CIN2Lesions.begin () + i);
-                Data.CIN2LesionTimer.erase (Data.CIN2LesionTimer.begin () + i);
-                i--;
-            } else {
-                Data.CIN2LesionTimer[i]++;
             }
         }
     }

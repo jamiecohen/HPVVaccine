@@ -16,7 +16,7 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         trace[i].resize(y);
         for (int j = 0; j < y; ++j)
-            trace[i][j].resize(4);
+            trace[i][j].resize(8);
     }
 
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
@@ -222,6 +222,7 @@ Output::Output(Inputs &Tables, int y) {
 }
 
 void Output::createTrace(Woman &Data, int y) {
+    // No Cancer, HPV16, HPV18, HPV31, HPV33, HPV45, HPV52, HPV58
     
     if(!Data.cancer){
         if(Data.CurrentAge >= 15){
@@ -236,58 +237,77 @@ void Output::createTrace(Woman &Data, int y) {
         if(Data.HPVinfections.empty()){
             HPVdenom[Data.CurrentAge][y]++;
         }
-        trace[Data.CurrentAge][y][3]++; // HIVneg, no cancer (prev DENOM)
+        trace[Data.CurrentAge][y][0]++; // HIVneg, no cancer (prev DENOM)
         CAdenom[Data.CurrentAge][y]++;
-        if (Data.hpv16 || Data.hpv18 || Data.hpv31 || Data.hpv33 || Data.hpv45 || Data.hpv52 || Data.hpv58 || Data.hpvotherHR) {
-            trace[Data.CurrentAge][y][4]++; // all prevalent HIVpos hr-HPV
-            if(!Data.CIN2Lesions.empty () || !Data.CIN3Lesions.empty ()){
-                trace[Data.CurrentAge][y][5]++; // all prevalent CIN2+
-            }
+        if (Data.hpv16){
+            trace[Data.CurrentAge][y][1]++; // all prevalent HPV16
+        } 
+        if (Data.hpv18){
+            trace[Data.CurrentAge][y][2]++; // all prevalent HPV18
+        } 
+        if (Data.hpv31){
+            trace[Data.CurrentAge][y][3]++; // all prevalent HPV31
+        } 
+        if (Data.hpv33){
+            trace[Data.CurrentAge][y][4]++; // all prevalent HPV33
+        } 
+        if (Data.hpv45){
+            trace[Data.CurrentAge][y][5]++; // all prevalent HPV45
+        } 
+        if (Data.hpv52){
+            trace[Data.CurrentAge][y][6]++; // all prevalent HPV52
+        } 
+        if (Data.hpv58){
+            trace[Data.CurrentAge][y][7]++; // all prevalent HPV58
         }
     }
 }
 
 void Output::createCalibOutput(int y) {
+    int numgenotypes = 7;
+    
+    for (int j = 0; j < numgenotypes; j++){
+        int HPVcalibnum = 0;
+        int HPVcalibdenom = 0;
+        for(int i = 15; i < 21; i++){
+            HPVcalibnum += trace[i][y][1+j];
+            HPVcalibdenom += trace[i][y][0];
+        }
+        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
 
-    int HPVHIVneg = 0;
-    int HIVneg = 0;
-    for(int i = 15; i < 21; i++){
-        HPVHIVneg += trace[i][y][4];
-        HIVneg += trace[i][y][3];
-    }
-    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
+        HPVcalibnum = 0;
+        HPVcalibdenom = 0;
+        for(int i = 21; i < 25; i++){
+            HPVcalibnum += trace[i][y][1+j];
+            HPVcalibdenom += trace[i][y][0];
+        }
+        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
 
-    HPVHIVneg = 0;
-    HIVneg = 0;
-    for(int i = 21; i < 25; i++){
-        HPVHIVneg += trace[i][y][4];
-        HIVneg += trace[i][y][3];
-    }
-    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
+        HPVcalibnum = 0;
+        HPVcalibdenom = 0;
+        for(int i = 25; i < 30; i++){
+            HPVcalibnum += trace[i][y][1+j];
+            HPVcalibdenom += trace[i][y][0];
+        }
+        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
 
-    HPVHIVneg = 0;
-    HIVneg = 0;
-    for(int i = 25; i < 30; i++){
-        HPVHIVneg += trace[i][y][4];
-        HIVneg += trace[i][y][3];
-    }
-    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
+        HPVcalibnum = 0;
+        HPVcalibdenom = 0;
+        for(int i = 30; i < 50; i++){
+            HPVcalibnum += trace[i][y][1+j];
+            HPVcalibdenom += trace[i][y][0];
+        }
+        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
 
-    HPVHIVneg = 0;
-    HIVneg = 0;
-    for(int i = 30; i < 50; i++){
-        HPVHIVneg += trace[i][y][4];
-        HIVneg += trace[i][y][3];
+        HPVcalibnum = 0;
+        HPVcalibdenom = 0;
+        for(int i = 50; i < 90; i++){
+            HPVcalibnum += trace[i][y][1+j];
+            HPVcalibdenom += trace[i][y][0];
+        }
+        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
     }
-    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
 
-    HPVHIVneg = 0;
-    HIVneg = 0;
-    for(int i = 50; i < 90; i++){
-        HPVHIVneg += trace[i][y][4];
-        HIVneg += trace[i][y][3];
-    }
-    calib.push_back (static_cast<double>(HPVHIVneg)/HIVneg);
     calib.push_back(static_cast<double>(CIN216) / CIN2total );
     calib.push_back(static_cast<double>(CIN218) / CIN2total );
     calib.push_back(static_cast<double>(CIN231) / CIN2total );

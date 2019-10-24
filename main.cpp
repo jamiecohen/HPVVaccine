@@ -261,10 +261,12 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
     tables.loadVariables ();
     int BurnInModelYear = tables.StartYear - tables.BurnInYears;
     int TotalSimYears = tables.BurnInYears + tables.SimulationYears;
+    int ModelStartAge = tables.ModelStartAge;
+    int ModelStopAge = tables.ModelStopAge;
     vector<Woman> women;
     women.reserve(tables.CohortSize);
 
-    for (int j = 0; j < tables.ModelStopAge; j++) {
+    for (int j = ModelStartAge; j < ModelStopAge; j++) {
         for (int k = 0; k < tables.burnin[j]; k++) {
             Woman newWoman(j, BurnInModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
             women.push_back(newWoman);
@@ -278,7 +280,7 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
         for (auto & k : women) {
             Machine.runPopulationYear (k, tables, trace, true, help, y);
             if (!k.Alive) {
-                k.reset(0, BurnInModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
+                k.reset(ModelStartAge, BurnInModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
                         tables.VaccineCoverage);
             }
         }
@@ -291,7 +293,7 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
         for (auto &k : women) {
             Machine.runPopulationYear (k, tables, trace, false, help, y);
             if (!k.Alive) {
-                k.reset (0, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
+                k.reset (ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
                          tables.VaccineCoverage);
             }
         }
