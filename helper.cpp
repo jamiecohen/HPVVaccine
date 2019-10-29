@@ -11,14 +11,11 @@ helper::helper() {
 }
 
 double helper::getrand() {
-    double x = dist(engine);
-    return x;
+    return dist(engine);
 }
 
 double helper::ratetoprob(double rate) {
-    double prob;
-    prob = 1 - exp(-rate);
-    return(prob);
+    return(1 - exp(-rate));
 }
 
 

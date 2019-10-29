@@ -399,7 +399,9 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     LatencyTime = RunsFile.GetValueI (CurKey, LatencyTimeName);
     CA1_CA2 = RunsFile.GetValueF(CurKey, CA1_CA2Name);
     CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
+
     // NEW PARAMETERS
+
     CIN2_NL_LR = RunsFile.GetValueF(CurKey, CIN2_NL_LRName);
     CIN2_NL_high5 = RunsFile.GetValueF(CurKey, CIN2_NL_high5Name);
     CIN2_NL_16 = RunsFile.GetValueF(CurKey, CIN2_NL_16Name);
@@ -419,6 +421,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CIN3_CA_18 = RunsFile.GetValueF(CurKey, CIN3_CA_18Name);
     CIN3_CA_otherHR = RunsFile.GetValueF(CurKey, CIN3_CA_otherHRName);
     CIN3_CA_high5 = RunsFile.GetValueF(CurKey, CIN3_CA_high5Name);
+
     burnin.clear();
     for(int i = 0; i < ModelStopAge; i++){
         if(i < ModelStartAge){

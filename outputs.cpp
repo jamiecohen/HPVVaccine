@@ -266,10 +266,12 @@ void Output::createTrace(Woman &Data, int y) {
 
 void Output::createCalibOutput(int y) {
     int numgenotypes = 7;
+    int HPVcalibnum;
+    int HPVcalibdenom;
     
     for (int j = 0; j < numgenotypes; j++){
-        int HPVcalibnum = 0;
-        int HPVcalibdenom = 0;
+        HPVcalibnum = 0;
+        HPVcalibdenom = 0;
         for(int i = 15; i < 21; i++){
             HPVcalibnum += trace[i][y][1+j];
             HPVcalibdenom += trace[i][y][0];

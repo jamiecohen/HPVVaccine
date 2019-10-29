@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("test.ini");
+        RunsFileName.append("Calibration.ini");
         FileName = "test.ini";
     }
     else if(argc > 1){
@@ -226,7 +226,7 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
         CurrentModelYear++;
     }
 
-    trace_burnin.createCalibOutput (SimulationYears);
+    trace_burnin.createCalibOutput (SimulationYears-1);
     calib.saved_output[i] = trace_burnin.calib;
     rand = help.getrand ();
     calib.CalculateGOF (i, tables.Tuning_Factor, rand);

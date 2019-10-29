@@ -14,6 +14,7 @@ public:
 
 
 // Use Mersenne twister engine to generate pseudo-random numbers.
+    /*std::mt19937::result_type seed = time(0);*/
     std::mt19937 engine{1234};
 
 // "Filter" MT engine's output to generate pseudo-random double values,

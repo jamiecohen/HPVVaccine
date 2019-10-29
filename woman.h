@@ -19,7 +19,9 @@ public:
 
     int CurrentYear;
     int CurrentAge;
-    bool    Alive;
+    int CurrentMonth;
+    int CurrentMonthAge;
+    bool Alive;
     int Cycle;
 
     enum caT {Stage0, Stage1, Stage2, Stage3, Stage1d, Stage2d, Stage3d};
