@@ -33,6 +33,8 @@ public:
     void GetProbAcceptance(double neighbor, double current, int n_sims, double temp);
 
     double tune_factor;
+    enum MultType {prob = 0, RR = 1};
+    std::vector<MultType> multipliers_type;
 
     std::vector<double> calib_targs;
     std::vector<double> calib_targs_SD;

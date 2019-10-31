@@ -109,6 +109,27 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string CIN3_CA_18Name = "CIN3_CA_18";
     string CIN3_CA_otherHRName = "CIN3_CA_otherHR";
     string CIN3_CA_high5Name = "CIN3_CA_high5";
+    string NL_HPV_16_21Name = "NL_HPV_16_21";
+    string NL_HPV_16_21_25Name = "NL_HPV_16_21_25";
+    string NL_HPV_16_25_29Name = "NL_HPV_16_25_29";
+    string NL_HPV_18_21Name = "NL_HPV_18_21";
+    string NL_HPV_18_21_25Name = "NL_HPV_18_21_25";
+    string NL_HPV_18_25_29Name = "NL_HPV_18_25_29";
+    string NL_HPV_31_21Name = "NL_HPV_31_21";
+    string NL_HPV_31_21_25Name = "NL_HPV_31_21_25";
+    string NL_HPV_31_25_29Name = "NL_HPV_31_25_29";
+    string NL_HPV_33_21Name = "NL_HPV_33_21";
+    string NL_HPV_33_21_25Name = "NL_HPV_33_21_25";
+    string NL_HPV_33_25_29Name = "NL_HPV_33_25_29";
+    string NL_HPV_45_21Name = "NL_HPV_45_21";
+    string NL_HPV_45_21_25Name = "NL_HPV_45_21_25";
+    string NL_HPV_45_25_29Name = "NL_HPV_45_25_29";
+    string NL_HPV_52_21Name = "NL_HPV_52_21";
+    string NL_HPV_52_21_25Name = "NL_HPV_52_21_25";
+    string NL_HPV_52_25_29Name = "NL_HPV_52_25_29";
+    string NL_HPV_58_21Name = "NL_HPV_58_21";
+    string NL_HPV_58_21_25Name = "NL_HPV_58_21_25";
+    string NL_HPV_58_25_29Name = "NL_HPV_58_25_29";
     string CA1_CA2Name = "CA1_CA2";
     string CA2_CA3Name = "CA2_CA3";
 
@@ -421,6 +442,27 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CIN3_CA_18 = RunsFile.GetValueF(CurKey, CIN3_CA_18Name);
     CIN3_CA_otherHR = RunsFile.GetValueF(CurKey, CIN3_CA_otherHRName);
     CIN3_CA_high5 = RunsFile.GetValueF(CurKey, CIN3_CA_high5Name);
+    NL_HPV_16_21 = RunsFile.GetValueF(CurKey, NL_HPV_16_21Name);
+    NL_HPV_16_21_25 = RunsFile.GetValueF(CurKey, NL_HPV_16_21_25Name);
+    NL_HPV_16_25_29 = RunsFile.GetValueF(CurKey, NL_HPV_16_25_29Name);
+    NL_HPV_18_21 = RunsFile.GetValueF(CurKey, NL_HPV_18_21Name);
+    NL_HPV_18_21_25 = RunsFile.GetValueF(CurKey, NL_HPV_18_21_25Name);
+    NL_HPV_18_25_29 = RunsFile.GetValueF(CurKey, NL_HPV_18_25_29Name);
+    NL_HPV_31_21 = RunsFile.GetValueF(CurKey, NL_HPV_31_21Name);
+    NL_HPV_31_21_25 = RunsFile.GetValueF(CurKey, NL_HPV_31_21_25Name);
+    NL_HPV_31_25_29 = RunsFile.GetValueF(CurKey, NL_HPV_31_25_29Name);
+    NL_HPV_33_21 = RunsFile.GetValueF(CurKey, NL_HPV_33_21Name);
+    NL_HPV_33_21_25 = RunsFile.GetValueF(CurKey, NL_HPV_33_21_25Name);
+    NL_HPV_33_25_29 = RunsFile.GetValueF(CurKey, NL_HPV_33_25_29Name);
+    NL_HPV_45_21 = RunsFile.GetValueF(CurKey, NL_HPV_45_21Name);
+    NL_HPV_45_21_25 = RunsFile.GetValueF(CurKey, NL_HPV_45_21_25Name);
+    NL_HPV_45_25_29 = RunsFile.GetValueF(CurKey, NL_HPV_45_25_29Name);
+    NL_HPV_52_21 = RunsFile.GetValueF(CurKey, NL_HPV_52_21Name);
+    NL_HPV_52_21_25 = RunsFile.GetValueF(CurKey, NL_HPV_52_21_25Name);
+    NL_HPV_52_25_29 = RunsFile.GetValueF(CurKey, NL_HPV_52_25_29Name);
+    NL_HPV_58_21 = RunsFile.GetValueF(CurKey, NL_HPV_58_21Name);
+    NL_HPV_58_21_25 = RunsFile.GetValueF(CurKey, NL_HPV_58_21_25Name);
+    NL_HPV_58_25_29 = RunsFile.GetValueF(CurKey, NL_HPV_58_25_29Name);
 
     burnin.clear();
     for(int i = 0; i < ModelStopAge; i++){
@@ -464,6 +506,33 @@ void Inputs::loadVariables() {
         pHPV_45[j] = HPVInc[j][4];
         pHPV_52[j] = HPVInc[j][5];
         pHPV_58[j] = HPVInc[j][6];
+
+        if(j < 21){
+            pHPV_16[j] = ApplyMult (pHPV_16[j], NL_HPV_16_21);
+            pHPV_18[j] = ApplyMult (pHPV_18[j], NL_HPV_18_21);
+            pHPV_31[j] = ApplyMult (pHPV_31[j], NL_HPV_31_21);
+            pHPV_33[j] = ApplyMult (pHPV_33[j], NL_HPV_33_21);
+            pHPV_45[j] = ApplyMult (pHPV_45[j], NL_HPV_45_21);
+            pHPV_52[j] = ApplyMult (pHPV_52[j], NL_HPV_52_21);
+            pHPV_58[j] = ApplyMult (pHPV_58[j], NL_HPV_58_21);
+        } else if (j <25){
+            pHPV_16[j] = ApplyMult (pHPV_16[j], NL_HPV_16_21_25);
+            pHPV_18[j] = ApplyMult (pHPV_18[j], NL_HPV_18_21_25);
+            pHPV_31[j] = ApplyMult (pHPV_31[j], NL_HPV_31_21_25);
+            pHPV_33[j] = ApplyMult (pHPV_33[j], NL_HPV_33_21_25);
+            pHPV_45[j] = ApplyMult (pHPV_45[j], NL_HPV_45_21_25);
+            pHPV_52[j] = ApplyMult (pHPV_52[j], NL_HPV_52_21_25);
+            pHPV_58[j] = ApplyMult (pHPV_58[j], NL_HPV_58_21_25);
+        } else if (j < 30){
+            pHPV_16[j] = ApplyMult (pHPV_16[j], NL_HPV_16_25_29);
+            pHPV_18[j] = ApplyMult (pHPV_18[j], NL_HPV_18_25_29);
+            pHPV_31[j] = ApplyMult (pHPV_31[j], NL_HPV_31_25_29);
+            pHPV_33[j] = ApplyMult (pHPV_33[j], NL_HPV_33_25_29);
+            pHPV_45[j] = ApplyMult (pHPV_45[j], NL_HPV_45_25_29);
+            pHPV_52[j] = ApplyMult (pHPV_52[j], NL_HPV_52_25_29);
+            pHPV_58[j] = ApplyMult (pHPV_58[j], NL_HPV_58_25_29);
+        }
+
         pHPV_otherHR[j] = HPVInc[j][7];
         pHPV_LR[j] = HPVInc[j][8];
         pHPV_LR_NL[j] = ApplyMult(HPVClearance[j][0], HPV_NL_LR);

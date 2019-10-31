@@ -131,7 +131,7 @@ public:
     void createCalibOutput(int y);
     void calcDwellTime(Woman &Data);
     void writeDwellTime(std::string *Outdir);
-    void writeCalibOutput(std::string *Outdir);
+    void writeCalibOutput(std::string *Outdir, std::string calib_targs_names);
 
 };
 

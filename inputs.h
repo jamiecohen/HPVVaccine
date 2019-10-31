@@ -127,6 +127,7 @@ public:
 
     enum Immunity {Degree, Factor, Seropositivity};
     Immunity ImmuneMechanism;
+
     double CIN2_NL;
     double CIN2_NL_LR;
     double CIN2_NL_high5;
@@ -147,6 +148,27 @@ public:
     double CIN3_CA_18;
     double CIN3_CA_otherHR;
     double CIN3_CA_high5;
+    double NL_HPV_16_21;
+    double NL_HPV_16_21_25;
+    double NL_HPV_16_25_29;
+    double NL_HPV_18_21;
+    double NL_HPV_18_21_25;
+    double NL_HPV_18_25_29;
+    double NL_HPV_31_21;
+    double NL_HPV_31_21_25;
+    double NL_HPV_31_25_29;
+    double NL_HPV_33_21;
+    double NL_HPV_33_21_25;
+    double NL_HPV_33_25_29;
+    double NL_HPV_45_21;
+    double NL_HPV_45_21_25;
+    double NL_HPV_45_25_29;
+    double NL_HPV_52_21;
+    double NL_HPV_52_21_25;
+    double NL_HPV_52_25_29;
+    double NL_HPV_58_21;
+    double NL_HPV_58_21_25;
+    double NL_HPV_58_25_29;
     double CA1_CA2;
     double CA2_CA3;
     double pCA1_CA1D;

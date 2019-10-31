@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Calibration.ini");
+        RunsFileName.append("test.ini");
         FileName = "test.ini";
     }
     else if(argc > 1){
@@ -65,8 +65,15 @@ int main(int argc, char* argv[]) {
             calib.calib_targs_SD[i] = tables.CalibTargs[i][1];
         }
         for (int i = 0; i < n_params; i++){
-            for (int j = 0; j < 4; j++){
+            for (int j = 0; j < 3; j++){
                 calib.multipliers[i][j] = tables.Multipliers[i][j];
+            }
+        }
+        for (int i = 0; i < n_params; i++){
+            if(calib.multipliers[i][2] == 0){
+                calib.multipliers_type[i] = calib.RR;
+            } else {
+                calib.multipliers_type[i] = calib.prob;
             }
         }
         for (int i = 0; i < n_sims; i++){
@@ -185,6 +192,7 @@ int main(int argc, char* argv[]) {
             boost::filesystem::create_directories (dir);
             modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
             modeloutputs[i].writeDwellTime (&OutputDir);
+            modeloutputs[i].writeCalibOutput (&OutputDir, tables.CalibTargsNames);
         }
     }
     return(0);
@@ -204,7 +212,7 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
     vector<Woman> women;
     women.reserve (tables.CohortSize);
     helper help;
-    double rand;
+
     for (int j = ModelStartAge; j < ModelStopAge; j++) {
         for (int k = 0; k < tables.burnin[j]; k++) {
             Woman newWoman(j, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
@@ -228,6 +236,7 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
 
     trace_burnin.createCalibOutput (SimulationYears-1);
     calib.saved_output[i] = trace_burnin.calib;
+    double rand;
     rand = help.getrand ();
     calib.CalculateGOF (i, tables.Tuning_Factor, rand);
     women.clear();
@@ -312,6 +321,7 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
     for (auto & j : women) {
         trace.calcDwellTime(j);
     }
+    trace.createCalibOutput (TotalSimYears-1);
     women.clear();
     return(trace);
 }

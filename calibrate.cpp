@@ -14,8 +14,10 @@ calibrate::calibrate(int n_sims, int n_params, int n_targs) {
 
     multipliers.resize(n_params);
     for(int i = 0; i < n_params; i++){
-        multipliers[i].resize(4);
+        multipliers[i].resize(3);
     }
+
+    multipliers_type.resize(n_params);
 
     calib_params.resize (n_sims);
     for (int i = 0; i < calib_params.size(); i++){
@@ -74,13 +76,27 @@ std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
 
     if(n_sim == 0){
         for (int i = 0; i < n_params; i++){
-            logmean = log(multipliers[i][0]);
-            calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
+            switch(multipliers_type[i]){
+                case prob:
+                    calib_params[n_sim][i] = rnormal_trunc (multipliers[i][0], multipliers[i][1], 1, 0);
+                    break;
+                case RR:
+                    logmean = log(multipliers[i][0]);
+                    calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
+                    break;
+            }
         }
     } else {
         for (int i = 0; i < n_params; i++){
-            logmean = log(best_params[i]);
-            calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
+            switch(multipliers_type[i]){
+                case prob:
+                    calib_params[n_sim][i] = rnormal_trunc (best_params[i], multipliers[i][1], 1, 0);
+                    break;
+                case RR:
+                    logmean = log(best_params[i]);
+                    calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
+                    break;
+            }
         }
     }
 

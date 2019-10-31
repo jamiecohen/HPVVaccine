@@ -238,7 +238,7 @@ void Output::createTrace(Woman &Data, int y) {
         if(Data.HPVinfections.empty()){
             HPVdenom[Data.CurrentAge][y]++;
         }
-        trace[Data.CurrentAge][y][0]++; // HIVneg, no cancer (prev DENOM)
+        trace[Data.CurrentAge][y][0]++; // no cancer (prev DENOM)
         CAdenom[Data.CurrentAge][y]++;
         if (Data.hpv16){
             trace[Data.CurrentAge][y][1]++; // all prevalent HPV16
@@ -329,7 +329,7 @@ void Output::createCalibOutput(int y) {
     calib.push_back(static_cast<double>(CA18) / cancer );
 }
 
-void Output::writeCalibOutput(std::string *Outdir) {
+void Output::writeCalibOutput(std::string *Outdir, std::string calib_targs_names) {
 
     ofstream output;
     string OutputFileName;
@@ -340,6 +340,7 @@ void Output::writeCalibOutput(std::string *Outdir) {
     output.open(OutputFileName.c_str (), ios::out);
 
     if(output) {
+        output << calib_targs_names << endl;
         for (int k = 0; k < calib.size(); k ++){
             output << calib[k] << '\t';
         }
