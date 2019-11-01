@@ -569,12 +569,12 @@ void Inputs::loadVariables() {
         pCIN2_CA1_45[j] = ApplyMult(pCIN3_CA1_45[j], CIN2_CA);
         pCIN2_CA1_52[j] = ApplyMult(pCIN3_CA1_52[j], CIN2_CA);
         pCIN2_CA1_58[j] = ApplyMult(pCIN3_CA1_58[j], CIN2_CA);
-        mCA1[j] = CaMortality[j][1];
-        mCA2[j] = CaMortality[j][2];
-        mCA3[j] = CaMortality[j][3];
-        mCA1d[j] = CaMortality[j][5];
-        mCA2d[j] = CaMortality[j][6];
-        mCA3d[j] = CaMortality[j][7];
+        mCA1[j] = CaMortality[j][0];
+        mCA2[j] = CaMortality[j][1];
+        mCA3[j] = CaMortality[j][2];
+        mCA1d[j] = CaMortality[j][3];
+        mCA2d[j] = CaMortality[j][4];
+        mCA3d[j] = CaMortality[j][5];
     }
 
     cytosens_NL = cytosens[1][0];

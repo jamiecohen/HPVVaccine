@@ -16,7 +16,7 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         trace[i].resize(y);
         for (int j = 0; j < y; ++j)
-            trace[i][j].resize(8);
+            trace[i][j].resize(2);
     }
 
     inc.resize(Tables.ModelStopAge + 1);
@@ -240,76 +240,88 @@ void Output::createTrace(Woman &Data, int y) {
         }
         trace[Data.CurrentAge][y][0]++; // no cancer (prev DENOM)
         CAdenom[Data.CurrentAge][y]++;
-        if (Data.hpv16){
-            trace[Data.CurrentAge][y][1]++; // all prevalent HPV16
-        } 
-        if (Data.hpv18){
-            trace[Data.CurrentAge][y][2]++; // all prevalent HPV18
-        } 
-        if (Data.hpv31){
-            trace[Data.CurrentAge][y][3]++; // all prevalent HPV31
-        } 
-        if (Data.hpv33){
-            trace[Data.CurrentAge][y][4]++; // all prevalent HPV33
-        } 
-        if (Data.hpv45){
-            trace[Data.CurrentAge][y][5]++; // all prevalent HPV45
-        } 
-        if (Data.hpv52){
-            trace[Data.CurrentAge][y][6]++; // all prevalent HPV52
-        } 
-        if (Data.hpv58){
-            trace[Data.CurrentAge][y][7]++; // all prevalent HPV58
+        if (Data.hpv16 || Data.hpv18 || Data.hpv31 || Data.hpv33 ||Data.hpv45 || Data.hpv52 || Data.hpv58 || Data.hpvotherHR){
+            trace[Data.CurrentAge][y][1]++; // all prevalent hr-HPV
         }
     }
 }
 
 void Output::createCalibOutput(int y) {
-    int numgenotypes = 7;
+
     int HPVcalibnum;
     int HPVcalibdenom;
-    
-    for (int j = 0; j < numgenotypes; j++){
-        HPVcalibnum = 0;
-        HPVcalibdenom = 0;
-        for(int i = 15; i < 21; i++){
-            HPVcalibnum += trace[i][y][1+j];
-            HPVcalibdenom += trace[i][y][0];
-        }
-        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
 
-        HPVcalibnum = 0;
-        HPVcalibdenom = 0;
-        for(int i = 21; i < 25; i++){
-            HPVcalibnum += trace[i][y][1+j];
-            HPVcalibdenom += trace[i][y][0];
-        }
-        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
-
-        HPVcalibnum = 0;
-        HPVcalibdenom = 0;
-        for(int i = 25; i < 30; i++){
-            HPVcalibnum += trace[i][y][1+j];
-            HPVcalibdenom += trace[i][y][0];
-        }
-        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
-
-        HPVcalibnum = 0;
-        HPVcalibdenom = 0;
-        for(int i = 30; i < 50; i++){
-            HPVcalibnum += trace[i][y][1+j];
-            HPVcalibdenom += trace[i][y][0];
-        }
-        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
-
-        HPVcalibnum = 0;
-        HPVcalibdenom = 0;
-        for(int i = 50; i < 90; i++){
-            HPVcalibnum += trace[i][y][1+j];
-            HPVcalibdenom += trace[i][y][0];
-        }
-        calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 17; i < 20; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
     }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 20; i < 25; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 25; i < 30; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 30; i < 35; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 35; i < 40; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 40; i < 45; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 45; i < 50; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 50; i < 55; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 55; i < 65; i++){
+        HPVcalibnum += trace[i][y][1];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
 
     calib.push_back(static_cast<double>(CIN216) / CIN2total );
     calib.push_back(static_cast<double>(CIN218) / CIN2total );
@@ -327,6 +339,111 @@ void Output::createCalibOutput(int y) {
     calib.push_back(static_cast<double>(CIN358) / CIN3total );
     calib.push_back(static_cast<double>(CA16) / cancer );
     calib.push_back(static_cast<double>(CA18) / cancer );
+    calib.push_back(static_cast<double>(CA31) / cancer );
+    calib.push_back(static_cast<double>(CA33) / cancer );
+    calib.push_back(static_cast<double>(CA45) / cancer );
+    calib.push_back(static_cast<double>(CA52) / cancer );
+    calib.push_back(static_cast<double>(CA58) / cancer );
+
+    int CAnew;
+    int CAdenom;
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 15; i < 20; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 20; i < 25; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 25; i < 30; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 30; i < 35; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 35; i < 40; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 40; i < 45; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 45; i < 50; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 50; i < 55; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 55; i < 60; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 60; i < 65; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 65; i < 70; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
+    CAnew = 0;
+    CAdenom = 0;
+    for(int i = 70; i < 75; i++){
+        CAnew += CAcount[i][y];
+        CAdenom += TotalCancerDenom[i][y];
+    }
+    calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
+
 }
 
 void Output::writeCalibOutput(std::string *Outdir, std::string calib_targs_names) {

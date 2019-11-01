@@ -10,7 +10,7 @@ using namespace std;
 calibrate::calibrate(int n_sims, int n_params, int n_targs) {
 
     calib_targs.resize (n_targs);
-    calib_targs_SD.resize (n_targs);
+    calib_targs_N.resize (n_targs);
 
     multipliers.resize(n_params);
     for(int i = 0; i < n_params; i++){
@@ -43,9 +43,9 @@ calibrate::~calibrate(void) {
 }
 
 void calibrate::CalculateGOF(int n_sims, double tuning_factor, double rand) {
-    GOF.push_back (WeightedDistance (saved_output[n_sims][0], calib_targs[0], calib_targs_SD[0]));
+    GOF.push_back (WeightedDistance (saved_output[n_sims][0], calib_targs[0], calib_targs_N[0]));
     for (int i = 1; i < calib_targs.size(); i ++){
-        GOF[n_sims] += WeightedDistance (saved_output[n_sims][i], calib_targs[i], calib_targs_SD[i]);
+        GOF[n_sims] += WeightedDistance (saved_output[n_sims][i], calib_targs[i], calib_targs_N[i]);
     }
     if (n_sims == 0){
         GOF_min = GOF[0];
@@ -103,8 +103,8 @@ std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
     return(calib_params[n_sim]);
 }
 
-double calibrate::WeightedDistance(double data, double mean, double SD) {
-    double distance = pow((data - mean)/(SD * 2),2);
+double calibrate::WeightedDistance(double data, double mean, double N) {
+    double distance = pow((data - mean)/sqrt(N),2);
     return distance;
 }
 

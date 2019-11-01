@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("test.ini");
+        RunsFileName.append("Calibration.ini");
         FileName = "test.ini";
     }
     else if(argc > 1){
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
         calib.calib_targs_names = tables.CalibTargsNames;
         for (int i = 0; i < n_targs; i ++){
             calib.calib_targs[i] = tables.CalibTargs[i][0];
-            calib.calib_targs_SD[i] = tables.CalibTargs[i][1];
+            calib.calib_targs_N[i] = tables.CalibTargs[i][1];
         }
         for (int i = 0; i < n_params; i++){
             for (int j = 0; j < 3; j++){
