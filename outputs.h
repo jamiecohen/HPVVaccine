@@ -75,6 +75,7 @@ public:
     unsigned int CIN352;
     unsigned int CIN358;
     unsigned int CIN3otherHR;
+    unsigned int CIN3LR;
     unsigned int CIN216;
     unsigned int CIN218;
     unsigned int CIN231;
@@ -83,6 +84,7 @@ public:
     unsigned int CIN252;
     unsigned int CIN258;
     unsigned int CIN2otherHR;
+    unsigned int CIN2LR;
     unsigned int CIN2total;
     unsigned int CIN3total;
     IntMatrix hpvscreens;
@@ -128,6 +130,7 @@ public:
 
     void createTrace(Woman &Data, int y);
     void writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears);
+    void createTypeDist(Woman &Data);
     void createCalibOutput(int y);
     void calcDwellTime(Woman &Data);
     void writeDwellTime(std::string *Outdir);

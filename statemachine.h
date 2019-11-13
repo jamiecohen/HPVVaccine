@@ -24,6 +24,7 @@ public:
     double mCA;
     double pHPV_NL;
     double pHPV_CIN;
+    double prop_CIN2;
     double pCIN3_HPV;
     double pCIN2_HPV;
     double pCIN3_CA;
@@ -67,8 +68,6 @@ public:
     static void CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype, int i, int y);
     static void CountDetectedCancer(Woman &Data, Output &Count, int y);
     void GetMortality(Woman &Data, Inputs &Tables);
-    static void CountCIN2(Woman &Data, Output &Count);
-    static void CountCIN3(Woman &Data, Output &Count);
     void GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help);
 };
 

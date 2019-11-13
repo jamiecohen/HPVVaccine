@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Calibration.ini");
-        FileName = "test.ini";
+        RunsFileName.append("test_naive.ini");
+        FileName = "test_naive.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -234,6 +234,9 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
         CurrentModelYear++;
     }
 
+    for (auto & k : women) {
+        trace_burnin.createTypeDist (k);
+    }
     trace_burnin.createCalibOutput (SimulationYears-1);
     calib.saved_output[i] = trace_burnin.calib;
     double rand;
@@ -320,6 +323,7 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
 
     for (auto & j : women) {
         trace.calcDwellTime(j);
+        trace.createTypeDist (j);
     }
     trace.createCalibOutput (TotalSimYears-1);
     women.clear();

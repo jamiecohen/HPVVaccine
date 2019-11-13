@@ -16,7 +16,7 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         trace[i].resize(y);
         for (int j = 0; j < y; ++j)
-            trace[i][j].resize(2);
+            trace[i][j].resize(7);
     }
 
     inc.resize(Tables.ModelStopAge + 1);
@@ -242,8 +242,88 @@ void Output::createTrace(Woman &Data, int y) {
         CAdenom[Data.CurrentAge][y]++;
         if (Data.hpv16 || Data.hpv18 || Data.hpv31 || Data.hpv33 ||Data.hpv45 || Data.hpv52 || Data.hpv58 || Data.hpvotherHR){
             trace[Data.CurrentAge][y][1]++; // all prevalent hr-HPV
+            if(Data.hpv16){
+                trace[Data.CurrentAge][y][2]++; // all prevalent HPV16
+            }
+            if(Data.hpv18){
+                trace[Data.CurrentAge][y][3]++; // all prevalent HPV18
+            }
+            if(Data.hpv31 || Data.hpv33 ||Data.hpv45 || Data.hpv52 || Data.hpv58){
+                trace[Data.CurrentAge][y][4]++; // all prevalent high-5
+            }
+            if(Data.hpvotherHR){
+                trace[Data.CurrentAge][y][5]++; // all prevalent HPVotherHR
+            }
+        }
+
+        if(Data.hpvlo){
+            trace[Data.CurrentAge][y][6]++; // all prevalent HPVLR
         }
     }
+}
+
+void Output::createTypeDist(Woman &Data) {
+    if (!Data.CIN2Lesions.empty()){
+        CIN2total++;
+        if(Data.hpv16){
+            CIN216++;
+        }
+        if(Data.hpv18){
+            CIN218++;
+        }
+        if(Data.hpv31){
+            CIN231++;
+        }
+        if(Data.hpv33){
+            CIN233++;
+        }
+        if(Data.hpv45){
+            CIN245++;
+        }
+        if(Data.hpv52){
+            CIN252++;
+        }
+        if(Data.hpv58){
+            CIN258++;
+        }
+        if(Data.hpvotherHR){
+            CIN2otherHR++;
+        }
+        if(Data.hpvlo){
+            CIN2LR++;
+        }
+    }
+    if (!Data.CIN3Lesions.empty()){
+        CIN3total++;
+        if(Data.hpv16){
+            CIN316++;
+        }
+        if(Data.hpv18){
+            CIN318++;
+        }
+        if(Data.hpv31){
+            CIN331++;
+        }
+        if(Data.hpv33){
+            CIN333++;
+        }
+        if(Data.hpv45){
+            CIN345++;
+        }
+        if(Data.hpv52){
+            CIN352++;
+        }
+        if(Data.hpv58){
+            CIN358++;
+        }
+        if(Data.hpvotherHR){
+            CIN3otherHR++;
+        }
+        if(Data.hpvlo){
+            CIN3LR++;
+        }
+    }
+    
 }
 
 void Output::createCalibOutput(int y) {
@@ -323,6 +403,46 @@ void Output::createCalibOutput(int y) {
     }
     calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
 
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 16; i < 23; i++){
+        HPVcalibnum += trace[i][y][2];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 16; i < 23; i++){
+        HPVcalibnum += trace[i][y][3];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 16; i < 23; i++){
+        HPVcalibnum += trace[i][y][4];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 16; i < 23; i++){
+        HPVcalibnum += trace[i][y][5];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
+    HPVcalibnum = 0;
+    HPVcalibdenom = 0;
+    for(int i = 16; i < 23; i++){
+        HPVcalibnum += trace[i][y][6];
+        HPVcalibdenom += trace[i][y][0];
+    }
+    calib.push_back (static_cast<double>(HPVcalibnum)/HPVcalibdenom);
+
     calib.push_back(static_cast<double>(CIN216) / CIN2total );
     calib.push_back(static_cast<double>(CIN218) / CIN2total );
     calib.push_back(static_cast<double>(CIN231) / CIN2total );
@@ -330,6 +450,7 @@ void Output::createCalibOutput(int y) {
     calib.push_back(static_cast<double>(CIN245) / CIN2total );
     calib.push_back(static_cast<double>(CIN252) / CIN2total );
     calib.push_back(static_cast<double>(CIN258) / CIN2total );
+    calib.push_back(static_cast<double>(CIN2LR) / CIN2total );
     calib.push_back(static_cast<double>(CIN316) / CIN3total );
     calib.push_back(static_cast<double>(CIN318) / CIN3total );
     calib.push_back(static_cast<double>(CIN331) / CIN3total );
@@ -337,6 +458,7 @@ void Output::createCalibOutput(int y) {
     calib.push_back(static_cast<double>(CIN345) / CIN3total );
     calib.push_back(static_cast<double>(CIN352) / CIN3total );
     calib.push_back(static_cast<double>(CIN358) / CIN3total );
+    calib.push_back(static_cast<double>(CIN3LR) / CIN3total );
     calib.push_back(static_cast<double>(CA16) / cancer );
     calib.push_back(static_cast<double>(CA18) / cancer );
     calib.push_back(static_cast<double>(CA31) / cancer );
