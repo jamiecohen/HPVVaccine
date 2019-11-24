@@ -66,6 +66,7 @@ public:
     void GetCIN2Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);
     void GetCIN3Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype);
     static void CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype, int i, int y);
+    static void CountCIN(Woman &Data, Woman::hpvT genotype, int i);
     static void CountDetectedCancer(Woman &Data, Output &Count, int y);
     void GetMortality(Woman &Data, Inputs &Tables);
     void GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &help);

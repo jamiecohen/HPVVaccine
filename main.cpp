@@ -10,7 +10,7 @@
 #include <vector>
 #include "statemachine.h"
 #include <boost/filesystem.hpp>
-#include <random>
+#include <ctime>
 #include "calibrate.h"
 #include <thread>
 
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("test_naive.ini");
+        RunsFileName.append("Calibration.ini");
         FileName = "test_naive.ini";
     }
     else if(argc > 1){
@@ -77,7 +77,10 @@ int main(int argc, char* argv[]) {
             }
         }
         for (int i = 0; i < n_sims; i++){
+            clock_t begin = clock();
             RunCalibration (calib, tables, i);
+            clock_t end = clock();
+            cout << double(end - begin) / CLOCKS_PER_SEC << " Seconds" << endl;
         }
         string OutDir = OutputFolder.append("HPVVaccine_Calib");
         if(argc == 4){
@@ -101,6 +104,23 @@ int main(int argc, char* argv[]) {
             cerr << "Warning: Unable to open " << OutputFileName << endl;
         output.close();
         output.clear();
+
+        OutputFileName.clear();
+        OutputFileName.append(OutDir);
+        OutputFileName.append("/");
+        OutputFileName.append("all_GOF.txt");
+        output.open(OutputFileName.c_str (), ios::out);
+        if(output) {
+            for(int i = 0; i < n_sims; i++){
+                output << "Sim" << i << '\t';
+                output << calib.GOF[i] << endl;
+            }
+        }
+        else
+            cerr << "Warning: Unable to open " << OutputFileName << endl;
+        output.close();
+        output.clear();
+
         OutputFileName.clear();
         OutputFileName.append(OutDir);
         OutputFileName.append("/");
@@ -133,6 +153,7 @@ int main(int argc, char* argv[]) {
             cerr << "Warning: Unable to open " << OutputFileName << endl;
         output.close();
         output.clear();
+
     } else if (RunsFile.GetValue(RunType, "RunType") == "Cohort") {
 
         cout << "Running " << FileName << endl;

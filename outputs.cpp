@@ -174,6 +174,7 @@ Output::Output(Inputs &Tables, int y) {
     CIN345 = 0;
     CIN352 = 0;
     CIN358 = 0;
+    CIN3LR = 0;
     CIN216 = 0;
     CIN218 = 0;
     CIN231 = 0;
@@ -181,6 +182,7 @@ Output::Output(Inputs &Tables, int y) {
     CIN245 = 0;
     CIN252 = 0;
     CIN258 = 0;
+    CIN2LR = 0;
     CAotherHR = 0;
     CIN2otherHR = 0;
     CIN3otherHR = 0;
@@ -473,7 +475,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 15; i < 20; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -481,7 +483,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 20; i < 25; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -489,7 +491,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 25; i < 30; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -497,7 +499,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 30; i < 35; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -505,7 +507,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 35; i < 40; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -513,7 +515,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 40; i < 45; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -521,7 +523,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 45; i < 50; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -529,7 +531,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 50; i < 55; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -537,7 +539,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 55; i < 60; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -545,7 +547,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 60; i < 65; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -553,7 +555,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 65; i < 70; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);
@@ -561,7 +563,7 @@ void Output::createCalibOutput(int y) {
     CAnew = 0;
     CAdenom = 0;
     for(int i = 70; i < 75; i++){
-        CAnew += CAcount[i][y];
+        CAnew += DetectedCAcount[i][y];
         CAdenom += TotalCancerDenom[i][y];
     }
     calib.push_back (100000*static_cast<double>(CAnew)/CAdenom);

@@ -59,9 +59,6 @@ public:
     std::string CINRegressionFile;
     std::vector< std::vector<double> > CINRegression;
 
-    std::string SymptomDetectionFile;
-    std::vector< std::vector<double> > sympdet;
-
     std::string VaccineEfficacyFile;
     std::vector< std::vector<double> > vaccineefficacy;
 
@@ -125,11 +122,12 @@ public:
 
     double CIN2_NL;
 
-    double CIN2_NL_LR;
-    double CIN2_NL_high5;
-    double CIN2_NL_16;
-    double CIN2_NL_18;
-    double CIN2_NL_otherHR;
+    double CIN2_NL_allother_1;
+    double CIN2_NL_allother_2_4;
+    double CIN2_NL_allother_5;
+    double CIN2_NL_16_1;
+    double CIN2_NL_16_2_4;
+    double CIN2_NL_16_5;
     double HPV_NL_LR_1;
     double HPV_NL_LR_2_4;
     double HPV_NL_LR_5;
@@ -240,12 +238,12 @@ public:
     double CIN2_CA;
     double HPV_CIN2_16;
     double HPV_CIN2_allother;
-
+    double CA1_CA1d;
+    double CA2_CA2d;
+    double CA3_CA3d;
     double CA1_CA2;
     double CA2_CA3;
-    double pCA1_CA1D;
-    double pCA2_CA2D;
-    double pCA3_CA3D;
+
     double pHPV_LR[100];
     double pHPV_otherHR[100];
     double pHPV_16[100];
@@ -280,16 +278,16 @@ public:
     double pHPV_45_CIN[100];
     double pHPV_52_CIN[100];
     double pHPV_58_CIN[100];
-    double pCIN3_NL_16;
-    double pCIN3_NL_18;
-    double pCIN3_NL_LR;
-    double pCIN3_NL_oHR;
-    double pCIN3_NL_high5;
-    double pCIN2_NL_16;
-    double pCIN2_NL_18;
-    double pCIN2_NL_LR;
-    double pCIN2_NL_oHR;
-    double pCIN2_NL_high5;
+    double pCIN3_NL_16[100];
+    double pCIN3_NL_18[100];
+    double pCIN3_NL_LR[100];
+    double pCIN3_NL_oHR[100];
+    double pCIN3_NL_high5[100];
+    double pCIN2_NL_16[100];
+    double pCIN2_NL_18[100];
+    double pCIN2_NL_LR[100];
+    double pCIN2_NL_oHR[100];
+    double pCIN2_NL_high5[100];
     double pHPV_LR_NL[100];
     double pHPV_otherHR_NL[100];
     double pHPV_16_NL[100];

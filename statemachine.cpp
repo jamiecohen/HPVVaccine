@@ -14,93 +14,69 @@ StateMachine::StateMachine() {
 void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
     if (Data.Alive) {
         StateMachine::GetMortality (Data, Tables);
-        switch (Data.cancerstage) {
-            case Woman::Stage1:
-                rand = help.getrand ();
-                if (rand < Tables.CA1_CA2) {
-                    Data.cancerstage = Data.Stage2;
-                    Data.ca2Timer++;
-                } else if (rand < (Tables.CA1_CA2 + mCA)) {
-                    Data.Alive = false;
-                    Count.totaldeadcancer++;
-                } else if (rand < (Tables.CA1_CA2 + mCA + Tables.pCA1_CA1D)) {
-                    Data.cancerstage = Data.Stage1d;
-                    Count.DwellTime_CA_detected_num += Data.ca1Timer;
-                    Count.DwellTime_CA_detected_denom++;
-                    StateMachine::CountDetectedCancer (Data, Count, y);
+        rand = help.getrand ();
+        if (rand <  mCA) {
+            Data.Alive = false;
+            Count.totaldeadcancer++;
+        } else {
+            switch (Data.cancerstage) {
+                case Woman::Stage1:
+                    rand = help.getrand ();
+                    if (rand < Tables.CA1_CA2) {
+                        Data.cancerstage = Data.Stage2;
+                        Data.ca2Timer++;
+                    } else if (rand < (Tables.CA1_CA2 + Tables.CA1_CA1d)) {
+                        Data.cancerstage = Data.Stage1d;
+                        Count.DwellTime_CA_detected_num += Data.ca1Timer;
+                        Count.DwellTime_CA_detected_denom++;
+                        StateMachine::CountDetectedCancer (Data, Count, y);
+                        Data.ca1Timer++;
+                        StateMachine::Colpo (Data, Tables, Count, help);
+                    } else {
+                        Data.ca1Timer++;
+                    }
+                    break;
+                case Woman::Stage2:
+                    rand = help.getrand ();
+                    if (rand < Tables.CA2_CA3) {
+                        Data.cancerstage = Data.Stage3;
+                        Data.ca3Timer++;
+                    } else if (rand < (Tables.CA2_CA3 + Tables.CA2_CA2d)) {
+                        Data.cancerstage = Data.Stage2d;
+                        StateMachine::CountDetectedCancer (Data, Count, y);
+                        Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer;
+                        Count.DwellTime_CA_detected_denom++;
+                        Data.ca2Timer++;
+                        StateMachine::Colpo (Data, Tables, Count, help);
+                    } else {
+                        Data.ca2Timer++;
+                    }
+                    break;
+                case Woman::Stage3:
+                    rand = help.getrand ();
+                    if (rand <  Tables.CA3_CA3d) {
+                        Data.cancerstage = Data.Stage3d;
+                        StateMachine::CountDetectedCancer (Data, Count, y);
+                        Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer + Data.ca3Timer;
+                        Count.DwellTime_CA_detected_denom++;
+                        Data.ca3Timer++;
+                        StateMachine::Colpo (Data, Tables, Count, help);
+                    } else {
+                        Data.ca3Timer++;
+                    }
+                    break;
+                case Woman::Stage1d:
                     Data.ca1Timer++;
-                    StateMachine::Colpo (Data, Tables, Count, help);
-                } else {
-                    Data.ca1Timer++;
-                }
-                break;
-            case Woman::Stage2:
-                rand = help.getrand ();
-                if (rand < Tables.CA2_CA3) {
-                    Data.cancerstage = Data.Stage3;
-                    Data.ca3Timer++;
-                } else if (rand < (Tables.CA2_CA3 + mCA)) {
-                    Data.Alive = false;
-                    Count.totaldeadcancer++;
-                } else if (rand < (Tables.CA2_CA3 + mCA + Tables.pCA2_CA2D)) {
-                    Data.cancerstage = Data.Stage2d;
-                    StateMachine::CountDetectedCancer (Data, Count, y);
-                    Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer;
-                    Count.DwellTime_CA_detected_denom++;
+                    break;
+                case Woman::Stage2d:
                     Data.ca2Timer++;
-                    StateMachine::Colpo (Data, Tables, Count, help);
-                } else {
-                    Data.ca2Timer++;
-                }
-                break;
-            case Woman::Stage3:
-                rand = help.getrand ();
-                if (rand < mCA) {
-                    Data.Alive = false;
-                    Count.totaldeadcancer++;
-                } else if (rand < (mCA + Tables.pCA3_CA3D)) {
-                    Data.cancerstage = Data.Stage3d;
-                    StateMachine::CountDetectedCancer (Data, Count, y);
-                    Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer + Data.ca3Timer;
-                    Count.DwellTime_CA_detected_denom++;
+                    break;
+                case Woman::Stage3d:
                     Data.ca3Timer++;
-                    StateMachine::Colpo (Data, Tables, Count, help);
-                } else {
-                    Data.ca3Timer++;
-                }
-                break;
-            case Woman::Stage1d:
-                rand = help.getrand ();
-                if (rand < mCA) {
-                    Count.CAdead[Data.CurrentAge][y]++;
-                    Count.totaldeadcancer++;
-                    Data.Alive = false;
-                } else {
-                    Data.ca1Timer++;
-                }
-                break;
-            case Woman::Stage2d:
-                rand = help.getrand ();
-                if (rand < mCA) {
-                    Count.CAdead[Data.CurrentAge][y]++;
-                    Count.totaldeadcancer++;
-                    Data.Alive = false;
-                } else {
-                    Data.ca2Timer++;
-                }
-                break;
-            case Woman::Stage3d:
-                rand = help.getrand ();
-                if (rand < mCA) {
-                    Count.CAdead[Data.CurrentAge][y]++;
-                    Count.totaldeadcancer++;
-                    Data.Alive = false;
-                } else {
-                    Data.ca3Timer++;
-                }
-                break;
-            default:
-                break;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
@@ -115,6 +91,7 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
             rand = help.getrand ();
             if (rand < pHPV_CIN) {
                 Data.HPVinfectionTimer[i]++;
+                StateMachine::CountCIN (Data, Data.HPVinfections[i], Data.HPVinfectionTimer[i]);
                 rand = help.getrand ();
                 if (rand < prop_CIN2){
                     Data.CIN2Lesions.push_back (Data.HPVinfections[i]);
@@ -723,39 +700,39 @@ void StateMachine::GetCIN2Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT g
         switch(genotype){
             case Woman::No:break;
             case Woman::Low:
-                pCIN2_HPV = Tables.pCIN2_NL_LR;
+                pCIN2_HPV = Tables.pCIN2_NL_LR[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = 0;
                 break;
             case Woman::otherHR:
-                pCIN2_HPV = Tables.pCIN2_NL_oHR;
+                pCIN2_HPV = Tables.pCIN2_NL_oHR[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_oHR[Data.CIN2LesionTimer[i]];
                 break;
             case Woman::High16:
-                pCIN2_HPV = Tables.pCIN2_NL_16;
+                pCIN2_HPV = Tables.pCIN2_NL_16[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_16[Data.CIN2LesionTimer[i]];
                 break;
             case Woman::High18:
-                pCIN2_HPV = Tables.pCIN2_NL_18;
+                pCIN2_HPV = Tables.pCIN2_NL_18[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_18[Data.CIN2LesionTimer[i]];
                 break;
             case Woman::High31:
-                pCIN2_HPV = Tables.pCIN2_NL_high5;
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_31[Data.CIN2LesionTimer[i]];
                 break;
             case Woman::High33:
-                pCIN2_HPV = Tables.pCIN2_NL_high5;
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_33[Data.CIN2LesionTimer[i]];
                 break;
             case Woman::High45:
-                pCIN2_HPV = Tables.pCIN2_NL_high5;
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_45[Data.CIN2LesionTimer[i]];
                 break;
             case Woman::High52:
-                pCIN2_HPV = Tables.pCIN2_NL_high5;
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_52[Data.CIN2LesionTimer[i]];
                 break;
             case Woman::High58:
-                pCIN2_HPV = Tables.pCIN2_NL_high5;
+                pCIN2_HPV = Tables.pCIN2_NL_high5[Data.CIN2LesionTimer[i]];
                 pCIN2_CA = Tables.pCIN2_CA1_58[Data.CIN2LesionTimer[i]];
                 break;
         }
@@ -768,39 +745,39 @@ void StateMachine::GetCIN3Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT g
         switch(genotype){
             case Woman::No:break;
             case Woman::Low:
-                pCIN3_HPV = Tables.pCIN3_NL_LR;
+                pCIN3_HPV = Tables.pCIN3_NL_LR[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = 0;
                 break;
             case Woman::otherHR:
-                pCIN3_HPV = Tables.pCIN3_NL_oHR;
+                pCIN3_HPV = Tables.pCIN3_NL_oHR[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_oHR[Data.CIN3LesionTimer[i]];
                 break;
             case Woman::High16:
-                pCIN3_HPV = Tables.pCIN3_NL_16;
+                pCIN3_HPV = Tables.pCIN3_NL_16[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_16[Data.CIN3LesionTimer[i]];
                 break;
             case Woman::High18:
-                pCIN3_HPV = Tables.pCIN3_NL_18;
+                pCIN3_HPV = Tables.pCIN3_NL_18[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_18[Data.CIN3LesionTimer[i]];
                 break;
             case Woman::High31:
-                pCIN3_HPV = Tables.pCIN3_NL_high5;
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_31[Data.CIN3LesionTimer[i]];
                 break;
             case Woman::High33:
-                pCIN3_HPV = Tables.pCIN3_NL_high5;
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_33[Data.CIN3LesionTimer[i]];
                 break;
             case Woman::High45:
-                pCIN3_HPV = Tables.pCIN3_NL_high5;
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_45[Data.CIN3LesionTimer[i]];
                 break;
             case Woman::High52:
-                pCIN3_HPV = Tables.pCIN3_NL_high5;
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_52[Data.CIN3LesionTimer[i]];
                 break;
             case Woman::High58:
-                pCIN3_HPV = Tables.pCIN3_NL_high5;
+                pCIN3_HPV = Tables.pCIN3_NL_high5[Data.CIN3LesionTimer[i]];
                 pCIN3_CA = Tables.pCIN3_CA1_58[Data.CIN3LesionTimer[i]];
                 break;
         }
@@ -810,6 +787,37 @@ void StateMachine::GetCIN3Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT g
 void StateMachine::CountDetectedCancer(Woman &Data, Output &Count, int y) {
     Count.TotalDetectedCancer[Data.CurrentAge][y]++;
     Count.DetectedCAcount[Data.CurrentAge][y]++;
+}
+
+void StateMachine::CountCIN(Woman &Data, Woman::hpvT genotype, int i) {
+    switch(genotype){
+        case Woman::No:break;
+        case Woman::Low:break;
+        case Woman::otherHR:
+            Data.CINoHR = i;
+            break;
+        case Woman::High16:
+            Data.CIN16 = i;
+            break;
+        case Woman::High18:
+            Data.CIN18 = i;
+            break;
+        case Woman::High31:
+            Data.CIN31 = i;
+            break;
+        case Woman::High33:
+            Data.CIN33 = i;
+            break;
+        case Woman::High45:
+            Data.CIN45 = i;
+            break;
+        case Woman::High52:
+            Data.CIN52 = i;
+            break;
+        case Woman::High58:
+            Data.CIN58 = i;
+            break;
+    }
 }
 
 void StateMachine::CountCancer(Woman &Data, Output &Count, Woman::hpvT genotype, int i, int y) {

@@ -13,20 +13,20 @@ calibrate::calibrate(int n_sims, int n_params, int n_targs) {
     calib_targs_N.resize (n_targs);
 
     multipliers.resize(n_params);
-    for(int i = 0; i < n_params; i++){
+    for (int i = 0; i < n_params; i++) {
         multipliers[i].resize(3);
     }
 
     multipliers_type.resize(n_params);
 
     calib_params.resize (n_sims);
-    for (int i = 0; i < calib_params.size(); i++){
-        calib_params[i].resize (n_params);
+    for (auto & calib_param : calib_params){
+        calib_param.resize (n_params);
     }
 
     saved_output.resize (n_sims);
-    for (int i = 0; i < saved_output.size(); i++){
-        saved_output[i].resize (n_targs);
+    for (auto & i : saved_output){
+        i.resize (n_targs);
     }
 
     best_params.resize (n_params);
@@ -104,7 +104,7 @@ std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
 }
 
 double calibrate::WeightedDistance(double data, double mean, double N) {
-    double distance = pow((data - mean)/sqrt(N),2);
+    double distance = pow((data - mean)/2*N,2);
     return distance;
 }
 

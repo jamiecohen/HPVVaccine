@@ -51,7 +51,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     //[NaturalHistory] variable names
     //Natural History related distributions
     //e.g. string TableExampleFileName = "TableExampleFile";
-    string StartHealthName = "StartHealth";
     string ASRMortalityFileName = "ASRMortalityFile";
     string HPVIncidenceFileName = "HPVIncidenceFile";
     string HPVProgressionFileName = "HPVProgressionFile";
@@ -88,11 +87,12 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
 
     //[Multipliers] variable names
     //[NaturalImmunity Multipliers] variable names
-    string CIN2_NL_LRName = "CIN2_NL_LR";
-    string CIN2_NL_high5Name = "CIN2_NL_high5";
-    string CIN2_NL_16Name = "CIN2_NL_16";
-    string CIN2_NL_18Name = "CIN2_NL_18";
-    string CIN2_NL_otherHRName = "CIN2_NL_otherHR";
+    string CIN2_NL_allother_1Name = "CIN2_NL_allother_1";
+    string CIN2_NL_allother_2_4Name = "CIN2_NL_allother_2_4";
+    string CIN2_NL_allother_5Name = "CIN2_NL_allother_5";
+    string CIN2_NL_16_1Name = "CIN2_NL_16_1";
+    string CIN2_NL_16_2_4Name = "CIN2_NL_16_2_4";
+    string CIN2_NL_16_5Name = "CIN2_NL_16_5";
     string HPV_NL_LR_1Name = "HPV_NL_LR_1";
     string HPV_NL_LR_2_4Name = "HPV_NL_LR_2_4";
     string HPV_NL_LR_5Name = "HPV_NL_LR_5";
@@ -203,6 +203,9 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string CIN2_CAName = "CIN2_CA";
     string HPV_CIN2_16Name = "HPV_CIN2_16";
     string HPV_CIN2_allotherName = "HPV_CIN2_allother";
+    string CA1_CA1dName = "CA1_CA1d";
+    string CA2_CA2dName = "CA2_CA2d";
+    string CA3_CA3dName = "CA3_CA3d";
     string CA1_CA2Name = "CA1_CA2";
     string CA2_CA3Name = "CA2_CA3";
 
@@ -400,18 +403,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
-    SymptomDetectionFile.append(DataFolder);
-    SymptomDetectionFile.append(RunsFile.GetValue(CurKey, SymptomDetectionFileName));
-    Infile.open(SymptomDetectionFile, ios::in);
-    if(Infile.fail())
-    {
-        cerr << "\nError: Unable to open file: " << SymptomDetectionFile << endl;
-        exit(1);
-    }
-
-    loadData (Infile, sympdet);
-    Infile.close();
-    Infile.clear();
 
     //[Interventions]
 
@@ -489,16 +480,16 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     ImmuneDuration = RunsFile.GetValueI(CurKey, ImmuneDurationName);
     MechanismofImmunity = RunsFile.GetValue (CurKey, MechanismofImmunityName);
     LatencyTime = RunsFile.GetValueI (CurKey, LatencyTimeName);
-    CA1_CA2 = RunsFile.GetValueF(CurKey, CA1_CA2Name);
-    CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
+
 
     // NEW PARAMETERS
 
-    CIN2_NL_LR = RunsFile.GetValueF(CurKey, CIN2_NL_LRName);
-    CIN2_NL_high5 = RunsFile.GetValueF(CurKey, CIN2_NL_high5Name);
-    CIN2_NL_16 = RunsFile.GetValueF(CurKey, CIN2_NL_16Name);
-    CIN2_NL_18 = RunsFile.GetValueF(CurKey, CIN2_NL_18Name);
-    CIN2_NL_otherHR = RunsFile.GetValueF(CurKey, CIN2_NL_otherHRName);
+    CIN2_NL_allother_1 = RunsFile.GetValueF(CurKey, CIN2_NL_allother_1Name);
+    CIN2_NL_allother_2_4 = RunsFile.GetValueF(CurKey, CIN2_NL_allother_2_4Name);
+    CIN2_NL_allother_5 = RunsFile.GetValueF(CurKey, CIN2_NL_allother_5Name);
+    CIN2_NL_16_1 = RunsFile.GetValueF(CurKey, CIN2_NL_16_1Name);
+    CIN2_NL_16_2_4 = RunsFile.GetValueF(CurKey, CIN2_NL_16_2_4Name);
+    CIN2_NL_16_5 = RunsFile.GetValueF(CurKey, CIN2_NL_16_5Name);
     HPV_NL_LR_1 = RunsFile.GetValueF(CurKey, HPV_NL_LR_1Name);
     HPV_NL_LR_2_4 = RunsFile.GetValueF(CurKey, HPV_NL_LR_2_4Name);
     HPV_NL_LR_5 = RunsFile.GetValueF(CurKey, HPV_NL_LR_5Name);
@@ -609,6 +600,11 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     CIN2_CA = RunsFile.GetValueF(CurKey, CIN2_CAName);
     HPV_CIN2_16 = RunsFile.GetValueF(CurKey, HPV_CIN2_16Name);
     HPV_CIN2_allother = RunsFile.GetValueF(CurKey, HPV_CIN2_allotherName);
+    CA1_CA1d = RunsFile.GetValueF(CurKey, CA1_CA1dName);
+    CA2_CA2d = RunsFile.GetValueF(CurKey, CA2_CA2dName);
+    CA3_CA3d = RunsFile.GetValueF(CurKey, CA3_CA3dName);
+    CA1_CA2 = RunsFile.GetValueF(CurKey, CA1_CA2Name);
+    CA2_CA3 = RunsFile.GetValueF(CurKey, CA2_CA3Name);
 
     burnin.clear();
     for(int i = 0; i < ModelStopAge; i++){
@@ -629,19 +625,6 @@ void Inputs::loadVariables() {
     }
 
     CIN2_NL = CINRegression[0][0];
-    pCIN2_NL_16 = ApplyMult (CIN2_NL, CIN2_NL_16);
-    pCIN3_NL_16 = ApplyMult (pCIN2_NL_16, CIN3_NL);
-    pCIN2_NL_18 = ApplyMult (CIN2_NL, CIN2_NL_18);
-    pCIN3_NL_18 = ApplyMult (pCIN2_NL_18, CIN3_NL);
-    pCIN2_NL_high5 = ApplyMult (CIN2_NL, CIN2_NL_high5);
-    pCIN3_NL_high5 = ApplyMult (pCIN2_NL_high5, CIN3_NL);
-    pCIN2_NL_oHR = ApplyMult (CIN2_NL, CIN2_NL_otherHR);
-    pCIN3_NL_oHR = ApplyMult (pCIN2_NL_oHR, CIN3_NL);
-    pCIN2_NL_LR = ApplyMult (CIN2_NL, CIN2_NL_LR);
-    pCIN3_NL_LR = ApplyMult (pCIN3_NL_LR, CIN3_NL);
-    pCA1_CA1D = sympdet[0][0];
-    pCA2_CA2D = sympdet[1][0];
-    pCA3_CA3D = sympdet[2][0];
 
     for (int j = 0; j < 99; j ++){
         pHPV_16[j] = HPVInc[j][0];
@@ -830,6 +813,16 @@ void Inputs::loadVariables() {
             pHPV_45_CIN[j] = ApplyMult(HPVProgression[j][6], HPV_CIN_high5_1);
             pHPV_52_CIN[j] = ApplyMult(HPVProgression[j][7], HPV_CIN_high5_1);
             pHPV_58_CIN[j] = ApplyMult(HPVProgression[j][8], HPV_CIN_high5_1);
+            pCIN2_NL_16[j] = ApplyMult (CIN2_NL, CIN2_NL_16_1);
+            pCIN3_NL_16[j] = ApplyMult (pCIN2_NL_16[j], CIN3_NL);
+            pCIN2_NL_18[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_1);
+            pCIN3_NL_18[j] = ApplyMult (pCIN2_NL_18[j], CIN3_NL);
+            pCIN2_NL_high5[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_1);
+            pCIN3_NL_high5[j] = ApplyMult (pCIN2_NL_high5[j], CIN3_NL);
+            pCIN2_NL_oHR[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_1);
+            pCIN3_NL_oHR[j] = ApplyMult (pCIN2_NL_oHR[j], CIN3_NL);
+            pCIN2_NL_LR[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_1);
+            pCIN3_NL_LR[j] = ApplyMult (pCIN3_NL_LR[j], CIN3_NL);
         } else if (j < 5){
             pHPV_LR_NL[j] = ApplyMult(HPVClearance[j][0], HPV_NL_LR_2_4);
             pHPV_otherHR_NL[j] = ApplyMult(HPVClearance[j][1], HPV_NL_otherHR_2_4);
@@ -849,6 +842,16 @@ void Inputs::loadVariables() {
             pHPV_45_CIN[j] = ApplyMult(HPVProgression[j][6], HPV_CIN_high5_2_4);
             pHPV_52_CIN[j] = ApplyMult(HPVProgression[j][7], HPV_CIN_high5_2_4);
             pHPV_58_CIN[j] = ApplyMult(HPVProgression[j][8], HPV_CIN_high5_2_4);
+            pCIN2_NL_16[j] = ApplyMult (CIN2_NL, CIN2_NL_16_2_4);
+            pCIN3_NL_16[j] = ApplyMult (pCIN2_NL_16[j], CIN3_NL);
+            pCIN2_NL_18[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_2_4);
+            pCIN3_NL_18[j] = ApplyMult (pCIN2_NL_18[j], CIN3_NL);
+            pCIN2_NL_high5[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_2_4);
+            pCIN3_NL_high5[j] = ApplyMult (pCIN2_NL_high5[j], CIN3_NL);
+            pCIN2_NL_oHR[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_2_4);
+            pCIN3_NL_oHR[j] = ApplyMult (pCIN2_NL_oHR[j], CIN3_NL);
+            pCIN2_NL_LR[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_2_4);
+            pCIN3_NL_LR[j] = ApplyMult (pCIN3_NL_LR[j], CIN3_NL);
         } else {
             pHPV_LR_NL[j] = ApplyMult(HPVClearance[j][0], HPV_NL_LR_5);
             pHPV_otherHR_NL[j] = ApplyMult(HPVClearance[j][1], HPV_NL_otherHR_5);
@@ -868,6 +871,16 @@ void Inputs::loadVariables() {
             pHPV_45_CIN[j] = ApplyMult(HPVProgression[j][6], HPV_CIN_high5_5);
             pHPV_52_CIN[j] = ApplyMult(HPVProgression[j][7], HPV_CIN_high5_5);
             pHPV_58_CIN[j] = ApplyMult(HPVProgression[j][8], HPV_CIN_high5_5);
+            pCIN2_NL_16[j] = ApplyMult (CIN2_NL, CIN2_NL_16_5);
+            pCIN3_NL_16[j] = ApplyMult (pCIN2_NL_16[j], CIN3_NL);
+            pCIN2_NL_18[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_5);
+            pCIN3_NL_18[j] = ApplyMult (pCIN2_NL_18[j], CIN3_NL);
+            pCIN2_NL_high5[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_5);
+            pCIN3_NL_high5[j] = ApplyMult (pCIN2_NL_high5[j], CIN3_NL);
+            pCIN2_NL_oHR[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_5);
+            pCIN3_NL_oHR[j] = ApplyMult (pCIN2_NL_oHR[j], CIN3_NL);
+            pCIN2_NL_LR[j] = ApplyMult (CIN2_NL, CIN2_NL_allother_5);
+            pCIN3_NL_LR[j] = ApplyMult (pCIN3_NL_LR[j], CIN3_NL);
         }
 
         pCIN2_CA1_oHR[j] = ApplyMult(pCIN3_CA1_oHR[j], CIN2_CA);
@@ -919,122 +932,127 @@ double Inputs::ApplyMult(double prob, double mult){
 
 void Inputs::loadCalibParams(vector<double> calib_params) {
 
-    CIN2_NL_LR = calib_params[0];
-    CIN2_NL_high5 = calib_params[1];
-    CIN2_NL_16 = calib_params[2];
-    CIN2_NL_18 = calib_params[3];
-    CIN2_NL_otherHR = calib_params[4];
-    HPV_NL_LR_1 = calib_params[5];
-    HPV_NL_LR_2_4 = calib_params[6];
-    HPV_NL_LR_5 = calib_params[7];
-    HPV_NL_otherHR_1 = calib_params[8];
-    HPV_NL_otherHR_2_4 = calib_params[9];
-    HPV_NL_otherHR_5 = calib_params[10];
-    HPV_NL_high5_1 = calib_params[11];
-    HPV_NL_high5_2_4 = calib_params[12];
-    HPV_NL_high5_5 = calib_params[13];
-    HPV_NL_16_1 = calib_params[14];
-    HPV_NL_16_2_4 = calib_params[15];
-    HPV_NL_16_5 = calib_params[16];
-    HPV_NL_18_1 = calib_params[17];
-    HPV_NL_18_2_4 = calib_params[18];
-    HPV_NL_18_5 = calib_params[19];
-    HPV_CIN_LR_1 = calib_params[20];
-    HPV_CIN_LR_2_4 = calib_params[21];
-    HPV_CIN_LR_5 = calib_params[22];
-    HPV_CIN_otherHR_1 = calib_params[23];
-    HPV_CIN_otherHR_2_4 = calib_params[24];
-    HPV_CIN_otherHR_5 = calib_params[25];
-    HPV_CIN_high5_1 = calib_params[26];
-    HPV_CIN_high5_2_4 = calib_params[27];
-    HPV_CIN_high5_5 = calib_params[28];
-    HPV_CIN_16_1 = calib_params[29];
-    HPV_CIN_16_2_4 = calib_params[30];
-    HPV_CIN_16_5 = calib_params[31];
-    HPV_CIN_18_1 = calib_params[32];
-    HPV_CIN_18_2_4 = calib_params[33];
-    HPV_CIN_18_5 = calib_params[34];
-    CIN3_CA_high5_1_5 = calib_params[35];
-    CIN3_CA_high5_6_10 = calib_params[36];
-    CIN3_CA_high5_11_20 = calib_params[37];
-    CIN3_CA_high5_21_30 = calib_params[38];
-    CIN3_CA_high5_31_40 = calib_params[39];
-    CIN3_CA_high5_41_50 = calib_params[40];
-    CIN3_CA_high5_50 = calib_params[41];
-    CIN3_CA_16_1_5 = calib_params[42];
-    CIN3_CA_16_6_10 = calib_params[43];
-    CIN3_CA_16_11_20 = calib_params[44];
-    CIN3_CA_16_21_30 = calib_params[45];
-    CIN3_CA_16_31_40 = calib_params[46];
-    CIN3_CA_16_41_50 = calib_params[47];
-    CIN3_CA_16_50 = calib_params[48];
-    CIN3_CA_18_1_5 = calib_params[49];
-    CIN3_CA_18_6_10 = calib_params[50];
-    CIN3_CA_18_11_20 = calib_params[51];
-    CIN3_CA_18_21_30 = calib_params[52];
-    CIN3_CA_18_31_40 = calib_params[53];
-    CIN3_CA_18_41_50 = calib_params[54];
-    CIN3_CA_18_50 = calib_params[55];
-    CIN3_CA_otherHR_1_5 = calib_params[56];
-    CIN3_CA_otherHR_6_10 = calib_params[57];
-    CIN3_CA_otherHR_11_20 = calib_params[58];
-    CIN3_CA_otherHR_21_30 = calib_params[59];
-    CIN3_CA_otherHR_31_40 = calib_params[60];
-    CIN3_CA_otherHR_41_50 = calib_params[61];
-    CIN3_CA_otherHR_50 = calib_params[62];
-    NL_HPV16_17_19 = calib_params[63];
-    NL_HPV16_20_24 = calib_params[64];
-    NL_HPV16_25_29 = calib_params[65];
-    NL_HPV16_30_34 = calib_params[66];
-    NL_HPV16_35_39 = calib_params[67];
-    NL_HPV16_40_44 = calib_params[68];
-    NL_HPV16_45_49 = calib_params[69];
-    NL_HPV16_50_54 = calib_params[70];
-    NL_HPV16_55_65 = calib_params[71];
-    NL_HPV18_17_19 = calib_params[72];
-    NL_HPV18_20_24 = calib_params[73];
-    NL_HPV18_25_29 = calib_params[74];
-    NL_HPV18_30_34 = calib_params[75];
-    NL_HPV18_35_39 = calib_params[76];
-    NL_HPV18_40_44 = calib_params[77];
-    NL_HPV18_45_49 = calib_params[78];
-    NL_HPV18_50_54 = calib_params[79];
-    NL_HPV18_55_65 = calib_params[80];
-    NL_HPVhigh5_17_19 = calib_params[81];
-    NL_HPVhigh5_20_24 = calib_params[82];
-    NL_HPVhigh5_25_29 = calib_params[83];
-    NL_HPVhigh5_30_34 = calib_params[84];
-    NL_HPVhigh5_35_39 = calib_params[85];
-    NL_HPVhigh5_40_44 = calib_params[86];
-    NL_HPVhigh5_45_49 = calib_params[87];
-    NL_HPVhigh5_50_54 = calib_params[88];
-    NL_HPVhigh5_55_65 = calib_params[89];
-    NL_HPVoHR_17_19 = calib_params[90];
-    NL_HPVoHR_20_24 = calib_params[91];
-    NL_HPVoHR_25_29 = calib_params[92];
-    NL_HPVoHR_30_34 = calib_params[93];
-    NL_HPVoHR_35_39 = calib_params[94];
-    NL_HPVoHR_40_44 = calib_params[95];
-    NL_HPVoHR_45_49 = calib_params[96];
-    NL_HPVoHR_50_54 = calib_params[97];
-    NL_HPVoHR_55_65 = calib_params[98];
-    NL_HPVLR_17_19 = calib_params[99];
-    NL_HPVLR_20_24 = calib_params[100];
-    NL_HPVLR_25_29 = calib_params[101];
-    NL_HPVLR_30_34 = calib_params[102];
-    NL_HPVLR_35_39 = calib_params[103];
-    NL_HPVLR_40_44 = calib_params[104];
-    NL_HPVLR_45_49 = calib_params[105];
-    NL_HPVLR_50_54 = calib_params[106];
-    NL_HPVLR_55_65 = calib_params[107];
-    ImmuneDegree = calib_params[108];
-    ImmuneDegree16 = calib_params[109];
-    pRegresstoHPV = calib_params[110];
-    CIN3_NL = calib_params[111];
-    CIN2_CA = calib_params[112];
-    HPV_CIN2_16 = calib_params[113];
-    HPV_CIN2_allother = calib_params[114];
-
+    CIN2_NL_allother_1 = calib_params[0];
+    CIN2_NL_allother_2_4 = calib_params[1];
+    CIN2_NL_allother_5 = calib_params[2];
+    CIN2_NL_16_1 = calib_params[3];
+    CIN2_NL_16_2_4 = calib_params[4];
+    CIN2_NL_16_5 = calib_params[5];
+    HPV_NL_LR_1 = calib_params[6];
+    HPV_NL_LR_2_4 = calib_params[7];
+    HPV_NL_LR_5 = calib_params[8];
+    HPV_NL_otherHR_1 = calib_params[9];
+    HPV_NL_otherHR_2_4 = calib_params[10];
+    HPV_NL_otherHR_5 = calib_params[11];
+    HPV_NL_high5_1 = calib_params[12];
+    HPV_NL_high5_2_4 = calib_params[13];
+    HPV_NL_high5_5 = calib_params[14];
+    HPV_NL_16_1 = calib_params[15];
+    HPV_NL_16_2_4 = calib_params[16];
+    HPV_NL_16_5 = calib_params[17];
+    HPV_NL_18_1 = calib_params[18];
+    HPV_NL_18_2_4 = calib_params[19];
+    HPV_NL_18_5 = calib_params[20];
+    HPV_CIN_LR_1 = calib_params[21];
+    HPV_CIN_LR_2_4 = calib_params[22];
+    HPV_CIN_LR_5 = calib_params[23];
+    HPV_CIN_otherHR_1 = calib_params[24];
+    HPV_CIN_otherHR_2_4 = calib_params[25];
+    HPV_CIN_otherHR_5 = calib_params[26];
+    HPV_CIN_high5_1 = calib_params[27];
+    HPV_CIN_high5_2_4 = calib_params[28];
+    HPV_CIN_high5_5 = calib_params[29];
+    HPV_CIN_16_1 = calib_params[30];
+    HPV_CIN_16_2_4 = calib_params[31];
+    HPV_CIN_16_5 = calib_params[32];
+    HPV_CIN_18_1 = calib_params[33];
+    HPV_CIN_18_2_4 = calib_params[34];
+    HPV_CIN_18_5 = calib_params[35];
+    CIN3_CA_high5_1_5 = calib_params[36];
+    CIN3_CA_high5_6_10 = calib_params[37];
+    CIN3_CA_high5_11_20 = calib_params[38];
+    CIN3_CA_high5_21_30 = calib_params[39];
+    CIN3_CA_high5_31_40 = calib_params[40];
+    CIN3_CA_high5_41_50 = calib_params[41];
+    CIN3_CA_high5_50 = calib_params[42];
+    CIN3_CA_16_1_5 = calib_params[43];
+    CIN3_CA_16_6_10 = calib_params[44];
+    CIN3_CA_16_11_20 = calib_params[45];
+    CIN3_CA_16_21_30 = calib_params[46];
+    CIN3_CA_16_31_40 = calib_params[47];
+    CIN3_CA_16_41_50 = calib_params[48];
+    CIN3_CA_16_50 = calib_params[49];
+    CIN3_CA_18_1_5 = calib_params[50];
+    CIN3_CA_18_6_10 = calib_params[51];
+    CIN3_CA_18_11_20 = calib_params[52];
+    CIN3_CA_18_21_30 = calib_params[53];
+    CIN3_CA_18_31_40 = calib_params[54];
+    CIN3_CA_18_41_50 = calib_params[55];
+    CIN3_CA_18_50 = calib_params[56];
+    CIN3_CA_otherHR_1_5 = calib_params[57];
+    CIN3_CA_otherHR_6_10 = calib_params[58];
+    CIN3_CA_otherHR_11_20 = calib_params[59];
+    CIN3_CA_otherHR_21_30 = calib_params[60];
+    CIN3_CA_otherHR_31_40 = calib_params[61];
+    CIN3_CA_otherHR_41_50 = calib_params[62];
+    CIN3_CA_otherHR_50 = calib_params[63];
+    NL_HPV16_17_19 = calib_params[64];
+    NL_HPV16_20_24 = calib_params[65];
+    NL_HPV16_25_29 = calib_params[66];
+    NL_HPV16_30_34 = calib_params[67];
+    NL_HPV16_35_39 = calib_params[68];
+    NL_HPV16_40_44 = calib_params[69];
+    NL_HPV16_45_49 = calib_params[70];
+    NL_HPV16_50_54 = calib_params[71];
+    NL_HPV16_55_65 = calib_params[72];
+    NL_HPV18_17_19 = calib_params[73];
+    NL_HPV18_20_24 = calib_params[74];
+    NL_HPV18_25_29 = calib_params[75];
+    NL_HPV18_30_34 = calib_params[76];
+    NL_HPV18_35_39 = calib_params[77];
+    NL_HPV18_40_44 = calib_params[78];
+    NL_HPV18_45_49 = calib_params[79];
+    NL_HPV18_50_54 = calib_params[80];
+    NL_HPV18_55_65 = calib_params[81];
+    NL_HPVhigh5_17_19 = calib_params[82];
+    NL_HPVhigh5_20_24 = calib_params[83];
+    NL_HPVhigh5_25_29 = calib_params[84];
+    NL_HPVhigh5_30_34 = calib_params[85];
+    NL_HPVhigh5_35_39 = calib_params[86];
+    NL_HPVhigh5_40_44 = calib_params[87];
+    NL_HPVhigh5_45_49 = calib_params[88];
+    NL_HPVhigh5_50_54 = calib_params[89];
+    NL_HPVhigh5_55_65 = calib_params[90];
+    NL_HPVoHR_17_19 = calib_params[91];
+    NL_HPVoHR_20_24 = calib_params[92];
+    NL_HPVoHR_25_29 = calib_params[93];
+    NL_HPVoHR_30_34 = calib_params[94];
+    NL_HPVoHR_35_39 = calib_params[95];
+    NL_HPVoHR_40_44 = calib_params[96];
+    NL_HPVoHR_45_49 = calib_params[97];
+    NL_HPVoHR_50_54 = calib_params[98];
+    NL_HPVoHR_55_65 = calib_params[99];
+    NL_HPVLR_17_19 = calib_params[100];
+    NL_HPVLR_20_24 = calib_params[101];
+    NL_HPVLR_25_29 = calib_params[102];
+    NL_HPVLR_30_34 = calib_params[103];
+    NL_HPVLR_35_39 = calib_params[104];
+    NL_HPVLR_40_44 = calib_params[105];
+    NL_HPVLR_45_49 = calib_params[106];
+    NL_HPVLR_50_54 = calib_params[107];
+    NL_HPVLR_55_65 = calib_params[108];
+    ImmuneDegree = calib_params[109];
+    ImmuneDegree16 = calib_params[110];
+    pRegresstoHPV = calib_params[111];
+    CIN3_NL = calib_params[112];
+    CIN2_CA = calib_params[113];
+    HPV_CIN2_16 = calib_params[114];
+    HPV_CIN2_allother = calib_params[115];
+    CA1_CA1d = calib_params[116];
+    CA2_CA2d = calib_params[117];
+    CA3_CA3d = calib_params[118];
+    CA1_CA2 = calib_params[119];
+    CA2_CA3 = calib_params[120];
 }
 
 void Inputs::loadStringData(ifstream &Infile, string &VariableName) {
