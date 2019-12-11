@@ -26,11 +26,11 @@ public:
     ~calibrate(void);
 
     std::vector<double> loadCalibData(int n_params, int n_sim);
-    void CalculateGOF(int n_sims, double tuning_factor, double rand);
+    void CalculateGOF(int n_sims, double rand);
     double WeightedDistance(double data, double mean, double N);
     double rnormal_trunc (double mu, double sigma, double upper, double lower);
     double rlognormal (double mu, double sigma);
-    void GetProbAcceptance(double neighbor, double current, int n_sims, double temp);
+    void GetProbAcceptance(double neighbor, double current, int n_sims);
 
     double tune_factor;
     enum MultType {prob = 0, RR = 1};

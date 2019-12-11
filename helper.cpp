@@ -4,7 +4,7 @@
 
 #include "helper.h"
 
-using namespace boost::math;
+using namespace std;
 
 helper::helper() {
 }

@@ -447,27 +447,15 @@ void Output::createCalibOutput(int y) {
 
     calib.push_back(static_cast<double>(CIN216) / CIN2total );
     calib.push_back(static_cast<double>(CIN218) / CIN2total );
-    calib.push_back(static_cast<double>(CIN231) / CIN2total );
-    calib.push_back(static_cast<double>(CIN233) / CIN2total );
-    calib.push_back(static_cast<double>(CIN245) / CIN2total );
-    calib.push_back(static_cast<double>(CIN252) / CIN2total );
-    calib.push_back(static_cast<double>(CIN258) / CIN2total );
+    calib.push_back(static_cast<double>(CIN231 + CIN233 + CIN245 + CIN252 + CIN258) / CIN2total);
     calib.push_back(static_cast<double>(CIN2LR) / CIN2total );
     calib.push_back(static_cast<double>(CIN316) / CIN3total );
     calib.push_back(static_cast<double>(CIN318) / CIN3total );
-    calib.push_back(static_cast<double>(CIN331) / CIN3total );
-    calib.push_back(static_cast<double>(CIN333) / CIN3total );
-    calib.push_back(static_cast<double>(CIN345) / CIN3total );
-    calib.push_back(static_cast<double>(CIN352) / CIN3total );
-    calib.push_back(static_cast<double>(CIN358) / CIN3total );
+    calib.push_back(static_cast<double>(CIN331 + CIN333 + CIN345 + CIN352 + CIN358) / CIN3total);
     calib.push_back(static_cast<double>(CIN3LR) / CIN3total );
     calib.push_back(static_cast<double>(CA16) / cancer );
     calib.push_back(static_cast<double>(CA18) / cancer );
-    calib.push_back(static_cast<double>(CA31) / cancer );
-    calib.push_back(static_cast<double>(CA33) / cancer );
-    calib.push_back(static_cast<double>(CA45) / cancer );
-    calib.push_back(static_cast<double>(CA52) / cancer );
-    calib.push_back(static_cast<double>(CA58) / cancer );
+    calib.push_back(static_cast<double>(CA31 + CA33 + CA45 + CA52 + CA58) / cancer );
 
     int CAnew;
     int CAdenom;

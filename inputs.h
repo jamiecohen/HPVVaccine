@@ -36,7 +36,6 @@ public:
     int BurnInYears;
     int StartYear;
     int Simulations;
-    int Tuning_Factor;
 
     std::string ASRMortalityFile;
     std::vector< std::vector<double> > ASRMortality;
@@ -82,12 +81,6 @@ public:
     bool WaningImmunity;
     int ImmuneDuration;
     int ImmuneWaneTime;
-    double pSeroConvert_16[5];
-    double pSeroConvert_18[5];
-    double pSeroConvert_high5[5];
-
-    std::string SeroConversionFile;
-    std::vector< std::vector<double> > SeroConversion;
 
     std::string CytoSensFile;
     std::vector< std::vector<double> > cytosens;
@@ -112,16 +105,14 @@ public:
 
     std::string VaccineType;
 
-    enum VxType { Bivalent = 0, Nonavalent = 1
-    };
+    enum VxType { Bivalent = 0, Nonavalent = 1};
     VxType vaccinetype;
     double VE_1618;
     double VE_high5;
-    enum Immunity {Degree, Factor, Seropositivity};
+    enum Immunity {Degree, Factor};
     Immunity ImmuneMechanism;
 
     double CIN2_NL;
-
     double CIN2_NL_allother_1;
     double CIN2_NL_allother_2_4;
     double CIN2_NL_allother_5;

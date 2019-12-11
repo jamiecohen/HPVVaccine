@@ -14,6 +14,7 @@
 #include "calibrate.h"
 #include <thread>
 
+
 using namespace std;
 
 Output RunBirthCohort(string, string, string, string);
@@ -36,7 +37,7 @@ int main(int argc, char* argv[]) {
     string FileName;
     if(argc == 1){
         RunsFileName.append("Calibration.ini");
-        FileName = "test_naive.ini";
+        FileName = "Calibration.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -76,11 +77,14 @@ int main(int argc, char* argv[]) {
                 calib.multipliers_type[i] = calib.prob;
             }
         }
+
+        double timer[n_sims];
+
         for (int i = 0; i < n_sims; i++){
             clock_t begin = clock();
             RunCalibration (calib, tables, i);
             clock_t end = clock();
-            cout << double(end - begin) / CLOCKS_PER_SEC << " Seconds" << endl;
+            timer[i] = double(end - begin) / CLOCKS_PER_SEC;
         }
         string OutDir = OutputFolder.append("HPVVaccine_Calib");
         if(argc == 4){
@@ -154,6 +158,22 @@ int main(int argc, char* argv[]) {
         output.close();
         output.clear();
 
+        OutputFileName.clear();
+        OutputFileName.append(OutDir);
+        OutputFileName.append("/");
+        OutputFileName.append("timer.txt");
+        output.open(OutputFileName.c_str (), ios::out);
+        if(output) {
+            for(int i = 0; i < n_sims; i++){
+                output << "Sim" << i << '\t';
+                output << timer[i] << endl;
+            }
+        }
+        else
+            cerr << "Warning: Unable to open " << OutputFileName << endl;
+        output.close();
+        output.clear();
+
     } else if (RunsFile.GetValue(RunType, "RunType") == "Cohort") {
 
         cout << "Running " << FileName << endl;
@@ -187,10 +207,7 @@ int main(int argc, char* argv[]) {
     } else if (RunsFile.GetValue(RunType, "RunType") == "Population") {
 
         cout << "Running " << FileName << endl;
-        int numruns = 0;
-        for (run = 0; run < RunsFile.GetNumKeys (); run++) {
-            numruns++;
-        }
+        unsigned int numruns = RunsFile.GetNumKeys ();
         Inputs tables(OutputFolder, DataFolder);
         tables.loadRFG (RunsFileName, RunType);
         int ModelStartAge = tables.ModelStartAge;
@@ -200,11 +217,15 @@ int main(int argc, char* argv[]) {
         modeloutputs.reserve(numruns);
         vector<string> CurKey;
         CurKey.reserve(numruns);
+        double timer[numruns];
 
         for (run = 0; run < RunsFile.GetNumKeys (); run++) {
             cout << "Running Strat " << run << endl;
+            clock_t begin = clock();
             CurKey.push_back (RunsFile.GetKeyName (run));
             modeloutputs.push_back(RunPopulation (RunsFileName, CurKey[run], OutputFolder, DataFolder));
+            clock_t end = clock();
+            timer[run] = double(end - begin) / CLOCKS_PER_SEC;
         }
         for (int i = 0; i < modeloutputs.size(); i++){
             string OutputDir (OutputFolder);
@@ -214,6 +235,19 @@ int main(int argc, char* argv[]) {
             modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
             modeloutputs[i].writeDwellTime (&OutputDir);
             modeloutputs[i].writeCalibOutput (&OutputDir, tables.CalibTargsNames);
+            ofstream output;
+            string OutputFileName;
+            OutputFileName.append(OutputDir);
+            OutputFileName.append("/");
+            OutputFileName.append("timer.txt");
+            output.open(OutputFileName.c_str (), ios::out);
+            if(output) {
+                output << timer[i] << "Seconds";
+            }
+            else
+                cerr << "Warning: Unable to open " << OutputFileName << endl;
+            output.close();
+            output.clear();
         }
     }
     return(0);
@@ -262,7 +296,7 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
     calib.saved_output[i] = trace_burnin.calib;
     double rand;
     rand = help.getrand ();
-    calib.CalculateGOF (i, tables.Tuning_Factor, rand);
+    calib.CalculateGOF (i, rand);
     women.clear();
 }
 

@@ -81,10 +81,9 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
     }
 }
 
-void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
+void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
 
     if (Data.Alive) {
-        StateMachine::CheckSeropositivity (Data, Tables, help);
         for (int i = 0; i < Data.HPVinfections.size (); i++) {
             StateMachine::GetLesionRisk (Data, Tables, i, Data.HPVinfections[i]);
             StateMachine::GetHPVClearanceRisk (Data, Tables, i, Data.HPVinfections[i]);
@@ -126,7 +125,7 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper
                 StateMachine::StartCIN (Data, Count, Tables, help, y);
             }
             if (!Data.HPVinfections.empty ()) {
-                StateMachine::HPVNatHistory (Data, Tables, Count, help, y);
+                StateMachine::HPVNatHistory (Data, Tables, Count, help);
             }
             StateMachine::AcquireHPV (Data, Count, Tables, help, y);
         }
@@ -243,9 +242,6 @@ void StateMachine::ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hp
             break;
         case Inputs::Factor:
             StateMachine::GetImmuneFactor (Data, Tables, help, genotype);
-            break;
-        case Inputs::Seropositivity:
-            StateMachine::GetSeropositivity (Data, Tables, genotype);
             break;
     }
 
@@ -941,87 +937,6 @@ void StateMachine::GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype)
                 pHPV = 0;
             }
             break;
-    }
-}
-
-void StateMachine::CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help) {
-    for (int i = 0; i < Data.HPVinfections.size (); i++) {
-        switch (Data.HPVinfections[i]) {
-            case Woman::No:
-                break;
-            case Woman::Low:
-                if(!Data.hpvlo_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
-                        Data.hpvlo_seropos = true;
-                    }
-                }
-                break;
-            case Woman::otherHR:
-                if(!Data.hpvotherHR_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
-                        Data.hpvotherHR_seropos = true;
-                    }
-                }
-                break;
-            case Woman::High16:
-                if(!Data.hpv16_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_16[Data.HPVinfectionTimer[i]]){
-                        Data.hpv16_seropos = true;
-                    }
-                }
-                break;
-            case Woman::High18:
-                if(!Data.hpv18_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_18[Data.HPVinfectionTimer[i]]){
-                        Data.hpv18_seropos = true;
-                    }
-                }
-                break;
-            case Woman::High31:
-                if(!Data.hpv31_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
-                        Data.hpv31_seropos = true;
-                    }
-                }
-                break;
-            case Woman::High33:
-                if(!Data.hpv33_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
-                        Data.hpv33_seropos = true;
-                    }
-                }
-                break;
-            case Woman::High45:
-                if(!Data.hpv45_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
-                        Data.hpv45_seropos = true;
-                    }
-                }
-                break;
-            case Woman::High52:
-                if(!Data.hpv52_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
-                        Data.hpv52_seropos = true;
-                    }
-                }
-                break;
-            case Woman::High58:
-                if(!Data.hpv58_seropos){
-                    rand = help.getrand ();
-                    if(rand < Tables.pSeroConvert_high5[Data.HPVinfectionTimer[i]]){
-                        Data.hpv58_seropos = true;
-                    }
-                }
-                break;
-        }
     }
 }
 

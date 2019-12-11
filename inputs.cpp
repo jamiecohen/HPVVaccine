@@ -45,7 +45,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string StartYearName = "StartYear";
     string SimulationYearsName = "SimulationYears";
     string BurnInYearsName = "BurnInYears";
-    string TuningFactorName = "TuningFactor";
     string InitialPopulationFileName = "InitialPopulationFile";
 
     //[NaturalHistory] variable names
@@ -214,7 +213,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string MultipliersFileName = "MultipliersFile";
     string MultipliersNamesFileName = "MultipliersNamesFile";
     string SimulationsName = "Simulations";
-    string SeroConversionFileName = "SeroConversionFile";
 
     //READ IN DATA FROM INPUT FILE HERE FIRST
 
@@ -243,7 +241,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     StartYear = RunsFile.GetValueI(CurKey, StartYearName);
     SimulationYears = RunsFile.GetValueI (CurKey, SimulationYearsName);
     BurnInYears = RunsFile.GetValueI (CurKey, BurnInYearsName);
-    Tuning_Factor = RunsFile.GetValueI (CurKey, TuningFactorName);
 
     InitialPopulationFile.append(DataFolder);
     InitialPopulationFile.append(RunsFile.GetValue(CurKey, InitialPopulationFileName));
@@ -405,19 +402,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
 
 
     //[Interventions]
-
-    SeroConversionFile.append(DataFolder);
-    SeroConversionFile.append(RunsFile.GetValue(CurKey, SeroConversionFileName));
-    Infile.open(SeroConversionFile, ios::in);
-    if(Infile.fail())
-    {
-        cerr << "\nError: Unable to open file: " << SeroConversionFile << endl;
-        exit(1);
-    }
-
-    loadData (Infile, SeroConversion);
-    Infile.close();
-    Infile.clear();
 
     ScreenStartAge = RunsFile.GetValueI(CurKey, ScreenStartAgeName);
     ScreenStopAge = RunsFile.GetValueI(CurKey, ScreenStopAgeName);
@@ -617,12 +601,6 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
 }
 
 void Inputs::loadVariables() {
-
-    for(int j = 0; j < 5; j++) {
-        pSeroConvert_16[j] = SeroConversion[j][0];
-        pSeroConvert_18[j] = SeroConversion[j][1];
-        pSeroConvert_high5[j] = SeroConversion[j][2];
-    }
 
     CIN2_NL = CINRegression[0][0];
 
@@ -918,8 +896,6 @@ void Inputs::loadVariables() {
         ImmuneMechanism = Immunity::Degree;
     } else if(MechanismofImmunity == "Factor"){
         ImmuneMechanism = Immunity::Factor;
-    } else if(MechanismofImmunity == "Seropositivity"){
-        ImmuneMechanism = Immunity::Seropositivity;
     }
 }
 
@@ -1053,6 +1029,8 @@ void Inputs::loadCalibParams(vector<double> calib_params) {
     CA3_CA3d = calib_params[118];
     CA1_CA2 = calib_params[119];
     CA2_CA3 = calib_params[120];
+    ImmuneDuration = calib_params[121];
+    ImmuneWaneTime = calib_params[122];
 }
 
 void Inputs::loadStringData(ifstream &Infile, string &VariableName) {

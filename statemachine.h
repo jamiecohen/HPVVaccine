@@ -10,8 +10,6 @@
 #include "inputs.h"
 #include "outputs.h"
 #include <stdlib.h>
-#include <boost/thread.hpp>
-#include <boost/thread/future.hpp>
 #include <thread>
 #include <future>
 #include "helper.h"
@@ -42,7 +40,7 @@ public:
     ~StateMachine();
 
     void NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y, bool burnin);
-    void HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
+    void HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help);
     void CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
     void runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool burnin, helper &help, int y);
     void CytoScreen(Woman &Data, Inputs &Tables,  Output &Count, helper &help);
@@ -54,7 +52,6 @@ public:
     static void GetSeropositivity(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     static void CheckWaningImmunity(Woman &Data, Inputs &Tables);
     static void CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
-    void CheckSeropositivity(Woman &Data, Inputs &Tables, helper &help);
     void AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y);
     void Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &help);
     void LLETZ(Woman &Data, Inputs &Tables, Output &Count, helper &help);

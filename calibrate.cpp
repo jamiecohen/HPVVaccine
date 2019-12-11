@@ -42,7 +42,7 @@ calibrate::~calibrate(void) {
 
 }
 
-void calibrate::CalculateGOF(int n_sims, double tuning_factor, double rand) {
+void calibrate::CalculateGOF(int n_sims, double rand) {
     GOF.push_back (WeightedDistance (saved_output[n_sims][0], calib_targs[0], calib_targs_N[0]));
     for (int i = 1; i < calib_targs.size(); i ++){
         GOF[n_sims] += WeightedDistance (saved_output[n_sims][i], calib_targs[i], calib_targs_N[i]);
@@ -52,19 +52,17 @@ void calibrate::CalculateGOF(int n_sims, double tuning_factor, double rand) {
         best_params = calib_params[0];
         best_output = saved_output[0];
     } else {
-        auto it = std::min_element(std::begin(GOF), std::end(GOF));
-        int index = distance(GOF.begin(), it);
-        GOF_min_run = GOF[index];
+        GOF_min_run = GOF[n_sims];
         if (GOF_min_run <= GOF_min){
             GOF_min = GOF_min_run;
-            best_params = calib_params[index];
-            best_output = saved_output[index];
+            best_params = calib_params[n_sims];
+            best_output = saved_output[n_sims];
         } else {
-            calibrate::GetProbAcceptance (GOF_min_run, GOF_min, n_sims, tuning_factor);
+            calibrate::GetProbAcceptance (GOF_min_run, GOF_min, n_sims);
             if (rand < ProbAcceptance){
                 GOF_min = GOF_min_run;
-                best_params = calib_params[index];
-                best_output = saved_output[index];
+                best_params = calib_params[n_sims];
+                best_output = saved_output[n_sims];
             }
         }
     }
@@ -104,7 +102,7 @@ std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
 }
 
 double calibrate::WeightedDistance(double data, double mean, double N) {
-    double distance = pow((data - mean)/2*N,2);
+    double distance = pow((data - mean)/N,2);
     return distance;
 }
 
@@ -127,7 +125,7 @@ double calibrate::rnormal_trunc(double mu, double sigma, double upper, double lo
     return(prob);
 }
 
-void calibrate::GetProbAcceptance(double neighbor, double current, int n_sims, double temp) {
-    double temperature = pow(temp,n_sims);
+void calibrate::GetProbAcceptance(double neighbor, double current, int n_sims) {
+    double temperature = (-0.0299*n_sims) + 30;
     ProbAcceptance = exp((current - neighbor) / temperature);
 }

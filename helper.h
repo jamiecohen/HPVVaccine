@@ -6,7 +6,6 @@
 #define HPVVaccine_HELPER_H
 
 #include <random>
-#include <boost/math/distributions.hpp>
 #include <algorithm>
 
 class helper {
