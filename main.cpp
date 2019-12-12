@@ -79,7 +79,6 @@ int main(int argc, char* argv[]) {
         }
 
         double timer[n_sims];
-
         for (int i = 0; i < n_sims; i++){
             clock_t begin = clock();
             RunCalibration (calib, tables, i);
@@ -87,6 +86,21 @@ int main(int argc, char* argv[]) {
             timer[i] = double(end - begin) / CLOCKS_PER_SEC;
         }
         string OutDir = OutputFolder.append("HPVVaccine_Calib");
+        if(tables.LatencyTime){
+            OutDir.append("_Latency");
+        } else{
+            OutDir.append("_NoLatency");
+        }
+        switch(tables.ImmuneMechanism){
+
+            case Inputs::Degree:
+                OutDir.append("_Degree");
+                break;
+            case Inputs::Factor:
+                OutDir.append("_Factor");
+                break;
+        }
+
         if(argc == 4){
             OutDir.append("/");
             OutDir.append(argv[3]);
@@ -158,22 +172,6 @@ int main(int argc, char* argv[]) {
         output.close();
         output.clear();
 
-        OutputFileName.clear();
-        OutputFileName.append(OutDir);
-        OutputFileName.append("/");
-        OutputFileName.append("timer.txt");
-        output.open(OutputFileName.c_str (), ios::out);
-        if(output) {
-            for(int i = 0; i < n_sims; i++){
-                output << "Sim" << i << '\t';
-                output << timer[i] << endl;
-            }
-        }
-        else
-            cerr << "Warning: Unable to open " << OutputFileName << endl;
-        output.close();
-        output.clear();
-
     } else if (RunsFile.GetValue(RunType, "RunType") == "Cohort") {
 
         cout << "Running " << FileName << endl;
@@ -235,19 +233,6 @@ int main(int argc, char* argv[]) {
             modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
             modeloutputs[i].writeDwellTime (&OutputDir);
             modeloutputs[i].writeCalibOutput (&OutputDir, tables.CalibTargsNames);
-            ofstream output;
-            string OutputFileName;
-            OutputFileName.append(OutputDir);
-            OutputFileName.append("/");
-            OutputFileName.append("timer.txt");
-            output.open(OutputFileName.c_str (), ios::out);
-            if(output) {
-                output << timer[i] << "Seconds";
-            }
-            else
-                cerr << "Warning: Unable to open " << OutputFileName << endl;
-            output.close();
-            output.clear();
         }
     }
     return(0);

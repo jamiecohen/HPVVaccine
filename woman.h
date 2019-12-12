@@ -47,16 +47,6 @@ public:
     bool hpv58;
     bool hpvotherHR;
 
-    bool hpvlo_seropos;
-    bool hpv16_seropos;
-    bool hpv18_seropos;
-    bool hpv31_seropos;
-    bool hpv33_seropos;
-    bool hpv45_seropos;
-    bool hpv52_seropos;
-    bool hpv58_seropos;
-    bool hpvotherHR_seropos;
-
     int hpvlo_ageimmunity;
     int hpv16_ageimmunity;
     int hpv18_ageimmunity;

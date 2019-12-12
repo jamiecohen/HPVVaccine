@@ -1072,68 +1072,6 @@ void StateMachine::GetImmuneDeg(Woman &Data, Inputs &Tables, Woman::hpvT genotyp
     }
 }
 
-void StateMachine::GetSeropositivity(Woman &Data, Inputs &Tables, Woman::hpvT genotype) {
-
-    switch(genotype){
-        case Woman::No:
-            break;
-        case Woman::Low:
-            if(Data.hpvlo_seropos){
-                Data.immune_deg_LR = Tables.ImmuneDegree;
-                Data.hpvlo_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::otherHR:
-            if(Data.hpvotherHR_seropos){
-                Data.immune_deg_otherHR = Tables.ImmuneDegree;
-                Data.hpvotherHR_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::High16:
-            if(Data.hpv16_seropos){
-                Data.immune_deg_16 = Tables.ImmuneDegree16;
-                Data.hpv16_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::High18:
-            if(Data.hpv18_seropos){
-                Data.immune_deg_18 = Tables.ImmuneDegree;
-                Data.hpv18_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::High31:
-            if(Data.hpv31_seropos){
-                Data.immune_deg_31 = Tables.ImmuneDegree;
-                Data.hpv31_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::High33:
-            if(Data.hpv33_seropos){
-                Data.immune_deg_33 = Tables.ImmuneDegree;
-                Data.hpv33_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::High45:
-            if(Data.hpv45_seropos){
-                Data.immune_deg_45 = Tables.ImmuneDegree;
-                Data.hpv45_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::High52:
-            if(Data.hpv52_seropos){
-                Data.immune_deg_52 = Tables.ImmuneDegree;
-                Data.hpv52_ageimmunity = Data.CurrentAge;
-            }
-            break;
-        case Woman::High58:
-            if(Data.hpv58_seropos){
-                Data.immune_deg_58 = Tables.ImmuneDegree;
-                Data.hpv58_ageimmunity = Data.CurrentAge;
-            }
-            break;
-    }
-}
-
 void StateMachine::CheckWaningImmunity(Woman &Data, Inputs &Tables) {
         if(Data.immune_deg_LR < 1){
             if (Data.CurrentAge > (Tables.ImmuneDuration + Data.hpvlo_ageimmunity)) {
