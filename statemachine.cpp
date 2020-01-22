@@ -515,6 +515,7 @@ void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotyp
     for (int i = 0; i < Data.HPVLatentinfections.size (); i++) {
         if (Data.HPVLatentinfections[i] == genotype) {
             Data.HPVinfectionTimer.push_back(Data.HPVLatentinfectionTimer[i] + 1);
+            Data.LatentTimer = Data.HPVLatentinfectionTimer[i];
             Data.HPVLatentinfections.erase (Data.HPVLatentinfections.begin () + i);
             Data.HPVLatentinfectionTimer.erase (Data.HPVLatentinfectionTimer.begin () + i);
             priorlatent = true;
@@ -523,6 +524,7 @@ void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotyp
     }
     if(!priorlatent){
         Data.HPVinfectionTimer.push_back(1);
+        Data.LatentTimer = 0;
     }
 }
 
@@ -537,6 +539,7 @@ void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper
                 StateMachine::CheckLatency (Data, Tables, genotype);
             } else {
                 Data.HPVinfectionTimer.push_back (1);
+                Data.LatentTimer = 0;
             }
             Count.HPVcount[Data.CurrentAge][y]++;
             switch (genotype) {
@@ -547,37 +550,37 @@ void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper
                     break;
                 case Woman::otherHR:
                     Data.hpvotherHR = true;
-                    Data.ageoHR = Data.CurrentAge;
+                    Data.ageoHR = Data.CurrentAge - Data.LatentTimer;
                     break;
                 case Woman::High16:
                     Data.hpv16 = true;
-                    Data.age16 = Data.CurrentAge;
+                    Data.age16 = Data.CurrentAge - Data.LatentTimer;
                     Count.HPV16count[Data.CurrentAge][y]++;
                     break;
                 case Woman::High18:
                     Data.hpv18 = true;
-                    Data.age18 = Data.CurrentAge;
+                    Data.age18 = Data.CurrentAge - Data.LatentTimer;
                     Count.HPV18count[Data.CurrentAge][y]++;
                     break;
                 case Woman::High31:
                     Data.hpv31 = true;
-                    Data.age31 = Data.CurrentAge;
+                    Data.age31 = Data.CurrentAge - Data.LatentTimer;
                     break;
                 case Woman::High33:
                     Data.hpv33 = true;
-                    Data.age33 = Data.CurrentAge;
+                    Data.age33 = Data.CurrentAge - Data.LatentTimer;
                     break;
                 case Woman::High45:
                     Data.hpv45 = true;
-                    Data.age45 = Data.CurrentAge;
+                    Data.age45 = Data.CurrentAge - Data.LatentTimer;
                     break;
                 case Woman::High52:
                     Data.hpv52 = true;
-                    Data.age52 = Data.CurrentAge;
+                    Data.age52 = Data.CurrentAge - Data.LatentTimer;
                     break;
                 case Woman::High58:
                     Data.hpv58 = true;
-                    Data.age58 = Data.CurrentAge;
+                    Data.age58 = Data.CurrentAge - Data.LatentTimer;
                     break;
             }
             break;

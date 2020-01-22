@@ -32,6 +32,7 @@ public:
 
     std::vector<hpvT> HPVLatentinfections;
     std::vector<int> HPVLatentinfectionTimer;
+    int LatentTimer;
 
     std::vector<hpvT> CIN2Lesions;
     std::vector<hpvT> CIN3Lesions;

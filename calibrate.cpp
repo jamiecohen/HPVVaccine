@@ -38,7 +38,7 @@ calibrate::calibrate(int n_sims, int n_params, int n_targs) {
 
 }
 
-calibrate::~calibrate(void) {
+calibrate::~calibrate() {
 
 }
 

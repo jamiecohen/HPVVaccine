@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Calibration.ini");
-        FileName = "Calibration.ini";
+        RunsFileName.append("DegreeLatency_1.ini");
+        FileName = "DegreeLatency_1.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -84,6 +84,7 @@ int main(int argc, char* argv[]) {
             RunCalibration (calib, tables, i);
             clock_t end = clock();
             timer[i] = double(end - begin) / CLOCKS_PER_SEC;
+            cout << timer[i] << endl;
         }
         string OutDir = OutputFolder.append("HPVVaccine_Calib");
         if(tables.LatencyTime){
@@ -92,7 +93,6 @@ int main(int argc, char* argv[]) {
             OutDir.append("_NoLatency");
         }
         switch(tables.ImmuneMechanism){
-
             case Inputs::Degree:
                 OutDir.append("_Degree");
                 break;
@@ -230,9 +230,9 @@ int main(int argc, char* argv[]) {
             OutputDir.append (RunsFile.GetValue (CurKey[i], "OutputDir"));
             const boost::filesystem::path dir (OutputDir);
             boost::filesystem::create_directories (dir);
-            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
+//            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
             modeloutputs[i].writeDwellTime (&OutputDir);
-            modeloutputs[i].writeCalibOutput (&OutputDir, tables.CalibTargsNames);
+//            modeloutputs[i].writeCalibOutput (&OutputDir, tables.CalibTargsNames);
         }
     }
     return(0);
