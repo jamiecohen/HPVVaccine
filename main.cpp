@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("DegreeLatency_1.ini");
-        FileName = "DegreeLatency_1.ini";
+        RunsFileName.append("Naive_VaccineAge_1.ini");
+        FileName = "Naive_VaccineAge_1.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -73,8 +73,10 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < n_params; i++){
             if(calib.multipliers[i][2] == 0){
                 calib.multipliers_type[i] = calib.RR;
-            } else {
+            } else if(calib.multipliers[i][2] == 1){
                 calib.multipliers_type[i] = calib.prob;
+            } else if(calib.multipliers[i][2] == 2){
+                calib.multipliers_type[i] = calib.Unif;
             }
         }
 
@@ -87,7 +89,7 @@ int main(int argc, char* argv[]) {
             cout << timer[i] << endl;
         }
         string OutDir = OutputFolder.append("HPVVaccine_Calib");
-        if(tables.LatencyTime){
+        if(tables.Latency){
             OutDir.append("_Latency");
         } else{
             OutDir.append("_NoLatency");
@@ -199,8 +201,18 @@ int main(int argc, char* argv[]) {
             OutputDir.append (RunsFile.GetValue (CurKey[i], "OutputDir"));
             const boost::filesystem::path dir (OutputDir);
             boost::filesystem::create_directories (dir);
-            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
-            modeloutputs[i].writeDwellTime (&OutputDir);
+            if(tables.incidence_output){
+                modeloutputs[i].writeInc (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
+            }
+            if(tables.mortality_output){
+                modeloutputs[i].writeMort (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
+            }
+            if(tables.dwelltime_output){
+                modeloutputs[i].writeDwellTime (&OutputDir, SimulationYears);
+            }
+            if(tables.CEA_output){
+                modeloutputs[i].writeCEA (&OutputDir);
+            }
         }
     } else if (RunsFile.GetValue(RunType, "RunType") == "Population") {
 
@@ -230,9 +242,18 @@ int main(int argc, char* argv[]) {
             OutputDir.append (RunsFile.GetValue (CurKey[i], "OutputDir"));
             const boost::filesystem::path dir (OutputDir);
             boost::filesystem::create_directories (dir);
-//            modeloutputs[i].writeCohort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
-            modeloutputs[i].writeDwellTime (&OutputDir);
-//            modeloutputs[i].writeCalibOutput (&OutputDir, tables.CalibTargsNames);
+            if(tables.incidence_output){
+                modeloutputs[i].writeInc (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
+            }
+            if(tables.mortality_output){
+                modeloutputs[i].writeMort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
+            }
+            if(tables.dwelltime_output){
+                modeloutputs[i].writeDwellTime (&OutputDir, TotalSimYears);
+            }
+            if(tables.CEA_output){
+                modeloutputs[i].writeCEA (&OutputDir);
+            }
         }
     }
     return(0);
@@ -255,7 +276,7 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
 
     for (int j = ModelStartAge; j < ModelStopAge; j++) {
         for (int k = 0; k < tables.burnin[j]; k++) {
-            Woman newWoman(j, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+            Woman newWoman(j, CurrentModelYear, help, tables.ScreenCoverage);
             women.push_back(newWoman);
         }
     }
@@ -267,8 +288,7 @@ void RunCalibration(calibrate &calib, Inputs &tables, int i){
         for (auto & k : women) {
             Machine.runPopulationYear (k, tables, trace_burnin, true, help, y);
             if (!k.Alive) {
-                k.reset(ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
-                        tables.VaccineCoverage);
+                k.reset(ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage);
             }
         }
         CurrentModelYear++;
@@ -295,7 +315,7 @@ Output RunBirthCohort(string RunsFileName, string CurKey, string OutputFolder, s
     vector<Woman> women;
     women.reserve(tables.CohortSize);
     for (int j = 0; j < tables.CohortSize; j++) {
-        Woman newWoman(tables.ModelStartAge, CurrentModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+        Woman newWoman(tables.ModelStartAge, CurrentModelYear, help, tables.ScreenCoverage);
         women.push_back (newWoman);
     }
     Output trace (tables, tables.SimulationYears);
@@ -329,36 +349,39 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
 
     for (int j = ModelStartAge; j < ModelStopAge; j++) {
         for (int k = 0; k < tables.burnin[j]; k++) {
-            Woman newWoman(j, BurnInModelYear, help, tables.ScreenCoverage, tables.VaccineStartAge, tables.VaccineCoverage);
+            Woman newWoman(j, BurnInModelYear, help, tables.ScreenCoverage);
             women.push_back(newWoman);
         }
     }
     Output trace (tables, TotalSimYears);
 
     // Start running burn-in period
-
     for(int y = 0; y < tables.BurnInYears; y++){
         for (auto & k : women) {
             Machine.runPopulationYear (k, tables, trace, true, help, y);
             if (!k.Alive) {
-                k.reset(ModelStartAge, BurnInModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
-                        tables.VaccineCoverage);
+                k.reset(ModelStartAge, BurnInModelYear + 1, help, tables.ScreenCoverage);
             }
         }
         BurnInModelYear++;
     }
 
     // Now start running simulation from time 0
+    int SimYear = 0;
     int CurrentModelYear = tables.StartYear;
     for (int y = tables.BurnInYears; y < TotalSimYears; y++) {
         for (auto &k : women) {
             Machine.runPopulationYear (k, tables, trace, false, help, y);
             if (!k.Alive) {
-                k.reset (ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage, tables.VaccineStartAge,
-                         tables.VaccineCoverage);
+                k.reset (ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage);
             }
         }
         CurrentModelYear++;
+        trace.discDALY += (trace.YLL[y] + trace.YLD[y])/ pow ((1 + trace.discountrate), static_cast<double>(SimYear));
+        trace.TotalDALY += trace.YLL[y] + trace.YLD[y];
+        trace.TotalCost += trace.cost[y];
+        trace.discCost += trace.cost[y]/pow((1+trace.discountrate),static_cast<double>(SimYear));
+        SimYear++;
     }
 
     for (auto & j : women) {

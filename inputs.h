@@ -64,6 +64,15 @@ public:
     std::string InitialPopulationFile;
     std::vector<std::vector<double> > InitialPopulation;
 
+    std::string CostsFile;
+    std::vector<std::vector<double> > Costs;
+
+    std::string DisabilityFile;
+    std::vector<std::vector<double> > Disability;
+
+    std::string LifeExpectancyFile;
+    std::vector<std::vector<double> > LifeExpectancy;
+
     int ScreenStartAge;
     int ScreenStopAge;
     int ScreenFrequency;
@@ -74,13 +83,22 @@ public:
     double VaccineCoverage;
     int VaccineDuration;
     int VaccineStartAge;
+    int VaccineEndAge;
+    int VaccineStartYear;
     double VaccineWaneTime;
     int VaccineDose;
     std::string MechanismofImmunity;
-    bool LatencyTime;
+    bool Latency;
     bool WaningImmunity;
     int ImmuneDuration;
     int ImmuneWaneTime;
+
+    // outputs requested
+
+    bool dwelltime_output;
+    bool incidence_output;
+    bool mortality_output;
+    bool CEA_output;
 
     std::string CytoSensFile;
     std::vector< std::vector<double> > cytosens;
@@ -102,6 +120,25 @@ public:
 
     double LLETZSuccessRateCIN;
     double LLETZSuccessRateHPV;
+
+    double cPtTime;
+    double cPaptest;
+    double cReturnForResult;
+    double cColpoTime;
+    double cColpoProc;
+    double cTreatHPV;
+    double cTreatCIN23;
+    double cCryoVisit;
+    double cCryoHPV;
+    double cCryoCIN23;
+    double cCryoCA;
+    double cStage1Ca;
+    double cStage2Ca;
+    double cStage3Ca;
+    double cHPVVaccine;
+
+    double disabilityCA12;
+    double disabilityCA34;
 
     std::string VaccineType;
 

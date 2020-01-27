@@ -12,6 +12,16 @@ Output::Output(Inputs &Tables, int y) {
 
     // 2Dmatrices: [age][simyear]
 
+    DALY.resize (y + 1);
+    YLL.resize (y + 1);
+    YLD.resize (y + 1);
+    cost.resize (y + 1);
+    discDALY = 0;
+    TotalDALY = 0;
+    discountrate = 0.03;
+    TotalCost = 0;
+    discCost = 0;
+
     trace.resize(Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         trace[i].resize(y);
@@ -159,6 +169,40 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         CIN3HIVneg[i].resize (y);
     }
+
+    causalHPV16ageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPV16ageMatrix[i].resize (y);
+    }
+    causalHPV18ageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPV18ageMatrix[i].resize (y);
+    }
+    causalHPV31ageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPV31ageMatrix[i].resize (y);
+    }
+    causalHPV33ageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPV33ageMatrix[i].resize (y);
+    }
+    causalHPV45ageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPV45ageMatrix[i].resize (y);
+    }
+    causalHPV52ageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPV52ageMatrix[i].resize (y);
+    }
+    causalHPV58ageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPV58ageMatrix[i].resize (y);
+    }
+    causalHPVoHRageMatrix.resize(Tables.ModelStopAge + 1);
+    for (int i = 0; i <= Tables.ModelStopAge; i++) {
+        causalHPVoHRageMatrix[i].resize (y);
+    }
+
     cancer = 0;
     CA16 = 0;
     CA18 = 0;
@@ -581,8 +625,31 @@ void Output::writeCalibOutput(std::string *Outdir, std::string calib_targs_names
 
 }
 
-void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears) {
+void Output::writeCEA(std::string *Outdir) {
+    ofstream output;
+    string OutputFileName;
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_costbenefit");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
 
+    if(output){
+        output << " \tCost\tDALYs" << endl;
+        output << "Undiscounted" << '\t';
+        output << TotalCost << '\t';
+        output << TotalDALY << endl;
+        output << "Discounted" << '\t';
+        output << discCost << '\t';
+        output << discDALY << endl;
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+}
+
+void Output::writeInc(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears) {
     ofstream output;
     string OutputFileName;
     OutputFileName.append(*Outdir);
@@ -597,40 +664,13 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        for(int i = 0; i < TotalSimYears; i++) {
+        for(int i = 100; i < TotalSimYears; i++) {
             output << "SimYear" << i << '\t';
             for(int j = 15; j < ModelStopAge; j++) {
                 output << 100000*static_cast<double>(TotalDetectedCancer[j][i])/TotalCancerDenom[j][i] << '\t';
             }
             output << endl;
         }
-    }
-    else
-        cerr << "Warning: Unable to open " << OutputFileName << endl;
-    output.close();
-    output.clear();
-
-    OutputFileName.clear();
-    OutputFileName.append(*Outdir);
-    OutputFileName.append("/");
-    OutputFileName.append("_Mort");
-    OutputFileName.append(extension);
-    output.open(OutputFileName.c_str (), ios::out);
-
-    if(output){
-        output << "" << '\t';
-        for(int j = 15; j < ModelStopAge; j++) {
-            output << j << '\t';
-        }
-        output << endl;
-        for(int i = 0; i < TotalSimYears; i++) {
-            output << "SimYear" << i << '\t';
-            for(int j = 15; j < ModelStopAge; j++) {
-                output << 100000 * static_cast<double>(CAdead[j][i]) / total_alive[j][i] << '\t';
-            }
-            output << endl;
-        }
-
     }
     else
         cerr << "Warning: Unable to open " << OutputFileName << endl;
@@ -650,13 +690,47 @@ void Output::writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAg
             output << j << '\t';
         }
         output << endl;
-        for(int i = 0; i < TotalSimYears; i++) {
+        for(int i = 100; i < TotalSimYears; i++) {
             output << "SimYear" << i << '\t';
             for(int j = 15; j < ModelStopAge; j++) {
                 output << static_cast<double>(HPVcount[j][i])/HPVdenom[j][i] << '\t';
             }
             output << endl;
         }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+}
+
+void Output::writeMort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears) {
+
+    ofstream output;
+    string OutputFileName;
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Mort");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 15; j < ModelStopAge; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 100; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 15; j < ModelStopAge; j++) {
+                output << 100000 * static_cast<double>(CAdead[j][i]) / total_alive[j][i] << '\t';
+            }
+            output << endl;
+        }
+
     }
     else
         cerr << "Warning: Unable to open " << OutputFileName << endl;
@@ -671,6 +745,7 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_16_num += Data.CIN16;
         DwellTime_CIN_CA_16_num += Data.CA16;
         causalHPV16age += Data.age16;
+        causalHPV16ageMatrix[Data.age16][Data.year16]++;
         DwellTime_CA_16_denom++;
     }
 
@@ -678,6 +753,7 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_18_num += Data.CIN18;
         DwellTime_CIN_CA_18_num += Data.CA18;
         causalHPV18age += Data.age18;
+        causalHPV18ageMatrix[Data.age18][Data.year18]++;
         DwellTime_CA_18_denom++;
     }
 
@@ -685,6 +761,7 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_31_num += Data.CIN31;
         DwellTime_CIN_CA_31_num += Data.CA31;
         causalHPV31age += Data.age31;
+        causalHPV31ageMatrix[Data.age31][Data.year31]++;
         DwellTime_CA_31_denom++;
     }
 
@@ -692,6 +769,7 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_33_num += Data.CIN33;
         DwellTime_CIN_CA_33_num += Data.CA33;
         causalHPV33age += Data.age33;
+        causalHPV33ageMatrix[Data.age33][Data.year33]++;
         DwellTime_CA_33_denom++;
     }
 
@@ -699,6 +777,7 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_45_num += Data.CIN45;
         DwellTime_CIN_CA_45_num += Data.CA45;
         causalHPV45age += Data.age45;
+        causalHPV45ageMatrix[Data.age45][Data.year45]++;
         DwellTime_CA_45_denom++;
     }
 
@@ -706,6 +785,7 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_52_num += Data.CIN52;
         DwellTime_CIN_CA_52_num += Data.CA52;
         causalHPV52age += Data.age52;
+        causalHPV52ageMatrix[Data.age52][Data.year52]++;
         DwellTime_CA_52_denom++;
     }
 
@@ -713,6 +793,7 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_58_num += Data.CIN58;
         DwellTime_CIN_CA_58_num += Data.CA58;
         causalHPV58age += Data.age58;
+        causalHPV58ageMatrix[Data.age58][Data.year58]++;
         DwellTime_CA_58_denom++;
     }
 
@@ -720,11 +801,12 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_HPV_CIN_oHR_num += Data.CINoHR;
         DwellTime_CIN_CA_oHR_num += Data.CAoHR;
         causalHPVoHRage += Data.ageoHR;
+        causalHPVoHRageMatrix[Data.ageoHR][Data.yearoHR]++;
         DwellTime_CA_oHR_denom++;
     }
 }
 
-void Output::writeDwellTime(std::string *Outdir) {
+void Output::writeDwellTime(std::string *Outdir, int TotalSimYears) {
     ofstream output;
     string OutputFileName;
     OutputFileName.append(*Outdir);
@@ -784,6 +866,244 @@ void Output::writeDwellTime(std::string *Outdir) {
     output.close();
     output.clear();
 
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_Cum16");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPV16ageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_Cum18");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPV18ageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_Cum31");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPV31ageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_Cum33");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPV33ageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_Cum45");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPV45ageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_Cum52");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPV52ageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_Cum58");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPV58ageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Dwelltime_CumoHR");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 9; j < 100; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 9; j < 100; j++) {
+                output << causalHPVoHRageMatrix[j][i] << '\t';
+            }
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+}
+
+void Output::calcLE(Woman &Data, Inputs &Tables, int y) {
+    if (Data.Alive) {
+        if (Data.cancer) {
+            switch(Data.cancerstage){
+                case Woman::Stage0:break;
+                case Woman::Stage1:
+                    YLD[y] += Tables.disabilityCA12;
+                    break;
+                case Woman::Stage2:
+                    YLD[y] += Tables.disabilityCA12;
+                    break;
+                case Woman::Stage3:
+                    YLD[y] += Tables.disabilityCA34;
+                    break;
+                case Woman::Stage1d:
+                    YLD[y] += Tables.disabilityCA12;
+                    break;
+                case Woman::Stage2d:
+                    YLD[y] += Tables.disabilityCA12;
+                    break;
+                case Woman::Stage3d:
+                    YLD[y] += Tables.disabilityCA34;
+                    break;
+            }
+        }
+    } else {
+        YLL[y] += Tables.LifeExpectancy[Data.CurrentAge][0];
+    }
 }
 
 Output::~Output(void) = default;

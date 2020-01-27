@@ -82,6 +82,9 @@ std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
                     logmean = log(multipliers[i][0]);
                     calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
                     break;
+                case Unif:
+                    calib_params[n_sim][i] = runif (0, 100);
+                    break;
             }
         }
     } else {
@@ -93,6 +96,9 @@ std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
                 case RR:
                     logmean = log(best_params[i]);
                     calib_params[n_sim][i] = rlognormal (logmean, multipliers[i][1]);
+                    break;
+                case Unif:
+                    calib_params[n_sim][i] = rnormal_trunc (best_params[i], multipliers[i][1], 100, 0);
                     break;
             }
         }
@@ -123,6 +129,14 @@ double calibrate::rnormal_trunc(double mu, double sigma, double upper, double lo
         prob = distribution(generator);
     }
     return(prob);
+}
+
+int calibrate::runif(double lower, double upper) {
+    std::random_device rdev{};
+    std::default_random_engine generator{rdev()};
+    std::uniform_int_distribution<int> distribution(lower, upper);
+    int mult = distribution(generator);
+    return(mult);
 }
 
 void calibrate::GetProbAcceptance(double neighbor, double current, int n_sims) {

@@ -117,11 +117,20 @@ public:
     int age52;
     int age58;
     int ageoHR;
+
+    int year16;
+    int year18;
+    int year31;
+    int year33;
+    int year45;
+    int year52;
+    int year58;
+    int yearoHR;
     double rand;
 
     Woman(int Age, int StartYear); // constructor used for calibration
-    Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov); // constructor used for analysis
-    void reset(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov);
+    Woman(int Age, int StartYear, helper &help, double ScreenCoverage); // constructor used for analysis
+    void reset(int Age, int StartYear, helper &help, double ScreenCoverage);
     ~Woman();
 
 };

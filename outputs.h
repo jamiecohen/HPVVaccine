@@ -124,17 +124,38 @@ public:
     int causalHPV52age;
     int causalHPV58age;
     int causalHPVoHRage;
+    IntMatrix causalHPV16ageMatrix;
+    IntMatrix causalHPV18ageMatrix;
+    IntMatrix causalHPV31ageMatrix;
+    IntMatrix causalHPV33ageMatrix;
+    IntMatrix causalHPV45ageMatrix;
+    IntMatrix causalHPV52ageMatrix;
+    IntMatrix causalHPV58ageMatrix;
+    IntMatrix causalHPVoHRageMatrix;
+
+    vector<double> cost;
+    vector<double> DALY;
+    vector<double> YLL;
+    vector<double> YLD;
+    double TotalCost;
+    double discDALY;
+    double TotalDALY;
+    double discCost;
+    double discountrate;
 
     Output(Inputs &Tables, int y);
     ~Output(void);
 
     void createTrace(Woman &Data, int y);
-    void writeCohort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears);
+    void writeInc(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears);
+    void writeCEA(std::string *Outdir);
+    void writeMort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears);
     void createTypeDist(Woman &Data);
     void createCalibOutput(int y);
     void calcDwellTime(Woman &Data);
-    void writeDwellTime(std::string *Outdir);
+    void writeDwellTime(std::string *Outdir, int TotalSimYears);
     void writeCalibOutput(std::string *Outdir, std::string calib_targs_names);
+    void calcLE(Woman &Data, Inputs &Tables, int y);
 
 };
 

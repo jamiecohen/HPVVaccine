@@ -30,10 +30,11 @@ public:
     double WeightedDistance(double data, double mean, double N);
     double rnormal_trunc (double mu, double sigma, double upper, double lower);
     double rlognormal (double mu, double sigma);
+    int runif (double lower, double upper);
     void GetProbAcceptance(double neighbor, double current, int n_sims);
 
     double tune_factor;
-    enum MultType {prob = 0, RR = 1};
+    enum MultType {prob = 0, RR = 1, Unif = 2};
     std::vector<MultType> multipliers_type;
 
     std::vector<double> calib_targs;

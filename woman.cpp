@@ -104,7 +104,7 @@ Woman::Woman(int Age, int StartYear) {
     cancerstage = caT::Stage0;
 }
 
-Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov) {
+Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage) {
     CIN16 = 0;
     CIN18 = 0;
     CIN31 = 0;
@@ -191,16 +191,10 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage, int Va
     nextscreenage = 0;
     rand = help.getrand ();
     ScreenAccess = rand < ScreenCoverage;
-    rand = help.getrand ();
-    if (rand < vaccinecov){
-        completevaccine = true;
-        vaccineage = VaccineAge;
-    } else {
-        completevaccine = false;
-    }
+    completevaccine = false;
 }
 
-void Woman::reset(int Age, int StartYear, helper &help, double ScreenCoverage, int VaccineAge, double vaccinecov) {
+void Woman::reset(int Age, int StartYear, helper &help, double ScreenCoverage) {
     CIN16 = 0;
     CIN18 = 0;
     CIN31 = 0;
@@ -225,6 +219,14 @@ void Woman::reset(int Age, int StartYear, helper &help, double ScreenCoverage, i
     age52 = 0;
     age58 = 0;
     ageoHR = 0;
+    year16 = 0;
+    year18 = 0;
+    year31 = 0;
+    year33 = 0;
+    year45 = 0;
+    year52 = 0;
+    year58 = 0;
+    yearoHR = 0;
     hpvlo = false;
     hpv16 = false;
     hpv18 = false;
@@ -285,13 +287,7 @@ void Woman::reset(int Age, int StartYear, helper &help, double ScreenCoverage, i
     nextscreenage = 0;
     rand = help.getrand ();
     ScreenAccess = rand < ScreenCoverage;
-    rand = help.getrand ();
-    if (rand < vaccinecov){
-        completevaccine = true;
-        vaccineage = VaccineAge;
-    } else {
-        completevaccine = false;
-    }
+    completevaccine = false;
 }
 
 Woman::~Woman()

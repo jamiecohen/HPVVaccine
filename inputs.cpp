@@ -60,6 +60,9 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string SymptomDetectionFileName = "SymptomDetectionFile";
 
     // Interventions
+    string CostsFileName = "CostsFile";
+    string DisabilityFileName = "DisabilityFile";
+    string LifeExpectancyFileName = "LifeExpectancyFile";
     string ScreenStopAgeName = "ScreenStopAge";
     string ScreenStartAgeName = "ScreenStartAge";
     string ScreenFrequencyName = "ScreenFrequency";
@@ -67,13 +70,15 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string ScreenComplianceName = "ScreenCompliance";
     string VaccineCoverageName = "VaccineCoverage";
     string MechanismofImmunityName = "MechanismofImmunity";
-    string LatencyTimeName = "LatencyTime";
+    string LatencyName = "Latency";
     string WaningImmunityName = "WaningImmunity";
     string ImmuneDurationName = "ImmuneDuration";
     string ImmuneWaneTimeName = "ImmuneWaneTime";
     string VaccineTypeName = "VaccineType";
     string VaccineDoseName = "VaccineDose";
     string VaccineStartAgeName = "VaccineStartAge";
+    string VaccineEndAgeName = "VaccineEndAge";
+    string VaccineStartYearName = "VaccineStartYear";
     string VaccineEfficacyFileName = "VaccineEfficacyFile";
     string VaccineDurationName = "VaccineDuration";
     string VaccineWaneTimeName = "VaccineWaneTime";
@@ -83,6 +88,10 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string LLETZSuccessRateHPVName = "LLETZSuccessRateHPV";
     string AdequacyLBCName = "AdequacyLBC";
     string ColpoAvailName = "ColpoAvail";
+    string dwelltime_outputName = "dwelltime_output";
+    string incidence_outputName = "incidence_output";
+    string mortality_outputName = "mortality_output";
+    string CEA_outputName = "CEA_output";
 
     //[Multipliers] variable names
     //[NaturalImmunity Multipliers] variable names
@@ -241,6 +250,10 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     StartYear = RunsFile.GetValueI(CurKey, StartYearName);
     SimulationYears = RunsFile.GetValueI (CurKey, SimulationYearsName);
     BurnInYears = RunsFile.GetValueI (CurKey, BurnInYearsName);
+    dwelltime_output = RunsFile.GetValueI(CurKey, dwelltime_outputName);
+    incidence_output = RunsFile.GetValueI(CurKey, incidence_outputName);
+    mortality_output = RunsFile.GetValueI(CurKey, mortality_outputName);
+    CEA_output = RunsFile.GetValueI(CurKey, CEA_outputName);
 
     InitialPopulationFile.append(DataFolder);
     InitialPopulationFile.append(RunsFile.GetValue(CurKey, InitialPopulationFileName));
@@ -400,6 +413,44 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     Infile.close();
     Infile.clear();
 
+    CostsFile.append(DataFolder);
+    CostsFile.append(RunsFile.GetValue(CurKey, CostsFileName));
+    Infile.open(CostsFile, ios::in);
+    if(Infile.fail())
+    {
+        cerr << "\nError: Unable to open file: " << CostsFile << endl;
+        exit(1);
+    }
+
+    loadData (Infile, Costs);
+    Infile.close();
+    Infile.clear();
+
+    DisabilityFile.append(DataFolder);
+    DisabilityFile.append(RunsFile.GetValue(CurKey, DisabilityFileName));
+    Infile.open(DisabilityFile, ios::in);
+    if(Infile.fail())
+    {
+        cerr << "\nError: Unable to open file: " << DisabilityFile << endl;
+        exit(1);
+    }
+
+    loadData (Infile, Disability);
+    Infile.close();
+    Infile.clear();
+
+    LifeExpectancyFile.append(DataFolder);
+    LifeExpectancyFile.append(RunsFile.GetValue(CurKey, LifeExpectancyFileName));
+    Infile.open(LifeExpectancyFile, ios::in);
+    if(Infile.fail())
+    {
+        cerr << "\nError: Unable to open file: " << LifeExpectancyFile << endl;
+        exit(1);
+    }
+
+    loadData (Infile, LifeExpectancy);
+    Infile.close();
+    Infile.clear();
 
     //[Interventions]
 
@@ -413,6 +464,8 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     VaccineType = RunsFile.GetValue(CurKey, VaccineTypeName);
     VaccineDose = RunsFile.GetValueI(CurKey, VaccineDoseName);
     VaccineStartAge = RunsFile.GetValueI(CurKey, VaccineStartAgeName);
+    VaccineEndAge = RunsFile.GetValueI(CurKey, VaccineEndAgeName);
+    VaccineStartYear = RunsFile.GetValueI(CurKey, VaccineStartYearName);
     VaccineDuration = RunsFile.GetValueI(CurKey, VaccineDurationName);
     VaccineWaneTime = RunsFile.GetValueF(CurKey, VaccineWaneTimeName);
     WaningImmunity = RunsFile.GetValueI(CurKey, WaningImmunityName);
@@ -463,7 +516,8 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     ImmuneWaneTime = RunsFile.GetValueI(CurKey, ImmuneWaneTimeName);
     ImmuneDuration = RunsFile.GetValueI(CurKey, ImmuneDurationName);
     MechanismofImmunity = RunsFile.GetValue (CurKey, MechanismofImmunityName);
-    LatencyTime = RunsFile.GetValueI (CurKey, LatencyTimeName);
+    Latency = RunsFile.GetValueI (CurKey, LatencyName);
+
 
 
     // NEW PARAMETERS
@@ -885,11 +939,12 @@ void Inputs::loadVariables() {
         vaccinetype = VxType::Bivalent;
         VE_1618 = vaccineefficacy[0][0];
         VE_high5 = vaccineefficacy[1][0];
-
+        cHPVVaccine = Costs[14][0];
     } else if(VaccineType == "Nonavalent"){
         vaccinetype = VxType::Nonavalent;
         VE_1618 = vaccineefficacy[0][1];
         VE_high5 = vaccineefficacy[1][1];
+        cHPVVaccine = Costs[15][0];
     }
 
     if(MechanismofImmunity == "Degree"){
@@ -897,6 +952,24 @@ void Inputs::loadVariables() {
     } else if(MechanismofImmunity == "Factor"){
         ImmuneMechanism = Immunity::Factor;
     }
+
+    cPtTime = Costs[0][0];
+    cPaptest = Costs[1][0];
+    cReturnForResult = Costs[2][0];
+    cColpoTime = Costs[3][0];
+    cColpoProc = Costs[4][0];
+    cTreatHPV = Costs[5][0];
+    cTreatCIN23 = Costs[6][0];
+    cCryoVisit = Costs[7][0];
+    cCryoHPV = Costs[8][0];
+    cCryoCIN23 = Costs[9][0];
+    cCryoCA = Costs[10][0];
+    cStage1Ca = Costs[11][0];
+    cStage2Ca = Costs[12][0];
+    cStage3Ca = Costs[13][0];
+    disabilityCA12 = Disability[0][0];
+    disabilityCA34 = Disability[1][0];
+
 }
 
 double Inputs::ApplyMult(double prob, double mult){

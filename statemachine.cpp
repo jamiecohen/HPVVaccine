@@ -31,7 +31,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                         Count.DwellTime_CA_detected_denom++;
                         StateMachine::CountDetectedCancer (Data, Count, y);
                         Data.ca1Timer++;
-                        StateMachine::Colpo (Data, Tables, Count, help);
+                        StateMachine::Colpo (Data, Tables, Count, help, y);
                     } else {
                         Data.ca1Timer++;
                     }
@@ -47,7 +47,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                         Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer;
                         Count.DwellTime_CA_detected_denom++;
                         Data.ca2Timer++;
-                        StateMachine::Colpo (Data, Tables, Count, help);
+                        StateMachine::Colpo (Data, Tables, Count, help, y);
                     } else {
                         Data.ca2Timer++;
                     }
@@ -60,7 +60,7 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
                         Count.DwellTime_CA_detected_num += Data.ca1Timer + Data.ca2Timer + Data.ca3Timer;
                         Count.DwellTime_CA_detected_denom++;
                         Data.ca3Timer++;
-                        StateMachine::Colpo (Data, Tables, Count, help);
+                        StateMachine::Colpo (Data, Tables, Count, help, y);
                     } else {
                         Data.ca3Timer++;
                     }
@@ -132,48 +132,53 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper
     }
 }
 
-void StateMachine::CytoScreen(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
-    Adequacy = Tables.AdequacyLBC;
-    Data.screen_first = Tables.ScreenStartAge;
-    ScreenFrequency = Tables.ScreenFrequency;
-    if (!Data.screenstart) {
-        Data.nextscreenage = Data.screen_first;
-    }
-    if (Data.Alive) {
-        if (Data.CurrentAge >= Data.nextscreenage && Data.CurrentAge <= Tables.ScreenStopAge) {
-            Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
-            Data.screens++;
-            Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
-            Data.screen_first = Data.CurrentAge;
-            Data.screenage.push_back (Data.CurrentAge);
-            rand = help.getrand ();
-            if (rand < Adequacy) {
+void StateMachine::CytoScreen(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
+    if (Data.ScreenAccess) {
+        Adequacy = Tables.AdequacyLBC;
+        Data.screen_first = Tables.ScreenStartAge;
+        ScreenFrequency = Tables.ScreenFrequency;
+        if (!Data.screenstart) {
+            Data.nextscreenage = Data.screen_first;
+        }
+        if (Data.Alive) {
+            if (Data.CurrentAge >= Data.nextscreenage && Data.CurrentAge <= Tables.ScreenStopAge) {
+                Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
                 Data.screens++;
+                Data.nextscreenage = Data.CurrentAge + ScreenFrequency;
+                Data.screen_first = Data.CurrentAge;
                 Data.screenage.push_back (Data.CurrentAge);
-            }
-            if (Data.cancer) {
+                Count.cost[y] += Tables.cPaptest;
+                Count.cost[y] += Tables.cReturnForResult;
+                Count.cost[y] += Tables.cPtTime;
                 rand = help.getrand ();
-                if (rand < Tables.cytosens_Ca) {
-                    rand = help.getrand ();
-                    if (rand < Tables.ScreenCompliance) {
-                        StateMachine::Colpo (Data, Tables, Count, help);
-                    }
+                if (rand < Adequacy) {
+                    Data.screens++;
+                    Data.screenage.push_back (Data.CurrentAge);
                 }
-            } else {
-                if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
+                if (Data.cancer) {
                     rand = help.getrand ();
-                    if (rand < Tables.cytosens_CIN) {
+                    if (rand < Tables.cytosens_Ca) {
                         rand = help.getrand ();
                         if (rand < Tables.ScreenCompliance) {
-                            StateMachine::Colpo (Data, Tables, Count, help);
+                            StateMachine::Colpo (Data, Tables, Count, help, y);
                         }
                     }
                 } else {
-                    rand = help.getrand ();
-                    if (rand < Tables.cytosens_NL) {
+                    if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
                         rand = help.getrand ();
-                        if (rand < Tables.ScreenCompliance) {
-                            StateMachine::Colpo (Data, Tables, Count, help);
+                        if (rand < Tables.cytosens_CIN) {
+                            rand = help.getrand ();
+                            if (rand < Tables.ScreenCompliance) {
+                                StateMachine::Colpo (Data, Tables, Count, help, y);
+                            }
+                        }
+                    } else {
+                        rand = help.getrand ();
+                        if (rand < Tables.cytosens_NL) {
+                            rand = help.getrand ();
+                            if (rand < Tables.ScreenCompliance) {
+                                StateMachine::Colpo (Data, Tables, Count, help, y);
+                            }
                         }
                     }
                 }
@@ -313,14 +318,16 @@ void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count,
             Data.Alive = false;
         } else {
             if (!calib) {
-                if (Data.ScreenAccess) {
-                    StateMachine::CytoScreen (Data, Tables, Count, help);
-                }
+                StateMachine::Vaccinate(Data, Tables, Count, help, y);
+                StateMachine::CytoScreen (Data, Tables, Count, help, y);
             }
             StateMachine::NatHistory (Data, Tables, Count, help, y, calib);
         }
 
         Count.createTrace (Data, y);
+        if (!calib) {
+            Count.calcLE (Data, Tables, y);
+        }
 
         if (Data.Alive) {
             Count.total_alive[Data.CurrentAge][y]++;
@@ -331,7 +338,11 @@ void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count,
     }
 }
 
-void StateMachine::LLETZ(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
+void StateMachine::LLETZ(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
+
+    Count.cost[y] += Tables.cPtTime;
+    Count.cost[y] += Tables.cCryoVisit;
+    Count.cost[y] += Tables.cCryoCIN23;
 
     if (Data.cancer) {
         switch (Data.cancerstage) {
@@ -423,19 +434,22 @@ void StateMachine::LLETZ(Woman &Data, Inputs &Tables, Output &Count, helper &hel
     }
 }
 
-void StateMachine::Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
+void StateMachine::Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
 
     rand = help.getrand ();
     if(rand < Tables.ScreenCompliance){
+        Count.cost[y] += Tables.cPtTime;
+        Count.cost[y] += Tables.cColpoProc;
+        Count.cost[y] += Tables.cColpoTime;
         if (Data.cancer) {
-            StateMachine::SendforTreatment (Data, Tables, Count, help);
+            StateMachine::SendforTreatment (Data, Tables, Count, help, y);
         } else {
             if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
                 rand = help.getrand ();
                 if (rand < Tables.colposens[1][1]) {
                     rand = help.getrand ();
                     if(rand < Tables.ScreenCompliance){
-                        StateMachine::SendforTreatment (Data, Tables, Count,help);
+                        StateMachine::SendforTreatment (Data, Tables, Count,help, y);
                     }
                 }
             } else if (!Data.HPVinfections.empty ()) {
@@ -443,7 +457,7 @@ void StateMachine::Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &hel
                 if (rand < Tables.colposens[1][0]) {
                     rand = help.getrand ();
                     if(rand < Tables.ScreenCompliance){
-                        StateMachine::SendforTreatment (Data, Tables, Count, help);
+                        StateMachine::SendforTreatment (Data, Tables, Count, help, y);
                     }
                 }
             } else {
@@ -451,7 +465,7 @@ void StateMachine::Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &hel
                 if (rand < Tables.colposens[1][0]) {
                     rand = help.getrand ();
                     if(rand < Tables.ScreenCompliance){
-                        StateMachine::SendforTreatment (Data, Tables, Count, help);
+                        StateMachine::SendforTreatment (Data, Tables, Count, help, y);
                     }
                 }
             }
@@ -535,7 +549,7 @@ void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper
         rand = help.getrand ();
         if (rand < pHPV) {
             Data.HPVinfections.push_back (genotype);
-            if (Tables.LatencyTime) {
+            if (Tables.Latency) {
                 StateMachine::CheckLatency (Data, Tables, genotype);
             } else {
                 Data.HPVinfectionTimer.push_back (1);
@@ -551,36 +565,44 @@ void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper
                 case Woman::otherHR:
                     Data.hpvotherHR = true;
                     Data.ageoHR = Data.CurrentAge - Data.LatentTimer;
+                    Data.yearoHR = Data.Cycle;
                     break;
                 case Woman::High16:
                     Data.hpv16 = true;
                     Data.age16 = Data.CurrentAge - Data.LatentTimer;
+                    Data.year16 = Data.Cycle;
                     Count.HPV16count[Data.CurrentAge][y]++;
                     break;
                 case Woman::High18:
                     Data.hpv18 = true;
                     Data.age18 = Data.CurrentAge - Data.LatentTimer;
+                    Data.year18 = Data.Cycle;
                     Count.HPV18count[Data.CurrentAge][y]++;
                     break;
                 case Woman::High31:
                     Data.hpv31 = true;
                     Data.age31 = Data.CurrentAge - Data.LatentTimer;
+                    Data.year31 = Data.Cycle;
                     break;
                 case Woman::High33:
                     Data.hpv33 = true;
                     Data.age33 = Data.CurrentAge - Data.LatentTimer;
+                    Data.year33 = Data.Cycle;
                     break;
                 case Woman::High45:
                     Data.hpv45 = true;
                     Data.age45 = Data.CurrentAge - Data.LatentTimer;
+                    Data.year45 = Data.Cycle;
                     break;
                 case Woman::High52:
                     Data.hpv52 = true;
                     Data.age52 = Data.CurrentAge - Data.LatentTimer;
+                    Data.year52 = Data.Cycle;
                     break;
                 case Woman::High58:
                     Data.hpv58 = true;
                     Data.age58 = Data.CurrentAge - Data.LatentTimer;
+                    Data.year58 = Data.Cycle;
                     break;
             }
             break;
@@ -1142,7 +1164,7 @@ void StateMachine::GetBackgroundMortality(Woman &Data, Inputs &Tables, helper &h
     }
 }
 
-void StateMachine::SendforTreatment(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
+void StateMachine::SendforTreatment(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
 
     if(Data.cancer){
         switch (Data.cancerstage) {
@@ -1150,19 +1172,38 @@ void StateMachine::SendforTreatment(Woman &Data, Inputs &Tables, Output &Count, 
                 break;
             case Woman::Stage1:
                 Data.cancerstage = Data.Stage1d;
+                Count.cost[y] += Tables.cStage1Ca;
                 break;
             case Woman::Stage2:
                 Data.cancerstage = Data.Stage2d;
+                Count.cost[y] += Tables.cStage2Ca;
                 break;
             case Woman::Stage3:
                 Data.cancerstage = Data.Stage3d;
+                Count.cost[y] += Tables.cStage3Ca;
                 break;
             case Woman::Stage1d:break;
             case Woman::Stage2d:break;
             case Woman::Stage3d:break;
         }
     } else {
-        StateMachine::LLETZ (Data, Tables,  Count, help);
+        StateMachine::LLETZ (Data, Tables,  Count, help, y);
+    }
+}
+
+void StateMachine::Vaccinate(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y) {
+
+    if(Data.CurrentYear >= Tables.VaccineStartYear){
+        if(Data.CurrentAge >= Tables.VaccineStartAge && Data.CurrentAge <= Tables.VaccineEndAge){
+            if(!Data.completevaccine){
+                rand = help.getrand();
+                if(rand < Tables.VaccineCoverage){
+                    Data.completevaccine = true;
+                    Data.vaccineage = Data.CurrentAge;
+                    Count.cost[y] += Tables.cHPVVaccine;
+                }
+            }
+        }
     }
 }
 
