@@ -323,7 +323,6 @@ void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count,
             }
             StateMachine::NatHistory (Data, Tables, Count, help, y, calib);
         }
-
         Count.createTrace (Data, y);
         if (!calib) {
             Count.calcLE (Data, Tables, y);
@@ -503,7 +502,7 @@ void StateMachine::GetVaccineEff(Woman &Data, Inputs &Tables, bool burnin) {
         vaccine_eff_high5 = 0;
         vaccine_deg_1618 = 1 - vaccine_eff_1618;
         vaccine_deg_high5 = 1 - vaccine_eff_high5;
-    } else{
+    } else {
         if (Data.completevaccine) {
             vaccine_eff_1618 = Tables.VE_1618;
             vaccine_eff_high5 = Tables.VE_high5;
@@ -808,6 +807,7 @@ void StateMachine::GetCIN3Risk(Woman &Data, Inputs &Tables, int i, Woman::hpvT g
 void StateMachine::CountDetectedCancer(Woman &Data, Output &Count, int y) {
     Count.TotalDetectedCancer[Data.CurrentAge][y]++;
     Count.DetectedCAcount[Data.CurrentAge][y]++;
+    Count.TotalDetectedCancer_byyear[y]++;
 }
 
 void StateMachine::CountCIN(Woman &Data, Woman::hpvT genotype, int i) {

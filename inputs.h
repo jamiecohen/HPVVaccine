@@ -126,8 +126,6 @@ public:
     double cReturnForResult;
     double cColpoTime;
     double cColpoProc;
-    double cTreatHPV;
-    double cTreatCIN23;
     double cCryoVisit;
     double cCryoHPV;
     double cCryoCIN23;
@@ -137,8 +135,9 @@ public:
     double cStage3Ca;
     double cHPVVaccine;
 
-    double disabilityCA12;
-    double disabilityCA34;
+    double disabilityCA1;
+    double disabilityCA2;
+    double disabilityCA3;
 
     std::string VaccineType;
 

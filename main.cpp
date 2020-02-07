@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Naive_VaccineAge_1.ini");
-        FileName = "Naive_VaccineAge_1.ini";
+        RunsFileName.append("test.ini");
+        FileName = "test.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
             RunCalibration (calib, tables, i);
             clock_t end = clock();
             timer[i] = double(end - begin) / CLOCKS_PER_SEC;
-            cout << timer[i] << endl;
+            //cout << timer[i] << endl;
         }
         string OutDir = OutputFolder.append("HPVVaccine_Calib");
         if(tables.Latency){
@@ -205,13 +205,13 @@ int main(int argc, char* argv[]) {
                 modeloutputs[i].writeInc (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
             }
             if(tables.mortality_output){
-                modeloutputs[i].writeMort (&OutputDir, ModelStartAge, ModelStopAge, SimulationYears);
+                modeloutputs[i].writeMort (&OutputDir, ModelStopAge, SimulationYears);
             }
             if(tables.dwelltime_output){
                 modeloutputs[i].writeDwellTime (&OutputDir, SimulationYears);
             }
             if(tables.CEA_output){
-                modeloutputs[i].writeCEA (&OutputDir);
+                modeloutputs[i].writeCEA (&OutputDir, ModelStopAge, SimulationYears);
             }
         }
     } else if (RunsFile.GetValue(RunType, "RunType") == "Population") {
@@ -246,13 +246,13 @@ int main(int argc, char* argv[]) {
                 modeloutputs[i].writeInc (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
             }
             if(tables.mortality_output){
-                modeloutputs[i].writeMort (&OutputDir, ModelStartAge, ModelStopAge, TotalSimYears);
+                modeloutputs[i].writeMort (&OutputDir, ModelStopAge, TotalSimYears);
             }
             if(tables.dwelltime_output){
                 modeloutputs[i].writeDwellTime (&OutputDir, TotalSimYears);
             }
             if(tables.CEA_output){
-                modeloutputs[i].writeCEA (&OutputDir);
+                modeloutputs[i].writeCEA (&OutputDir, ModelStopAge, TotalSimYears);
             }
         }
     }
@@ -371,10 +371,14 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
     int CurrentModelYear = tables.StartYear;
     for (int y = tables.BurnInYears; y < TotalSimYears; y++) {
         for (auto &k : women) {
+        /*for (int k = 0; k < women.size(); k++) {*/
             Machine.runPopulationYear (k, tables, trace, false, help, y);
-            if (!k.Alive) {
-                k.reset (ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage);
-            }
+            /*if (!women[k].Alive) {
+                trace.calcDwellTime(women[k]);
+                women.erase(women.begin() + k - 1);
+                k--;
+                *//*k.reset (ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage);*//*
+            }*/
         }
         CurrentModelYear++;
         trace.discDALY += (trace.YLL[y] + trace.YLD[y])/ pow ((1 + trace.discountrate), static_cast<double>(SimYear));
@@ -386,9 +390,7 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
 
     for (auto & j : women) {
         trace.calcDwellTime(j);
-        trace.createTypeDist (j);
     }
-    trace.createCalibOutput (TotalSimYears-1);
     women.clear();
     return(trace);
 }

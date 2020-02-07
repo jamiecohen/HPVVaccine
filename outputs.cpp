@@ -22,6 +22,7 @@ Output::Output(Inputs &Tables, int y) {
     TotalCost = 0;
     discCost = 0;
 
+
     trace.resize(Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         trace[i].resize(y);
@@ -89,6 +90,8 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         TotalDetectedCancer[i].resize (y);
     }
+    TotalDetectedCancer_byyear.resize(y);
+    CancerDenom_byyear.resize(y);
     TotalCancer_1618.resize(Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         TotalCancer_1618[i].resize (y);
@@ -178,29 +181,14 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         causalHPV18ageMatrix[i].resize (y);
     }
-    causalHPV31ageMatrix.resize(Tables.ModelStopAge + 1);
+
+    causalHPVhi5ageMatrix.resize(Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        causalHPV31ageMatrix[i].resize (y);
+        causalHPVhi5ageMatrix[i].resize (y);
     }
-    causalHPV33ageMatrix.resize(Tables.ModelStopAge + 1);
+    causalHPVallhrageMatrix.resize(Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        causalHPV33ageMatrix[i].resize (y);
-    }
-    causalHPV45ageMatrix.resize(Tables.ModelStopAge + 1);
-    for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        causalHPV45ageMatrix[i].resize (y);
-    }
-    causalHPV52ageMatrix.resize(Tables.ModelStopAge + 1);
-    for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        causalHPV52ageMatrix[i].resize (y);
-    }
-    causalHPV58ageMatrix.resize(Tables.ModelStopAge + 1);
-    for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        causalHPV58ageMatrix[i].resize (y);
-    }
-    causalHPVoHRageMatrix.resize(Tables.ModelStopAge + 1);
-    for (int i = 0; i <= Tables.ModelStopAge; i++) {
-        causalHPVoHRageMatrix[i].resize (y);
+        causalHPVallhrageMatrix[i].resize (y);
     }
 
     cancer = 0;
@@ -234,38 +222,22 @@ Output::Output(Inputs &Tables, int y) {
     CIN3total = 0;
     DwellTime_HPV_CIN_16_num = 0;
     DwellTime_HPV_CIN_18_num = 0;
-    DwellTime_HPV_CIN_31_num = 0;
-    DwellTime_HPV_CIN_33_num = 0;
-    DwellTime_HPV_CIN_45_num = 0;
-    DwellTime_HPV_CIN_52_num = 0;
-    DwellTime_HPV_CIN_58_num = 0;
-    DwellTime_HPV_CIN_oHR_num = 0;
+    DwellTime_HPV_CIN_hi5_num = 0;
+    DwellTime_HPV_CIN_allhr_num = 0;
     DwellTime_CIN_CA_16_num = 0;
     DwellTime_CIN_CA_18_num = 0;
-    DwellTime_CIN_CA_31_num = 0;
-    DwellTime_CIN_CA_33_num = 0;
-    DwellTime_CIN_CA_45_num = 0;
-    DwellTime_CIN_CA_52_num = 0;
-    DwellTime_CIN_CA_58_num = 0;
-    DwellTime_CIN_CA_oHR_num = 0;
+    DwellTime_CIN_CA_hi5_num = 0;
+    DwellTime_CIN_CA_allhr_num = 0;
     DwellTime_CA_16_denom = 0;
     DwellTime_CA_18_denom = 0;
-    DwellTime_CA_31_denom = 0;
-    DwellTime_CA_33_denom = 0;
-    DwellTime_CA_45_denom = 0;
-    DwellTime_CA_52_denom = 0;
-    DwellTime_CA_58_denom = 0;
-    DwellTime_CA_oHR_denom = 0;
+    DwellTime_CA_hi5_denom = 0;
+    DwellTime_CA_allhr_denom = 0;
     DwellTime_CA_detected_denom = 0;
     DwellTime_CA_detected_num = 0;
     causalHPV16age = 0;
     causalHPV18age = 0;
-    causalHPV31age = 0;
-    causalHPV33age = 0;
-    causalHPV45age = 0;
-    causalHPV52age = 0;
-    causalHPV58age = 0;
-    causalHPVoHRage = 0;
+    causalHPVhi5age = 0;
+    causalHPVallhrage = 0;
 }
 
 void Output::createTrace(Woman &Data, int y) {
@@ -274,6 +246,7 @@ void Output::createTrace(Woman &Data, int y) {
     if(!Data.cancer){
         if(Data.CurrentAge >= 15){
             TotalCancerDenom[Data.CurrentAge][y]++;
+            CancerDenom_byyear[y]++;
         }
         if(!Data.hpv16){
             HPV16denom[Data.CurrentAge][y]++;
@@ -625,7 +598,7 @@ void Output::writeCalibOutput(std::string *Outdir, std::string calib_targs_names
 
 }
 
-void Output::writeCEA(std::string *Outdir) {
+void Output::writeCEA(std::string *Outdir, int ModelStopAge, int TotalSimYears) {
     ofstream output;
     string OutputFileName;
     OutputFileName.append(*Outdir);
@@ -642,6 +615,32 @@ void Output::writeCEA(std::string *Outdir) {
         output << "Discounted" << '\t';
         output << discCost << '\t';
         output << discDALY << endl;
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_totalalive");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        output << "" << '\t';
+        for(int j = 0; j < ModelStopAge; j++) {
+            output << j << '\t';
+        }
+        output << endl;
+        for(int i = 0; i < TotalSimYears; i++) {
+            output << "SimYear" << i << '\t';
+            for(int j = 0; j < ModelStopAge; j++) {
+                output << total_alive[j][i] << '\t';
+            }
+            output << endl;
+        }
     }
     else
         cerr << "Warning: Unable to open " << OutputFileName << endl;
@@ -680,6 +679,25 @@ void Output::writeInc(std::string *Outdir, int ModelStartAge, int ModelStopAge, 
     OutputFileName.clear();
     OutputFileName.append(*Outdir);
     OutputFileName.append("/");
+    OutputFileName.append("_CAInc_byyear");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output){
+        for(int j = 100; j < TotalSimYears; j++) {
+            output << "SimYear" << j << '\t';
+            output << 100000*static_cast<double>(TotalDetectedCancer_byyear[j])/CancerDenom_byyear[j] << '\t';
+            output << endl;
+        }
+    }
+    else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
+    OutputFileName.clear();
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
     OutputFileName.append("_HPVInc");
     OutputFileName.append(extension);
     output.open(OutputFileName.c_str (), ios::out);
@@ -707,7 +725,7 @@ void Output::writeInc(std::string *Outdir, int ModelStartAge, int ModelStopAge, 
     OutputFileName.append(*Outdir);
 }
 
-void Output::writeMort(std::string *Outdir, int ModelStartAge, int ModelStopAge, int TotalSimYears) {
+void Output::writeMort(std::string *Outdir, int ModelStopAge, int TotalSimYears) {
 
     ofstream output;
     string OutputFileName;
@@ -747,6 +765,12 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPV16age += Data.age16;
         causalHPV16ageMatrix[Data.age16][Data.year16]++;
         DwellTime_CA_16_denom++;
+
+        DwellTime_HPV_CIN_allhr_num += Data.CIN16;
+        DwellTime_CIN_CA_allhr_num += Data.CA16;
+        causalHPVallhrage += Data.age16;
+        causalHPVallhrageMatrix[Data.age16][Data.year16]++;
+        DwellTime_CA_allhr_denom++;
     }
 
     if(Data.CA18 > 0){
@@ -755,54 +779,90 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPV18age += Data.age18;
         causalHPV18ageMatrix[Data.age18][Data.year18]++;
         DwellTime_CA_18_denom++;
+
+        DwellTime_HPV_CIN_allhr_num += Data.CIN18;
+        DwellTime_CIN_CA_allhr_num += Data.CA18;
+        causalHPVallhrage += Data.age18;
+        causalHPVallhrageMatrix[Data.age18][Data.year18]++;
+        DwellTime_CA_allhr_denom++;
     }
 
     if(Data.CA31 > 0){
-        DwellTime_HPV_CIN_31_num += Data.CIN31;
-        DwellTime_CIN_CA_31_num += Data.CA31;
-        causalHPV31age += Data.age31;
-        causalHPV31ageMatrix[Data.age31][Data.year31]++;
-        DwellTime_CA_31_denom++;
+        DwellTime_HPV_CIN_hi5_num += Data.CIN31;
+        DwellTime_CIN_CA_hi5_num += Data.CA31;
+        causalHPVhi5age += Data.age31;
+        causalHPVhi5ageMatrix[Data.age31][Data.year31]++;
+        DwellTime_CA_hi5_denom++;
+
+        DwellTime_HPV_CIN_allhr_num += Data.CIN31;
+        DwellTime_CIN_CA_allhr_num += Data.CA31;
+        causalHPVallhrage += Data.age31;
+        causalHPVallhrageMatrix[Data.age31][Data.year31]++;
+        DwellTime_CA_allhr_denom++;
     }
 
     if(Data.CA33 > 0){
-        DwellTime_HPV_CIN_33_num += Data.CIN33;
-        DwellTime_CIN_CA_33_num += Data.CA33;
-        causalHPV33age += Data.age33;
-        causalHPV33ageMatrix[Data.age33][Data.year33]++;
-        DwellTime_CA_33_denom++;
+        DwellTime_HPV_CIN_hi5_num += Data.CIN33;
+        DwellTime_CIN_CA_hi5_num += Data.CA33;
+        causalHPVhi5age += Data.age33;
+        causalHPVhi5ageMatrix[Data.age33][Data.year33]++;
+        DwellTime_CA_hi5_denom++;
+
+        DwellTime_HPV_CIN_allhr_num += Data.CIN33;
+        DwellTime_CIN_CA_allhr_num += Data.CA33;
+        causalHPVallhrage += Data.age33;
+        causalHPVallhrageMatrix[Data.age33][Data.year33]++;
+        DwellTime_CA_allhr_denom++;
     }
 
     if(Data.CA45 > 0){
-        DwellTime_HPV_CIN_45_num += Data.CIN45;
-        DwellTime_CIN_CA_45_num += Data.CA45;
-        causalHPV45age += Data.age45;
-        causalHPV45ageMatrix[Data.age45][Data.year45]++;
-        DwellTime_CA_45_denom++;
+        DwellTime_HPV_CIN_hi5_num += Data.CIN45;
+        DwellTime_CIN_CA_hi5_num += Data.CA45;
+        causalHPVhi5age += Data.age45;
+        causalHPVhi5ageMatrix[Data.age45][Data.year45]++;
+        DwellTime_CA_hi5_denom++;
+
+        DwellTime_HPV_CIN_allhr_num += Data.CIN45;
+        DwellTime_CIN_CA_allhr_num += Data.CA45;
+        causalHPVallhrage += Data.age45;
+        causalHPVallhrageMatrix[Data.age45][Data.year45]++;
+        DwellTime_CA_allhr_denom++;
     }
 
     if(Data.CA52 > 0){
-        DwellTime_HPV_CIN_52_num += Data.CIN52;
-        DwellTime_CIN_CA_52_num += Data.CA52;
-        causalHPV52age += Data.age52;
-        causalHPV52ageMatrix[Data.age52][Data.year52]++;
-        DwellTime_CA_52_denom++;
+        DwellTime_HPV_CIN_hi5_num += Data.CIN52;
+        DwellTime_CIN_CA_hi5_num += Data.CA52;
+        causalHPVhi5age += Data.age52;
+        causalHPVhi5ageMatrix[Data.age52][Data.year52]++;
+        DwellTime_CA_hi5_denom++;
+
+        DwellTime_HPV_CIN_allhr_num += Data.CIN52;
+        DwellTime_CIN_CA_allhr_num += Data.CA52;
+        causalHPVallhrage += Data.age52;
+        causalHPVallhrageMatrix[Data.age52][Data.year52]++;
+        DwellTime_CA_allhr_denom++;
     }
 
     if(Data.CA58 > 0){
-        DwellTime_HPV_CIN_58_num += Data.CIN58;
-        DwellTime_CIN_CA_58_num += Data.CA58;
-        causalHPV58age += Data.age58;
-        causalHPV58ageMatrix[Data.age58][Data.year58]++;
-        DwellTime_CA_58_denom++;
+        DwellTime_HPV_CIN_hi5_num += Data.CIN58;
+        DwellTime_CIN_CA_hi5_num += Data.CA58;
+        causalHPVhi5age += Data.age58;
+        causalHPVhi5ageMatrix[Data.age58][Data.year58]++;
+        DwellTime_CA_hi5_denom++;
+
+        DwellTime_HPV_CIN_allhr_num += Data.CIN58;
+        DwellTime_CIN_CA_allhr_num += Data.CA58;
+        causalHPVallhrage += Data.age58;
+        causalHPVallhrageMatrix[Data.age58][Data.year58]++;
+        DwellTime_CA_allhr_denom++;
     }
 
     if(Data.CAoHR > 0){
-        DwellTime_HPV_CIN_oHR_num += Data.CINoHR;
-        DwellTime_CIN_CA_oHR_num += Data.CAoHR;
-        causalHPVoHRage += Data.ageoHR;
-        causalHPVoHRageMatrix[Data.ageoHR][Data.yearoHR]++;
-        DwellTime_CA_oHR_denom++;
+        DwellTime_HPV_CIN_allhr_num += Data.CINoHR;
+        DwellTime_CIN_CA_allhr_num += Data.CAoHR;
+        causalHPVallhrage += Data.ageoHR;
+        causalHPVallhrageMatrix[Data.ageoHR][Data.yearoHR]++;
+        DwellTime_CA_allhr_denom++;
     }
 }
 
@@ -830,36 +890,17 @@ void Output::writeDwellTime(std::string *Outdir, int TotalSimYears) {
         output << static_cast<double>(DwellTime_HPV_CIN_18_num)/DwellTime_CA_18_denom << '\t';
         output << static_cast<double>(DwellTime_CIN_CA_18_num)/DwellTime_CA_18_denom << '\t';
         output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << endl;
-        output << "HPV31" << '\t';
-        output << static_cast<double>(causalHPV31age)/DwellTime_CA_31_denom << '\t';
-        output << static_cast<double>(DwellTime_HPV_CIN_31_num)/DwellTime_CA_31_denom << '\t';
-        output << static_cast<double>(DwellTime_CIN_CA_31_num)/DwellTime_CA_31_denom << '\t';
+        output << "HPVhi5" << '\t';
+        output << static_cast<double>(causalHPVhi5age)/DwellTime_CA_hi5_denom << '\t';
+        output << static_cast<double>(DwellTime_HPV_CIN_hi5_num)/DwellTime_CA_hi5_denom << '\t';
+        output << static_cast<double>(DwellTime_CIN_CA_hi5_num)/DwellTime_CA_hi5_denom << '\t';
         output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << endl;
-        output << "HPV33" << '\t';
-        output << static_cast<double>(causalHPV33age)/DwellTime_CA_33_denom << '\t';
-        output << static_cast<double>(DwellTime_HPV_CIN_33_num)/DwellTime_CA_33_denom << '\t';
-        output << static_cast<double>(DwellTime_CIN_CA_33_num)/DwellTime_CA_33_denom << '\t';
+        output << "hrHPV" << '\t';
+        output << static_cast<double>(causalHPVallhrage)/DwellTime_CA_allhr_denom << '\t';
+        output << static_cast<double>(DwellTime_HPV_CIN_allhr_num)/DwellTime_CA_allhr_denom << '\t';
+        output << static_cast<double>(DwellTime_CIN_CA_allhr_num)/DwellTime_CA_allhr_denom << '\t';
         output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << endl;
-        output << "HPV45" << '\t';
-        output << static_cast<double>(causalHPV45age)/DwellTime_CA_45_denom << '\t';
-        output << static_cast<double>(DwellTime_HPV_CIN_45_num)/DwellTime_CA_45_denom << '\t';
-        output << static_cast<double>(DwellTime_CIN_CA_45_num)/DwellTime_CA_45_denom << '\t';
-        output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << endl;
-        output << "HPV52" << '\t';
-        output << static_cast<double>(causalHPV52age)/DwellTime_CA_52_denom << '\t';
-        output << static_cast<double>(DwellTime_HPV_CIN_52_num)/DwellTime_CA_52_denom << '\t';
-        output << static_cast<double>(DwellTime_CIN_CA_52_num)/DwellTime_CA_52_denom << '\t';
-        output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << endl;
-        output << "HPV58" << '\t';
-        output << static_cast<double>(causalHPV58age)/DwellTime_CA_58_denom << '\t';
-        output << static_cast<double>(DwellTime_HPV_CIN_58_num)/DwellTime_CA_58_denom << '\t';
-        output << static_cast<double>(DwellTime_CIN_CA_58_num)/DwellTime_CA_58_denom << '\t';
-        output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << endl;
-        output << "HPVoHR" << '\t';
-        output << static_cast<double>(causalHPVoHRage)/DwellTime_CA_oHR_denom << '\t';
-        output << static_cast<double>(DwellTime_HPV_CIN_oHR_num)/DwellTime_CA_oHR_denom << '\t';
-        output << static_cast<double>(DwellTime_CIN_CA_oHR_num)/DwellTime_CA_oHR_denom << '\t';
-        output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << endl;
+
     }
     else
         cerr << "Warning: Unable to open " << OutputFileName << endl;
@@ -921,7 +962,7 @@ void Output::writeDwellTime(std::string *Outdir, int TotalSimYears) {
     OutputFileName.clear();
     OutputFileName.append(*Outdir);
     OutputFileName.append("/");
-    OutputFileName.append("_Dwelltime_Cum31");
+    OutputFileName.append("_Dwelltime_Cumhi5");
     OutputFileName.append(extension);
     output.open(OutputFileName.c_str (), ios::out);
 
@@ -934,7 +975,7 @@ void Output::writeDwellTime(std::string *Outdir, int TotalSimYears) {
         for(int i = 0; i < TotalSimYears; i++) {
             output << "SimYear" << i << '\t';
             for(int j = 9; j < 100; j++) {
-                output << causalHPV31ageMatrix[j][i] << '\t';
+                output << causalHPVhi5ageMatrix[j][i] << '\t';
             }
             output << endl;
         }
@@ -947,7 +988,7 @@ void Output::writeDwellTime(std::string *Outdir, int TotalSimYears) {
     OutputFileName.clear();
     OutputFileName.append(*Outdir);
     OutputFileName.append("/");
-    OutputFileName.append("_Dwelltime_Cum33");
+    OutputFileName.append("_Dwelltime_Cumallhr");
     OutputFileName.append(extension);
     output.open(OutputFileName.c_str (), ios::out);
 
@@ -960,111 +1001,7 @@ void Output::writeDwellTime(std::string *Outdir, int TotalSimYears) {
         for(int i = 0; i < TotalSimYears; i++) {
             output << "SimYear" << i << '\t';
             for(int j = 9; j < 100; j++) {
-                output << causalHPV33ageMatrix[j][i] << '\t';
-            }
-            output << endl;
-        }
-    }
-    else
-        cerr << "Warning: Unable to open " << OutputFileName << endl;
-    output.close();
-    output.clear();
-
-    OutputFileName.clear();
-    OutputFileName.append(*Outdir);
-    OutputFileName.append("/");
-    OutputFileName.append("_Dwelltime_Cum45");
-    OutputFileName.append(extension);
-    output.open(OutputFileName.c_str (), ios::out);
-
-    if(output){
-        output << "" << '\t';
-        for(int j = 9; j < 100; j++) {
-            output << j << '\t';
-        }
-        output << endl;
-        for(int i = 0; i < TotalSimYears; i++) {
-            output << "SimYear" << i << '\t';
-            for(int j = 9; j < 100; j++) {
-                output << causalHPV45ageMatrix[j][i] << '\t';
-            }
-            output << endl;
-        }
-    }
-    else
-        cerr << "Warning: Unable to open " << OutputFileName << endl;
-    output.close();
-    output.clear();
-
-    OutputFileName.clear();
-    OutputFileName.append(*Outdir);
-    OutputFileName.append("/");
-    OutputFileName.append("_Dwelltime_Cum52");
-    OutputFileName.append(extension);
-    output.open(OutputFileName.c_str (), ios::out);
-
-    if(output){
-        output << "" << '\t';
-        for(int j = 9; j < 100; j++) {
-            output << j << '\t';
-        }
-        output << endl;
-        for(int i = 0; i < TotalSimYears; i++) {
-            output << "SimYear" << i << '\t';
-            for(int j = 9; j < 100; j++) {
-                output << causalHPV52ageMatrix[j][i] << '\t';
-            }
-            output << endl;
-        }
-    }
-    else
-        cerr << "Warning: Unable to open " << OutputFileName << endl;
-    output.close();
-    output.clear();
-
-    OutputFileName.clear();
-    OutputFileName.append(*Outdir);
-    OutputFileName.append("/");
-    OutputFileName.append("_Dwelltime_Cum58");
-    OutputFileName.append(extension);
-    output.open(OutputFileName.c_str (), ios::out);
-
-    if(output){
-        output << "" << '\t';
-        for(int j = 9; j < 100; j++) {
-            output << j << '\t';
-        }
-        output << endl;
-        for(int i = 0; i < TotalSimYears; i++) {
-            output << "SimYear" << i << '\t';
-            for(int j = 9; j < 100; j++) {
-                output << causalHPV58ageMatrix[j][i] << '\t';
-            }
-            output << endl;
-        }
-    }
-    else
-        cerr << "Warning: Unable to open " << OutputFileName << endl;
-    output.close();
-    output.clear();
-
-    OutputFileName.clear();
-    OutputFileName.append(*Outdir);
-    OutputFileName.append("/");
-    OutputFileName.append("_Dwelltime_CumoHR");
-    OutputFileName.append(extension);
-    output.open(OutputFileName.c_str (), ios::out);
-
-    if(output){
-        output << "" << '\t';
-        for(int j = 9; j < 100; j++) {
-            output << j << '\t';
-        }
-        output << endl;
-        for(int i = 0; i < TotalSimYears; i++) {
-            output << "SimYear" << i << '\t';
-            for(int j = 9; j < 100; j++) {
-                output << causalHPVoHRageMatrix[j][i] << '\t';
+                output << causalHPVallhrageMatrix[j][i] << '\t';
             }
             output << endl;
         }
@@ -1082,22 +1019,22 @@ void Output::calcLE(Woman &Data, Inputs &Tables, int y) {
             switch(Data.cancerstage){
                 case Woman::Stage0:break;
                 case Woman::Stage1:
-                    YLD[y] += Tables.disabilityCA12;
+                    YLD[y] += Tables.disabilityCA1;
                     break;
                 case Woman::Stage2:
-                    YLD[y] += Tables.disabilityCA12;
+                    YLD[y] += Tables.disabilityCA2;
                     break;
                 case Woman::Stage3:
-                    YLD[y] += Tables.disabilityCA34;
+                    YLD[y] += Tables.disabilityCA3;
                     break;
                 case Woman::Stage1d:
-                    YLD[y] += Tables.disabilityCA12;
+                    YLD[y] += Tables.disabilityCA1;
                     break;
                 case Woman::Stage2d:
-                    YLD[y] += Tables.disabilityCA12;
+                    YLD[y] += Tables.disabilityCA2;
                     break;
                 case Woman::Stage3d:
-                    YLD[y] += Tables.disabilityCA34;
+                    YLD[y] += Tables.disabilityCA3;
                     break;
             }
         }

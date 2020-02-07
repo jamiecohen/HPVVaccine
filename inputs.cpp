@@ -939,12 +939,12 @@ void Inputs::loadVariables() {
         vaccinetype = VxType::Bivalent;
         VE_1618 = vaccineefficacy[0][0];
         VE_high5 = vaccineefficacy[1][0];
-        cHPVVaccine = Costs[14][0];
+        cHPVVaccine = Costs[12][0];
     } else if(VaccineType == "Nonavalent"){
         vaccinetype = VxType::Nonavalent;
         VE_1618 = vaccineefficacy[0][1];
         VE_high5 = vaccineefficacy[1][1];
-        cHPVVaccine = Costs[15][0];
+        cHPVVaccine = Costs[13][0];
     }
 
     if(MechanismofImmunity == "Degree"){
@@ -958,17 +958,16 @@ void Inputs::loadVariables() {
     cReturnForResult = Costs[2][0];
     cColpoTime = Costs[3][0];
     cColpoProc = Costs[4][0];
-    cTreatHPV = Costs[5][0];
-    cTreatCIN23 = Costs[6][0];
-    cCryoVisit = Costs[7][0];
-    cCryoHPV = Costs[8][0];
-    cCryoCIN23 = Costs[9][0];
-    cCryoCA = Costs[10][0];
-    cStage1Ca = Costs[11][0];
-    cStage2Ca = Costs[12][0];
-    cStage3Ca = Costs[13][0];
-    disabilityCA12 = Disability[0][0];
-    disabilityCA34 = Disability[1][0];
+    cCryoVisit = Costs[5][0];
+    cCryoHPV = Costs[6][0];
+    cCryoCIN23 = Costs[7][0];
+    cCryoCA = Costs[8][0];
+    cStage1Ca = Costs[9][0];
+    cStage2Ca = Costs[10][0];
+    cStage3Ca = Costs[11][0];
+    disabilityCA1 = Disability[0][0];
+    disabilityCA2 = Disability[1][0];
+    disabilityCA3 = Disability[2][0];
 
 }
 
