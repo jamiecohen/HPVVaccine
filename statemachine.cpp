@@ -311,29 +311,27 @@ void StateMachine::StartCIN(Woman &Data, Output &Count, Inputs &Tables, helper &
 
 void StateMachine::runPopulationYear(Woman &Data, Inputs &Tables, Output &Count, bool calib, helper &help, int y) {
 
-    if (Data.Alive) {
-        StateMachine::GetBackgroundMortality (Data, Tables, help);
-        rand = help.getrand ();
-        if (rand < mASR) {
-            Data.Alive = false;
-        } else {
-            if (!calib) {
-                StateMachine::Vaccinate(Data, Tables, Count, help, y);
-                StateMachine::CytoScreen (Data, Tables, Count, help, y);
-            }
-            StateMachine::NatHistory (Data, Tables, Count, help, y, calib);
-        }
-        Count.createTrace (Data, y);
+    StateMachine::GetBackgroundMortality (Data, Tables, help);
+    rand = help.getrand ();
+    if (rand < mASR) {
+        Data.Alive = false;
+    } else {
         if (!calib) {
-            Count.calcLE (Data, Tables, y);
+            StateMachine::Vaccinate (Data, Tables, Count, help, y);
+            StateMachine::CytoScreen (Data, Tables, Count, help, y);
         }
+        StateMachine::NatHistory (Data, Tables, Count, help, y, calib);
+    }
+    Count.createTrace (Data, y);
+    if (!calib) {
+        Count.calcLE (Data, Tables, y);
+    }
 
-        if (Data.Alive) {
-            Count.total_alive[Data.CurrentAge][y]++;
-            Data.CurrentAge++;
-            Data.CurrentYear++;
-            Data.Cycle++;
-        }
+    if (Data.Alive) {
+        Count.total_alive[Data.CurrentAge][y]++;
+        Data.CurrentAge++;
+        Data.CurrentYear++;
+        Data.Cycle++;
     }
 }
 

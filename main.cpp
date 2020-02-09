@@ -50,11 +50,25 @@ int main(int argc, char* argv[]) {
     }
     RunType = RunsFile.GetKeyName (0);
     if (RunsFile.GetValue(RunType, "RunType") == "Calibration"){
-        if(argc >= 4){
-            cout << "Chain number " << argv[3] << endl;
-        }
         Inputs tables(OutputFolder, DataFolder);
         tables.loadRFG (RunsFileName, RunType);
+        string ModelStruct = "Calib";
+        if(tables.Latency){
+            ModelStruct.append("_Latency");
+        } else{
+            ModelStruct.append("_NoLatency");
+        }
+        switch(tables.ImmuneMechanism){
+            case Inputs::Degree:
+                ModelStruct.append("_Degree");
+                break;
+            case Inputs::Factor:
+                ModelStruct.append("_Factor");
+                break;
+        }
+        if(argc >= 4){
+            cout << ModelStruct << ": Chain number " << argv[3] << endl;
+        }
         int n_sims = tables.Simulations;
         int n_params = tables.Multipliers.size();
         int n_targs = tables.CalibTargs.size();
@@ -371,14 +385,9 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
     int CurrentModelYear = tables.StartYear;
     for (int y = tables.BurnInYears; y < TotalSimYears; y++) {
         for (auto &k : women) {
-        /*for (int k = 0; k < women.size(); k++) {*/
-            Machine.runPopulationYear (k, tables, trace, false, help, y);
-            /*if (!women[k].Alive) {
-                trace.calcDwellTime(women[k]);
-                women.erase(women.begin() + k - 1);
-                k--;
-                *//*k.reset (ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage);*//*
-            }*/
+            if (k.Alive) {
+                Machine.runPopulationYear (k, tables, trace, false, help, y);
+            }
         }
         CurrentModelYear++;
         trace.discDALY += (trace.YLL[y] + trace.YLD[y])/ pow ((1 + trace.discountrate), static_cast<double>(SimYear));
