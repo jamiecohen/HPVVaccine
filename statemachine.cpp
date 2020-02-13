@@ -90,7 +90,7 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
             rand = help.getrand ();
             if (rand < pHPV_CIN) {
                 Data.HPVinfectionTimer[i]++;
-                StateMachine::CountCIN (Data, Data.HPVinfections[i], Data.HPVinfectionTimer[i]);
+                StateMachine::CountCIN (Data, i);
                 rand = help.getrand ();
                 if (rand < prop_CIN2){
                     Data.CIN2Lesions.push_back (Data.HPVinfections[i]);
@@ -811,33 +811,41 @@ void StateMachine::CountDetectedCancer(Woman &Data, Output &Count, int y) {
     Count.TotalDetectedCancer_byyear[y]++;
 }
 
-void StateMachine::CountCIN(Woman &Data, Woman::hpvT genotype, int i) {
-    switch(genotype){
+void StateMachine::CountCIN(Woman &Data, int i) {
+    switch(Data.HPVinfections[i]){
         case Woman::No:break;
         case Woman::Low:break;
         case Woman::otherHR:
-            Data.CINoHR = i;
+            Data.CINoHR = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_oHR = Data.DormancyTimer[i];
             break;
         case Woman::High16:
-            Data.CIN16 = i;
+            Data.CIN16 = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_16 = Data.DormancyTimer[i];
             break;
         case Woman::High18:
-            Data.CIN18 = i;
+            Data.CIN18 = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_18 = Data.DormancyTimer[i];
             break;
         case Woman::High31:
-            Data.CIN31 = i;
+            Data.CIN31 = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_31 = Data.DormancyTimer[i];
             break;
         case Woman::High33:
-            Data.CIN33 = i;
+            Data.CIN33 = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_33 = Data.DormancyTimer[i];
             break;
         case Woman::High45:
-            Data.CIN45 = i;
+            Data.CIN45 = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_45 = Data.DormancyTimer[i];
             break;
         case Woman::High52:
-            Data.CIN52 = i;
+            Data.CIN52 = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_52 = Data.DormancyTimer[i];
             break;
         case Woman::High58:
-            Data.CIN58 = i;
+            Data.CIN58 = Data.HPVinfectionTimer[i];
+            Data.CIN_dormant_58 = Data.DormancyTimer[i];
             break;
     }
 }

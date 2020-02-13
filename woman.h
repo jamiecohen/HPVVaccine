@@ -102,6 +102,15 @@ public:
     int CIN52;
     int CIN58;
     int CINoHR;
+
+    int CIN_dormant_16;
+    int CIN_dormant_18;
+    int CIN_dormant_31;
+    int CIN_dormant_33;
+    int CIN_dormant_45;
+    int CIN_dormant_52;
+    int CIN_dormant_58;
+    int CIN_dormant_oHR;
     int CA16;
     int CA18;
     int CA31;
