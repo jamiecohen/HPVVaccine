@@ -145,7 +145,7 @@ public:
     VxType vaccinetype;
     double VE_1618;
     double VE_high5;
-    enum Immunity {Degree, Factor};
+    enum Immunity {Degree, Factor, None};
     Immunity ImmuneMechanism;
 
     double CIN2_NL;

@@ -10,7 +10,6 @@
 #include <vector>
 #include "statemachine.h"
 #include <boost/filesystem.hpp>
-#include <ctime>
 #include "calibrate.h"
 #include <thread>
 
@@ -36,8 +35,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("test.ini");
-        FileName = "test.ini";
+        RunsFileName.append("Calib_test.ini");
+        FileName = "Calib_test.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -64,6 +63,9 @@ int main(int argc, char* argv[]) {
                 break;
             case Inputs::Factor:
                 ModelStruct.append("_Factor");
+                break;
+            case Inputs::None:
+                ModelStruct.append("_NoImmunity");
                 break;
         }
         if(argc >= 4){
@@ -94,13 +96,8 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        double timer[n_sims];
         for (int i = 0; i < n_sims; i++){
-            clock_t begin = clock();
             RunCalibration (calib, tables, i);
-            clock_t end = clock();
-            timer[i] = double(end - begin) / CLOCKS_PER_SEC;
-            //cout << timer[i] << endl;
         }
         string OutDir = OutputFolder.append("HPVVaccine_Calib");
         if(tables.Latency){
@@ -114,6 +111,9 @@ int main(int argc, char* argv[]) {
                 break;
             case Inputs::Factor:
                 OutDir.append("_Factor");
+                break;
+            case Inputs::None:
+                OutDir.append("_NoImmunity");
                 break;
         }
 
@@ -241,15 +241,11 @@ int main(int argc, char* argv[]) {
         modeloutputs.reserve(numruns);
         vector<string> CurKey;
         CurKey.reserve(numruns);
-        double timer[numruns];
 
         for (run = 0; run < RunsFile.GetNumKeys (); run++) {
             cout << "Running Strat " << run << endl;
-            clock_t begin = clock();
             CurKey.push_back (RunsFile.GetKeyName (run));
             modeloutputs.push_back(RunPopulation (RunsFileName, CurKey[run], OutputFolder, DataFolder));
-            clock_t end = clock();
-            timer[run] = double(end - begin) / CLOCKS_PER_SEC;
         }
         for (int i = 0; i < modeloutputs.size(); i++){
             string OutputDir (OutputFolder);
@@ -380,6 +376,7 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
         BurnInModelYear++;
     }
 
+
     // Now start running simulation from time 0
     int SimYear = 0;
     int CurrentModelYear = tables.StartYear;
@@ -396,6 +393,7 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
         trace.discCost += trace.cost[y]/pow((1+trace.discountrate),static_cast<double>(SimYear));
         SimYear++;
     }
+
 
     for (auto & j : women) {
         trace.calcDwellTime(j);

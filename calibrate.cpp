@@ -69,9 +69,7 @@ void calibrate::CalculateGOF(int n_sims, double rand) {
 }
 
 std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
-
     double logmean;
-
     if(n_sim == 0){
         for (int i = 0; i < n_params; i++){
             switch(multipliers_type[i]){
@@ -103,7 +101,6 @@ std::vector<double> calibrate::loadCalibData(int n_params, int n_sim) {
             }
         }
     }
-
     return(calib_params[n_sim]);
 }
 

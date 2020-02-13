@@ -118,7 +118,7 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper
                 CheckWaningImmunity (Data, Tables);
             }
             for(int i = 0; i < Data.HPVLatentinfections.size (); i ++) {
-                Data.HPVLatentinfectionTimer[i]++;
+                Data.DormancyTimer[i]++;
             }
             StateMachine::GetVaccineEff (Data, Tables, burnin);
             if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
@@ -193,6 +193,7 @@ void StateMachine::ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hp
         if (Data.HPVinfections[i] == genotype) {
             Data.HPVLatentinfections.push_back(genotype);
             Data.HPVLatentinfectionTimer.push_back(Data.HPVinfectionTimer[i]);
+            Data.DormancyTimer.push_back(1);
             Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
             Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
             i = Data.HPVinfections.size ();
@@ -247,6 +248,8 @@ void StateMachine::ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hp
             break;
         case Inputs::Factor:
             StateMachine::GetImmuneFactor (Data, Tables, help, genotype);
+            break;
+        case Inputs::None:
             break;
     }
 
@@ -893,6 +896,35 @@ double StateMachine::CalcEff(double wanetime, int age, int waneage, double start
 }
 
 void StateMachine::GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype) {
+
+    for (auto & HPVLatentinfection : Data.HPVLatentinfections) {
+        if (HPVLatentinfection == genotype) {
+            switch(genotype){
+                case Woman::High16:
+                    vaccine_deg_1618 = 1;
+                    break;
+                case Woman::High18:
+                    vaccine_deg_1618 = 1;
+                    break;
+                case Woman::High31:
+                    vaccine_deg_high5 = 1;
+                    break;
+                case Woman::High33:
+                    vaccine_deg_high5 = 1;
+                    break;
+                case Woman::High45:
+                    vaccine_deg_high5 = 1;
+                    break;
+                case Woman::High52:
+                    vaccine_deg_high5 = 1;
+                    break;
+                case Woman::High58:
+                    vaccine_deg_high5 = 1;
+                    break;
+                default: break;
+            }
+        }
+    }
 
     switch(genotype){
         case Woman::No:

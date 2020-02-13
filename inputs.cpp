@@ -947,11 +947,15 @@ void Inputs::loadVariables() {
         cHPVVaccine = Costs[13][0];
     }
 
+
     if(MechanismofImmunity == "Degree"){
         ImmuneMechanism = Immunity::Degree;
     } else if(MechanismofImmunity == "Factor"){
         ImmuneMechanism = Immunity::Factor;
+    } else if(MechanismofImmunity == "None"){
+        ImmuneMechanism = Immunity::None;
     }
+
 
     cPtTime = Costs[0][0];
     cPaptest = Costs[1][0];
@@ -965,9 +969,11 @@ void Inputs::loadVariables() {
     cStage1Ca = Costs[9][0];
     cStage2Ca = Costs[10][0];
     cStage3Ca = Costs[11][0];
+
     disabilityCA1 = Disability[0][0];
     disabilityCA2 = Disability[1][0];
     disabilityCA3 = Disability[2][0];
+
 
 }
 

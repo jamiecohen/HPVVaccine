@@ -77,6 +77,7 @@ Woman::Woman(int Age, int StartYear) {
     immune_deg_58 = 1;
     HPVLatentinfections.clear();
     HPVLatentinfectionTimer.clear();
+    DormancyTimer.clear();
     LatentTimer = 0;
     HPVinfections.clear();
     HPVinfectionTimer.clear();
@@ -167,6 +168,7 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage) {
     hpvotherHR_ageimmunity = 0;
     HPVLatentinfections.clear();
     HPVLatentinfectionTimer.clear();
+    DormancyTimer.clear();
     LatentTimer = 0;
     HPVinfections.clear();
     HPVinfectionTimer.clear();
@@ -265,6 +267,7 @@ void Woman::reset(int Age, int StartYear, helper &help, double ScreenCoverage) {
     hpvotherHR_ageimmunity = 0;
     HPVLatentinfections.clear();
     HPVLatentinfectionTimer.clear();
+    DormancyTimer.clear();
     LatentTimer = 0;
     HPVinfections.clear();
     HPVinfectionTimer.clear();
