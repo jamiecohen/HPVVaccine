@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Calib_test.ini");
-        FileName = "Calib_test.ini";
+        RunsFileName.append("Calib_Degree_Latency.ini");
+        FileName = "Calib_Degree_Latency.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -321,24 +321,52 @@ Output RunBirthCohort(string RunsFileName, string CurKey, string OutputFolder, s
     Inputs tables(std::move(OutputFolder), std::move(DataFolder));
     tables.loadRFG (RunsFileName, CurKey);
     tables.loadVariables ();
-    int CurrentModelYear = tables.StartYear;
+    int BurnInModelYear = tables.StartYear - tables.BurnInYears;
+    int TotalSimYears = tables.BurnInYears + tables.SimulationYears;
+    int ModelStartAge = tables.ModelStartAge;
+    int ModelStopAge = tables.ModelStopAge;
     vector<Woman> women;
     women.reserve(tables.CohortSize);
-    for (int j = 0; j < tables.CohortSize; j++) {
-        Woman newWoman(tables.ModelStartAge, CurrentModelYear, help, tables.ScreenCoverage);
-        women.push_back (newWoman);
+
+    for (int j = ModelStartAge; j < ModelStopAge; j++) {
+        for (int k = 0; k < tables.burnin[j]; k++) {
+            Woman newWoman(j, BurnInModelYear, help, tables.ScreenCoverage);
+            women.push_back(newWoman);
+        }
     }
-    Output trace (tables, tables.SimulationYears);
+    Output trace (tables, TotalSimYears);
+
+    // Start running burn-in period
+    for(int y = 0; y < tables.BurnInYears; y++){
+        for (auto & k : women) {
+            Machine.runPopulationYear (k, tables, trace, true, help, y);
+            if (!k.Alive) {
+                k.reset(ModelStartAge, BurnInModelYear + 1, help, tables.ScreenCoverage);
+            }
+        }
+        BurnInModelYear++;
+    }
+
+    // Now start running simulation from time 0
     int SimYear = 0;
-    for(int y = 0; y < tables.SimulationYears; y++){
-        for (int k = 0; k < tables.CohortSize; k++) {
-            Machine.runPopulationYear (women[k], tables, trace, false, help, y);
+    int CurrentModelYear = tables.StartYear;
+    for (int y = tables.BurnInYears; y < TotalSimYears; y++) {
+        for (auto &k : women) {
+            if (k.Alive) {
+                Machine.runPopulationYear (k, tables, trace, false, help, y);
+            }
         }
         CurrentModelYear++;
+        trace.discDALY += (trace.YLL[y] + trace.YLD[y])/ pow ((1 + trace.discountrate), static_cast<double>(SimYear));
+        trace.TotalDALY += trace.YLL[y] + trace.YLD[y];
+        trace.TotalCost += trace.cost[y];
+        trace.discCost += trace.cost[y]/pow((1+trace.discountrate),static_cast<double>(SimYear));
         SimYear++;
     }
-    for (int j = 0; j < tables.CohortSize; j++) {
-        trace.calcDwellTime(women[j]);
+
+
+    for (auto & j : women) {
+        trace.calcDwellTime(j);
     }
     women.clear();
     return(trace);
@@ -376,14 +404,14 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
         BurnInModelYear++;
     }
 
-
     // Now start running simulation from time 0
     int SimYear = 0;
     int CurrentModelYear = tables.StartYear;
     for (int y = tables.BurnInYears; y < TotalSimYears; y++) {
         for (auto &k : women) {
-            if (k.Alive) {
-                Machine.runPopulationYear (k, tables, trace, false, help, y);
+            Machine.runPopulationYear (k, tables, trace, false, help, y);
+            if (!k.Alive) {
+                k.reset(ModelStartAge, CurrentModelYear + 1, help, tables.ScreenCoverage);
             }
         }
         CurrentModelYear++;

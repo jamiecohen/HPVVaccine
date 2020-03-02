@@ -84,26 +84,32 @@ void StateMachine::CancerNatHistory(Woman &Data, Inputs &Tables, Output &Count, 
 void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, helper &help) {
 
     if (Data.Alive) {
-        for (int i = 0; i < Data.HPVinfections.size (); i++) {
-            StateMachine::GetLesionRisk (Data, Tables, i, Data.HPVinfections[i]);
-            StateMachine::GetHPVClearanceRisk (Data, Tables, i, Data.HPVinfections[i]);
-            rand = help.getrand ();
-            if (rand < pHPV_CIN) {
-                Data.HPVinfectionTimer[i]++;
-                StateMachine::CountCIN (Data, i);
+        for(int i = 0; i < genotypes.size(); i++){
+            if(Data.HPVinfectionTimer[i]>0){
+                StateMachine::GetLesionRisk (Data, Tables, i);
+                StateMachine::GetHPVClearanceRisk (Data, Tables, i);
                 rand = help.getrand ();
-                if (rand < prop_CIN2){
-                    Data.CIN2Lesions.push_back (Data.HPVinfections[i]);
-                    Data.CIN2LesionTimer.push_back (1);
+                if (rand < pHPV_CIN) {
+                    Data.HPVinfectionTimer[i]++;
+                    StateMachine::CountCIN (Data, i);
+                    rand = help.getrand ();
+                    if (rand < prop_CIN2){
+                        Data.CIN2Lesions.push_back (Data.HPVinfections[i]);
+                        Data.CIN2LesionTimer.push_back (1);
+                    } else {
+                        Data.CIN3Lesions.push_back (Data.HPVinfections[i]);
+                        Data.CIN3LesionTimer.push_back (1);
+                    }
+                } else if (rand < ( pHPV_CIN + pHPV_NL)) {
+
+                    StateMachine::ClearHPV (Data, Tables, help, Data.HPVinfections[i]);
                 } else {
-                    Data.CIN3Lesions.push_back (Data.HPVinfections[i]);
-                    Data.CIN3LesionTimer.push_back (1);
+                    Data.HPVinfectionTimer[i]++;
                 }
-            } else if (rand < ( pHPV_CIN + pHPV_NL)) {
-                StateMachine::ClearHPV (Data, Tables, help, Data.HPVinfections[i]);
-                i--;
             } else {
-                Data.HPVinfectionTimer[i]++;
+                if(Data.DormancyTimer[i]>1){
+                    Data.DormancyTimer[i]++;
+                }
             }
         }
     }
@@ -117,17 +123,14 @@ void StateMachine::NatHistory(Woman &Data, Inputs &Tables, Output &Count, helper
             if(Tables.WaningImmunity){
                 CheckWaningImmunity (Data, Tables);
             }
-            for(int i = 0; i < Data.HPVLatentinfections.size (); i ++) {
-                Data.DormancyTimer[i]++;
-            }
             StateMachine::GetVaccineEff (Data, Tables, burnin);
             if (!Data.CIN3Lesions.empty () || !Data.CIN2Lesions.empty ()) {
                 StateMachine::StartCIN (Data, Count, Tables, help, y);
             }
-            if (!Data.HPVinfections.empty ()) {
+            if (!Data.cancer) {
                 StateMachine::HPVNatHistory (Data, Tables, Count, help);
+                StateMachine::AcquireHPV (Data, Count, Tables, help, y);
             }
-            StateMachine::AcquireHPV (Data, Count, Tables, help, y);
         }
     }
 }
@@ -188,17 +191,12 @@ void StateMachine::CytoScreen(Woman &Data, Inputs &Tables, Output &Count, helper
 }
 
 void StateMachine::ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hpvT genotype) {
-    int i = 0;
-    while (i < Data.HPVinfections.size ()) {
-        if (Data.HPVinfections[i] == genotype) {
-            Data.HPVLatentinfections.push_back(genotype);
-            Data.HPVLatentinfectionTimer.push_back(Data.HPVinfectionTimer[i]);
-            Data.DormancyTimer.push_back(1);
-            Data.HPVinfections.erase (Data.HPVinfections.begin () + i);
-            Data.HPVinfectionTimer.erase (Data.HPVinfectionTimer.begin () + i);
-            i = Data.HPVinfections.size ();
-        } else {
-            i++;
+
+    for(int i = 0; i < genotypes.size(); i++){
+        if(genotypes[i] == genotype){
+            Data.HPVLatentinfectionTimer[i] += Data.HPVinfectionTimer[i];
+            Data.HPVinfectionTimer[i] = 0;
+            Data.DormancyTimer[i]++;
         }
     }
     switch (genotype) {
@@ -524,39 +522,26 @@ void StateMachine::GetVaccineEff(Woman &Data, Inputs &Tables, bool burnin) {
     }
 }
 
-void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, Woman::hpvT genotype) {
-    bool priorlatent = false;
-    for (int i = 0; i < Data.HPVLatentinfections.size (); i++) {
-        if (Data.HPVLatentinfections[i] == genotype) {
-            Data.HPVinfectionTimer.push_back(Data.HPVLatentinfectionTimer[i] + 1);
-            Data.LatentTimer = Data.HPVLatentinfectionTimer[i];
-            Data.HPVLatentinfections.erase (Data.HPVLatentinfections.begin () + i);
-            Data.HPVLatentinfectionTimer.erase (Data.HPVLatentinfectionTimer.begin () + i);
-            priorlatent = true;
-            break;
-        }
-    }
-    if(!priorlatent){
-        Data.HPVinfectionTimer.push_back(1);
-        Data.LatentTimer = 0;
-    }
+void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, int i) {
+    Data.HPVinfectionTimer[i] = Data.HPVLatentinfectionTimer[i] + 1;
+    Data.LatentTimer = Data.HPVLatentinfectionTimer[i] + Data.DormancyTimer[i];
 }
 
 void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y) {
 
-    for (auto &genotype : genotypes) {
-        StateMachine::GetHPVRisk (Data, Tables, genotype);
+    for(int i = 0; i < genotypes.size(); i++){
+        StateMachine::GetHPVRisk (Data, Tables, genotypes[i]);
         rand = help.getrand ();
         if (rand < pHPV) {
-            Data.HPVinfections.push_back (genotype);
+            StateMachine::CountDormancyTime(Data, i);
             if (Tables.Latency) {
-                StateMachine::CheckLatency (Data, Tables, genotype);
+                StateMachine::CheckLatency (Data, Tables, i);
             } else {
-                Data.HPVinfectionTimer.push_back (1);
+                Data.HPVinfectionTimer[i]++;
                 Data.LatentTimer = 0;
             }
             Count.HPVcount[Data.CurrentAge][y]++;
-            switch (genotype) {
+            switch (genotypes[i]) {
                 case Woman::No:
                     break;
                 case Woman::Low:
@@ -608,12 +593,11 @@ void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper
             break;
         }
     }
-
 }
 
-void StateMachine::GetLesionRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype) {
+void StateMachine::GetLesionRisk(Woman &Data, Inputs &Tables, int i) {
 
-    switch(genotype){
+    switch(genotypes[i]){
         case Woman::No:break;
         case Woman::Low:
             pHPV_CIN = Tables.pHPV_LR_CIN[Data.HPVinfectionTimer[i]];
@@ -654,23 +638,23 @@ void StateMachine::GetLesionRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT
     }
 
     for (auto & CIN2Lesion : Data.CIN2Lesions){
-        if(CIN2Lesion == genotype){
+        if(CIN2Lesion == genotypes[i]){
             pHPV_CIN = 0;
             break;
         }
     }
 
     for (auto & CIN3Lesion : Data.CIN3Lesions){
-        if(CIN3Lesion == genotype){
+        if(CIN3Lesion == genotypes[i]){
             pHPV_CIN = 0;
             break;
         }
     }
 }
 
-void StateMachine::GetHPVClearanceRisk(Woman &Data, Inputs &Tables, int i, Woman::hpvT genotype) {
+void StateMachine::GetHPVClearanceRisk(Woman &Data, Inputs &Tables, int i) {
 
-    switch(genotype){
+    switch(genotypes[i]){
         case Woman::No:break;
         case Woman::Low:
             pHPV_NL = Tables.pHPV_LR_NL[Data.HPVinfectionTimer[i]];
@@ -702,13 +686,13 @@ void StateMachine::GetHPVClearanceRisk(Woman &Data, Inputs &Tables, int i, Woman
     }
 
     for (auto & CIN2Lesion : Data.CIN2Lesions){
-        if(CIN2Lesion == genotype){
+        if(CIN2Lesion == genotypes[i]){
             pHPV_NL = 0;
             break;
         }
     }
     for (auto & CIN3Lesion : Data.CIN3Lesions){
-        if(CIN3Lesion == genotype){
+        if(CIN3Lesion == genotypes[i]){
             pHPV_NL = 0;
             break;
         }
@@ -817,35 +801,66 @@ void StateMachine::CountCIN(Woman &Data, int i) {
         case Woman::Low:break;
         case Woman::otherHR:
             Data.CINoHR = Data.HPVinfectionTimer[i];
-            Data.CIN_dormant_oHR = Data.DormancyTimer[i];
             break;
         case Woman::High16:
             Data.CIN16 = Data.HPVinfectionTimer[i];
-            Data.CIN_dormant_16 = Data.DormancyTimer[i];
             break;
         case Woman::High18:
             Data.CIN18 = Data.HPVinfectionTimer[i];
-            Data.CIN_dormant_18 = Data.DormancyTimer[i];
             break;
         case Woman::High31:
             Data.CIN31 = Data.HPVinfectionTimer[i];
-            Data.CIN_dormant_31 = Data.DormancyTimer[i];
             break;
         case Woman::High33:
             Data.CIN33 = Data.HPVinfectionTimer[i];
-            Data.CIN_dormant_33 = Data.DormancyTimer[i];
             break;
         case Woman::High45:
             Data.CIN45 = Data.HPVinfectionTimer[i];
-            Data.CIN_dormant_45 = Data.DormancyTimer[i];
             break;
         case Woman::High52:
             Data.CIN52 = Data.HPVinfectionTimer[i];
-            Data.CIN_dormant_52 = Data.DormancyTimer[i];
             break;
         case Woman::High58:
             Data.CIN58 = Data.HPVinfectionTimer[i];
+            break;
+    }
+}
+
+void StateMachine::CountDormancyTime(Woman &Data, int i) {
+    switch(Data.HPVinfections[i]){
+        case Woman::No:break;
+        case Woman::Low:break;
+        case Woman::otherHR:
+            Data.CIN_dormant_oHR = Data.DormancyTimer[i];
+            Data.CIN_latent_oHR = Data.HPVLatentinfectionTimer[i];
+            break;
+        case Woman::High16:
+            Data.CIN_dormant_16 = Data.DormancyTimer[i];
+            Data.CIN_latent_16 = Data.HPVLatentinfectionTimer[i];
+            break;
+        case Woman::High18:
+            Data.CIN_dormant_18 = Data.DormancyTimer[i];
+            Data.CIN_latent_18 = Data.HPVLatentinfectionTimer[i];
+            break;
+        case Woman::High31:
+            Data.CIN_dormant_31 = Data.DormancyTimer[i];
+            Data.CIN_latent_31 = Data.HPVLatentinfectionTimer[i];
+            break;
+        case Woman::High33:
+            Data.CIN_dormant_33 = Data.DormancyTimer[i];
+            Data.CIN_latent_33 = Data.HPVLatentinfectionTimer[i];
+            break;
+        case Woman::High45:
+            Data.CIN_dormant_45 = Data.DormancyTimer[i];
+            Data.CIN_latent_45 = Data.HPVLatentinfectionTimer[i];
+            break;
+        case Woman::High52:
+            Data.CIN_dormant_52 = Data.DormancyTimer[i];
+            Data.CIN_latent_52 = Data.HPVLatentinfectionTimer[i];
+            break;
+        case Woman::High58:
             Data.CIN_dormant_58 = Data.DormancyTimer[i];
+            Data.CIN_latent_58 = Data.HPVLatentinfectionTimer[i];
             break;
     }
 }
@@ -904,35 +919,6 @@ double StateMachine::CalcEff(double wanetime, int age, int waneage, double start
 }
 
 void StateMachine::GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype) {
-
-    for (auto & HPVLatentinfection : Data.HPVLatentinfections) {
-        if (HPVLatentinfection == genotype) {
-            switch(genotype){
-                case Woman::High16:
-                    vaccine_deg_1618 = 1;
-                    break;
-                case Woman::High18:
-                    vaccine_deg_1618 = 1;
-                    break;
-                case Woman::High31:
-                    vaccine_deg_high5 = 1;
-                    break;
-                case Woman::High33:
-                    vaccine_deg_high5 = 1;
-                    break;
-                case Woman::High45:
-                    vaccine_deg_high5 = 1;
-                    break;
-                case Woman::High52:
-                    vaccine_deg_high5 = 1;
-                    break;
-                case Woman::High58:
-                    vaccine_deg_high5 = 1;
-                    break;
-                default: break;
-            }
-        }
-    }
 
     switch(genotype){
         case Woman::No:

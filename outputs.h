@@ -100,6 +100,10 @@ public:
     int Dormancy_HPV_CIN_18_num;
     int Dormancy_HPV_CIN_hi5_num;
     int Dormancy_HPV_CIN_allhr_num;
+    int Latency_HPV_CIN_16_num;
+    int Latency_HPV_CIN_18_num;
+    int Latency_HPV_CIN_hi5_num;
+    int Latency_HPV_CIN_allhr_num;
     int DwellTime_CIN_CA_16_num;
     int DwellTime_CIN_CA_18_num;
     int DwellTime_CIN_CA_hi5_num;

@@ -32,6 +32,7 @@ public:
 
     std::vector<hpvT> HPVLatentinfections;
     std::vector<int> HPVLatentinfectionTimer;
+    std::vector<hpvT> Dormantinfections;
     std::vector<int> DormancyTimer;
     int LatentTimer;
 
@@ -111,6 +112,16 @@ public:
     int CIN_dormant_52;
     int CIN_dormant_58;
     int CIN_dormant_oHR;
+
+    int CIN_latent_16;
+    int CIN_latent_18;
+    int CIN_latent_31;
+    int CIN_latent_33;
+    int CIN_latent_45;
+    int CIN_latent_52;
+    int CIN_latent_58;
+    int CIN_latent_oHR;
+
     int CA16;
     int CA18;
     int CA31;
