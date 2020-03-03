@@ -467,7 +467,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     VaccineEndAge = RunsFile.GetValueI(CurKey, VaccineEndAgeName);
     VaccineStartYear = RunsFile.GetValueI(CurKey, VaccineStartYearName);
     VaccineDuration = RunsFile.GetValueI(CurKey, VaccineDurationName);
-    VaccineWaneTime = RunsFile.GetValueF(CurKey, VaccineWaneTimeName);
+    VaccineWaneTime = RunsFile.GetValueI(CurKey, VaccineWaneTimeName);
     WaningImmunity = RunsFile.GetValueI(CurKey, WaningImmunityName);
 
     VaccineEfficacyFile.append(DataFolder);

@@ -106,10 +106,6 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                 } else {
                     Data.HPVinfectionTimer[i]++;
                 }
-            } else {
-                if(Data.DormancyTimer[i]>1){
-                    Data.DormancyTimer[i]++;
-                }
             }
         }
     }
@@ -196,7 +192,7 @@ void StateMachine::ClearHPV(Woman &Data, Inputs &Tables, helper &help, Woman::hp
         if(genotypes[i] == genotype){
             Data.HPVLatentinfectionTimer[i] += Data.HPVinfectionTimer[i];
             Data.HPVinfectionTimer[i] = 0;
-            Data.DormancyTimer[i]++;
+            Data.AgeClearedHPV[i] = Data.CurrentAge;
         }
     }
     switch (genotype) {
@@ -523,8 +519,12 @@ void StateMachine::GetVaccineEff(Woman &Data, Inputs &Tables, bool burnin) {
 }
 
 void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, int i) {
-    Data.HPVinfectionTimer[i] = Data.HPVLatentinfectionTimer[i] + 1;
-    Data.LatentTimer = Data.HPVLatentinfectionTimer[i] + Data.DormancyTimer[i];
+    Data.HPVinfectionTimer[i] = (Data.HPVLatentinfectionTimer[i] + 1);
+    if(Data.HPVLatentinfectionTimer[i] > 0){
+        Data.DormancyTimer[i] += (Data.CurrentAge - Data.AgeClearedHPV[i]);
+        Data.LatentTimer = (Data.HPVLatentinfectionTimer[i] + Data.DormancyTimer[i]);
+    }
+
 }
 
 void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y) {
@@ -533,9 +533,9 @@ void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper
         StateMachine::GetHPVRisk (Data, Tables, genotypes[i]);
         rand = help.getrand ();
         if (rand < pHPV) {
-            StateMachine::CountDormancyTime(Data, i);
             if (Tables.Latency) {
                 StateMachine::CheckLatency (Data, Tables, i);
+                StateMachine::CountDormancyTime(Data, i);
             } else {
                 Data.HPVinfectionTimer[i]++;
                 Data.LatentTimer = 0;

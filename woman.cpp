@@ -13,7 +13,7 @@ using namespace std;
 
 //Value constructor
 
-Woman::Woman(int Age, int StartYear) {
+Woman::Woman(unsigned int Age, unsigned int StartYear) {
 
     CIN16 = 0;
     CIN18 = 0;
@@ -93,13 +93,26 @@ Woman::Woman(int Age, int StartYear) {
     immune_deg_58 = 1;
     HPVLatentinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
                            hpvT::High52, hpvT::High58, hpvT::otherHR};
-    HPVLatentinfections.resize(9);
+    HPVLatentinfectionTimer.clear();
+    for (int i = 0; i < 9; i++){
+        HPVLatentinfectionTimer.push_back(0);
+    }
     HPVinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
-                           hpvT::High52, hpvT::High58, hpvT::otherHR};
-    HPVinfectionTimer.resize(9);
+                     hpvT::High52, hpvT::High58, hpvT::otherHR};
+    HPVinfectionTimer.clear();
+    for (int i = 0; i < 9; i++){
+        HPVinfectionTimer.push_back(0);
+    }
     Dormantinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
-                           hpvT::High52, hpvT::High58, hpvT::otherHR};
-    DormancyTimer.resize(9);
+                         hpvT::High52, hpvT::High58, hpvT::otherHR};
+    DormancyTimer.clear();
+    for (int i = 0; i < 9; i++){
+        DormancyTimer.push_back(0);
+    }
+    AgeClearedHPV.clear();
+    for (int i = 0; i < 9; i++){
+        AgeClearedHPV.push_back(0);
+    }
     LatentTimer = 0;
     CIN2Lesions.clear();
     CIN3Lesions.clear();
@@ -125,7 +138,7 @@ Woman::Woman(int Age, int StartYear) {
     cancerstage = caT::Stage0;
 }
 
-Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage) {
+Woman::Woman(unsigned int Age, unsigned int StartYear, helper &help, double ScreenCoverage) {
     CIN16 = 0;
     CIN18 = 0;
     CIN31 = 0;
@@ -206,13 +219,26 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage) {
     hpvotherHR_ageimmunity = 0;
     HPVLatentinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
                            hpvT::High52, hpvT::High58, hpvT::otherHR};
-    HPVLatentinfectionTimer.resize(9);
+    HPVLatentinfectionTimer.clear();
+    for (int i = 0; i < 9; i++){
+        HPVLatentinfectionTimer.push_back(0);
+    }
     HPVinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
                      hpvT::High52, hpvT::High58, hpvT::otherHR};
-    HPVinfectionTimer.resize(9);
+    HPVinfectionTimer.clear();
+    for (int i = 0; i < 9; i++){
+        HPVinfectionTimer.push_back(0);
+    }
     Dormantinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
                          hpvT::High52, hpvT::High58, hpvT::otherHR};
-    DormancyTimer.resize(9);
+    DormancyTimer.clear();
+    for (int i = 0; i < 9; i++){
+        DormancyTimer.push_back(0);
+    }
+    AgeClearedHPV.clear();
+    for (int i = 0; i < 9; i++){
+        AgeClearedHPV.push_back(0);
+    }
     LatentTimer = 0;
     CIN2Lesions.clear();
     CIN3Lesions.clear();
@@ -238,7 +264,7 @@ Woman::Woman(int Age, int StartYear, helper &help, double ScreenCoverage) {
     completevaccine = false;
 }
 
-void Woman::reset(int Age, int StartYear, helper &help, double ScreenCoverage) {
+void Woman::reset(unsigned int Age, unsigned int StartYear, helper &help, double ScreenCoverage) {
     CIN16 = 0;
     CIN18 = 0;
     CIN31 = 0;
@@ -325,13 +351,26 @@ void Woman::reset(int Age, int StartYear, helper &help, double ScreenCoverage) {
     hpvotherHR_ageimmunity = 0;
     HPVLatentinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
                            hpvT::High52, hpvT::High58, hpvT::otherHR};
-    HPVLatentinfections.resize(9);
+    HPVLatentinfectionTimer.clear();
+    for (int i = 0; i < 9; i++){
+        HPVLatentinfectionTimer.push_back(0);
+    }
     HPVinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
                      hpvT::High52, hpvT::High58, hpvT::otherHR};
-    HPVinfectionTimer.resize(9);
+    HPVinfectionTimer.clear();
+    for (int i = 0; i < 9; i++){
+        HPVinfectionTimer.push_back(0);
+    }
     Dormantinfections = {hpvT::Low, hpvT::High16, hpvT::High18, hpvT::High31, hpvT::High33, hpvT::High45,
                          hpvT::High52, hpvT::High58, hpvT::otherHR};
-    DormancyTimer.resize(9);
+    DormancyTimer.clear();
+    for (int i = 0; i < 9; i++){
+        DormancyTimer.push_back(0);
+    }
+    AgeClearedHPV.clear();
+    for (int i = 0; i < 9; i++){
+        AgeClearedHPV.push_back(0);
+    }
     LatentTimer = 0;
     CIN2Lesions.clear();
     CIN3Lesions.clear();

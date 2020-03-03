@@ -85,7 +85,7 @@ public:
     int VaccineStartAge;
     int VaccineEndAge;
     int VaccineStartYear;
-    double VaccineWaneTime;
+    int VaccineWaneTime;
     int VaccineDose;
     std::string MechanismofImmunity;
     bool Latency;

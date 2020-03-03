@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Calib_Degree_Latency.ini");
-        FileName = "Calib_Degree_Latency.ini";
+        RunsFileName.append("Vaccine_FactorLatency_1.ini");
+        FileName = "Vaccine_FactorLatency_1.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -247,6 +247,7 @@ int main(int argc, char* argv[]) {
             CurKey.push_back (RunsFile.GetKeyName (run));
             modeloutputs.push_back(RunPopulation (RunsFileName, CurKey[run], OutputFolder, DataFolder));
         }
+
         for (int i = 0; i < modeloutputs.size(); i++){
             string OutputDir (OutputFolder);
             OutputDir.append (RunsFile.GetValue (CurKey[i], "OutputDir"));
@@ -265,6 +266,7 @@ int main(int argc, char* argv[]) {
                 modeloutputs[i].writeCEA (&OutputDir, ModelStopAge, TotalSimYears);
             }
         }
+
     }
     return(0);
 }
