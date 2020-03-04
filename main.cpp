@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Vaccine_FactorLatency_30.ini");
-        FileName = "Vaccine_FactorLatency_30.ini";
+        RunsFileName.append("Vaccine_FactorLatency_7.ini");
+        FileName = "Vaccine_FactorLatency_7.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);

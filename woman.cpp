@@ -113,7 +113,10 @@ Woman::Woman(unsigned int Age, unsigned int StartYear) {
     for (int i = 0; i < 9; i++){
         AgeClearedHPV.push_back(0);
     }
-    LatentTimer = 0;
+    LatentTimer.clear();
+    for (int i = 0; i < 9; i++){
+        LatentTimer.push_back(0);
+    }
     CIN2Lesions.clear();
     CIN3Lesions.clear();
     CIN2LesionTimer.clear();
@@ -239,7 +242,10 @@ Woman::Woman(unsigned int Age, unsigned int StartYear, helper &help, double Scre
     for (int i = 0; i < 9; i++){
         AgeClearedHPV.push_back(0);
     }
-    LatentTimer = 0;
+    LatentTimer.clear();
+    for (int i = 0; i < 9; i++){
+        LatentTimer.push_back(0);
+    }
     CIN2Lesions.clear();
     CIN3Lesions.clear();
     CIN2LesionTimer.clear();
@@ -371,7 +377,10 @@ void Woman::reset(unsigned int Age, unsigned int StartYear, helper &help, double
     for (int i = 0; i < 9; i++){
         AgeClearedHPV.push_back(0);
     }
-    LatentTimer = 0;
+    LatentTimer.clear();
+    for (int i = 0; i < 9; i++){
+        LatentTimer.push_back(0);
+    }
     CIN2Lesions.clear();
     CIN3Lesions.clear();
     CIN2LesionTimer.clear();

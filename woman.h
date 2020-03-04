@@ -35,7 +35,7 @@ public:
     std::vector<hpvT> Dormantinfections;
     std::vector<unsigned int> DormancyTimer;
     std::vector<unsigned int> AgeClearedHPV;
-    unsigned int LatentTimer;
+    std::vector<unsigned int> LatentTimer;
 
     std::vector<hpvT> CIN2Lesions;
     std::vector<hpvT> CIN3Lesions;
