@@ -2,6 +2,7 @@
 // Created by Jamie Cohen on 11/15/17.
 //
 
+
 #include "statemachine.h"
 
 using namespace std;
@@ -101,7 +102,6 @@ void StateMachine::HPVNatHistory(Woman &Data, Inputs &Tables, Output &Count, hel
                         Data.CIN3LesionTimer.push_back (1);
                     }
                 } else if (rand < ( pHPV_CIN + pHPV_NL)) {
-
                     StateMachine::ClearHPV (Data, Tables, help, Data.HPVinfections[i]);
                 } else {
                     Data.HPVinfectionTimer[i]++;
@@ -524,7 +524,6 @@ void StateMachine::CheckLatency(Woman &Data, Inputs &Tables, int i) {
         Data.DormancyTimer[i] += (Data.CurrentAge - Data.AgeClearedHPV[i]);
         Data.LatentTimer = (Data.HPVLatentinfectionTimer[i] + Data.DormancyTimer[i]);
     }
-
 }
 
 void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y) {
@@ -549,44 +548,36 @@ void StateMachine::AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper
                     break;
                 case Woman::otherHR:
                     Data.hpvotherHR = true;
-                    Data.ageoHR = Data.CurrentAge - Data.LatentTimer;
                     Data.yearoHR = Data.Cycle;
                     break;
                 case Woman::High16:
                     Data.hpv16 = true;
-                    Data.age16 = Data.CurrentAge - Data.LatentTimer;
                     Data.year16 = Data.Cycle;
                     Count.HPV16count[Data.CurrentAge][y]++;
                     break;
                 case Woman::High18:
                     Data.hpv18 = true;
-                    Data.age18 = Data.CurrentAge - Data.LatentTimer;
                     Data.year18 = Data.Cycle;
                     Count.HPV18count[Data.CurrentAge][y]++;
                     break;
                 case Woman::High31:
                     Data.hpv31 = true;
-                    Data.age31 = Data.CurrentAge - Data.LatentTimer;
                     Data.year31 = Data.Cycle;
                     break;
                 case Woman::High33:
                     Data.hpv33 = true;
-                    Data.age33 = Data.CurrentAge - Data.LatentTimer;
                     Data.year33 = Data.Cycle;
                     break;
                 case Woman::High45:
                     Data.hpv45 = true;
-                    Data.age45 = Data.CurrentAge - Data.LatentTimer;
                     Data.year45 = Data.Cycle;
                     break;
                 case Woman::High52:
                     Data.hpv52 = true;
-                    Data.age52 = Data.CurrentAge - Data.LatentTimer;
                     Data.year52 = Data.Cycle;
                     break;
                 case Woman::High58:
                     Data.hpv58 = true;
-                    Data.age58 = Data.CurrentAge - Data.LatentTimer;
                     Data.year58 = Data.Cycle;
                     break;
             }

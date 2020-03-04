@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Vaccine_FactorLatency_1.ini");
-        FileName = "Vaccine_FactorLatency_1.ini";
+        RunsFileName.append("Vaccine_FactorLatency_30.ini");
+        FileName = "Vaccine_FactorLatency_30.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -268,6 +268,7 @@ int main(int argc, char* argv[]) {
         }
 
     }
+
     return(0);
 }
 
@@ -424,10 +425,10 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
         SimYear++;
     }
 
-
     for (auto & j : women) {
         trace.calcDwellTime(j);
     }
+
     women.clear();
     return(trace);
 }

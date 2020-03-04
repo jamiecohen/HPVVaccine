@@ -25,7 +25,7 @@ public:
     unsigned int Cycle;
 
     enum caT {Stage0, Stage1, Stage2, Stage3, Stage1d, Stage2d, Stage3d};
-    enum hpvT {No = 0, Low = 1, otherHR = 2, High16 = 3, High18 = 4, High31 = 5, High33 = 6, High45 = 7, High52 = 8, High58 = 9};
+    enum hpvT {Low = 0, High16 = 1, High18 = 2, High31 = 3, High33 = 4, High45 = 5, High52 = 6, High58 = 7, otherHR = 8, No = 9};
     caT cancerstage;
     std::vector<hpvT> HPVinfections;
     std::vector<unsigned int> HPVinfectionTimer;

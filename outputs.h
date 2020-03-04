@@ -118,6 +118,14 @@ public:
     int causalHPV18age;
     int causalHPVhi5age;
     int causalHPVallhrage;
+    int ageoHR;
+    int age16;
+    int age18;
+    int age31;
+    int age33;
+    int age45;
+    int age52;
+    int age58;
     IntMatrix causalHPV16ageMatrix;
     IntMatrix causalHPV18ageMatrix;
     IntMatrix causalHPVhi5ageMatrix;
