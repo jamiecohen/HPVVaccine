@@ -29,10 +29,20 @@ public:
     double pCIN2_CA;
     double mASR;
     double rand;
-    double vaccine_deg_1618;
-    double vaccine_deg_high5;
-    double vaccine_eff_1618;
-    double vaccine_eff_high5;
+    double vaccine_deg_16;
+    double vaccine_deg_18;
+    double vaccine_deg_31;
+    double vaccine_deg_33;
+    double vaccine_deg_45;
+    double vaccine_deg_52;
+    double vaccine_deg_58;
+    double vaccine_eff_16;
+    double vaccine_eff_18;
+    double vaccine_eff_31;
+    double vaccine_eff_33;
+    double vaccine_eff_45;
+    double vaccine_eff_52;
+    double vaccine_eff_58;
     int ScreenFrequency;
     double Adequacy;
 
@@ -50,7 +60,7 @@ public:
     static void GetImmuneDeg(Woman &Data, Inputs &Tables, Woman::hpvT genotype);
     void GetImmuneFactor(Woman &Data, Inputs &Tables, helper &help, Woman::hpvT genotype);
     static void CheckWaningImmunity(Woman &Data, Inputs &Tables);
-    static void CheckLatency(Woman &Data, Inputs &Tables, int i);
+    void CheckLatency(Woman &Data, Inputs &Tables, int i);
     void AcquireHPV(Woman &Data, Output &Count, Inputs &Tables, helper &help, int y);
     void Colpo(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);
     void LLETZ(Woman &Data, Inputs &Tables, Output &Count, helper &help, int y);

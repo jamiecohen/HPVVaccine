@@ -75,7 +75,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
     string ImmuneDurationName = "ImmuneDuration";
     string ImmuneWaneTimeName = "ImmuneWaneTime";
     string VaccineTypeName = "VaccineType";
-    string VaccineDoseName = "VaccineDose";
+    string VaccineEfficacyPriorName = "VaccineEfficacyPrior";
     string VaccineStartAgeName = "VaccineStartAge";
     string VaccineEndAgeName = "VaccineEndAge";
     string VaccineStartYearName = "VaccineStartYear";
@@ -462,7 +462,7 @@ void Inputs::loadRFG(string &RunsFileName, string &CurKey) {
 
     VaccineCoverage = RunsFile.GetValueF(CurKey, VaccineCoverageName);
     VaccineType = RunsFile.GetValue(CurKey, VaccineTypeName);
-    VaccineDose = RunsFile.GetValueI(CurKey, VaccineDoseName);
+    VaccineEfficacyPrior = RunsFile.GetValueF(CurKey, VaccineEfficacyPriorName);
     VaccineStartAge = RunsFile.GetValueI(CurKey, VaccineStartAgeName);
     VaccineEndAge = RunsFile.GetValueI(CurKey, VaccineEndAgeName);
     VaccineStartYear = RunsFile.GetValueI(CurKey, VaccineStartYearName);

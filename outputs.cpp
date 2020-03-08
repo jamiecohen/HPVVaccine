@@ -783,7 +783,8 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_CIN_CA_16_num += Data.CA16;
         Dormancy_HPV_CIN_16_num += Data.CIN_dormant_16;
         Latency_HPV_CIN_16_num += Data.CIN_latent_16;
-        age16 = Data.CurrentAge - (Data.LatentTimer[Woman::High16] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        age16 = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::High16] + Data.DormancyTimer[Woman::High16] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
 
         causalHPV16age += age16;
         causalHPV16ageMatrix[age16][Data.year16]++;
@@ -803,7 +804,8 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_CIN_CA_18_num += Data.CA18;
         Dormancy_HPV_CIN_18_num += Data.CIN_dormant_18;
         Latency_HPV_CIN_18_num += Data.CIN_latent_18;
-        age18 = Data.CurrentAge - (Data.LatentTimer[Woman::High18] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        age18 = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::High18] + Data.DormancyTimer[Woman::High18] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
 
         causalHPV18age += age18;
         causalHPV18ageMatrix[age18][Data.year18]++;
@@ -823,7 +825,8 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_CIN_CA_hi5_num += Data.CA31;
         Dormancy_HPV_CIN_hi5_num += Data.CIN_dormant_31;
         Latency_HPV_CIN_hi5_num += Data.CIN_latent_31;
-        age31 = Data.CurrentAge - (Data.LatentTimer[Woman::High31] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        age31 = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::High31] + Data.DormancyTimer[Woman::High31] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
 
         causalHPVhi5age += age31;
         causalHPVhi5ageMatrix[age31][Data.year31]++;
@@ -843,7 +846,8 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_CIN_CA_hi5_num += Data.CA33;
         Dormancy_HPV_CIN_hi5_num += Data.CIN_dormant_33;
         Latency_HPV_CIN_hi5_num += Data.CIN_latent_33;
-        age33 = Data.CurrentAge - (Data.LatentTimer[Woman::High33] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        age33 = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::High33] + Data.DormancyTimer[Woman::High33] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
 
         causalHPVhi5age += age33;
         causalHPVhi5ageMatrix[age33][Data.year33]++;
@@ -863,7 +867,8 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_CIN_CA_hi5_num += Data.CA45;
         Latency_HPV_CIN_hi5_num += Data.CIN_latent_45;
         Dormancy_HPV_CIN_hi5_num += Data.CIN_dormant_45;
-        age45 = Data.CurrentAge - (Data.LatentTimer[Woman::High45] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        age45 = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::High45] + Data.DormancyTimer[Woman::High45] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
 
         causalHPVhi5age += age45;
         causalHPVhi5ageMatrix[age45][Data.year45]++;
@@ -883,7 +888,8 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_CIN_CA_hi5_num += Data.CA52;
         Latency_HPV_CIN_hi5_num += Data.CIN_latent_52;
         Dormancy_HPV_CIN_hi5_num += Data.CIN_dormant_52;
-        age52 = Data.CurrentAge - (Data.LatentTimer[Woman::High52] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        age52 = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::High52] + Data.DormancyTimer[Woman::High52] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
 
         causalHPVhi5age += age52;
         causalHPVhi5ageMatrix[age52][Data.year52]++;
@@ -903,7 +909,8 @@ void Output::calcDwellTime(Woman &Data) {
         DwellTime_CIN_CA_hi5_num += Data.CA58;
         Latency_HPV_CIN_hi5_num += Data.CIN_latent_58;
         Dormancy_HPV_CIN_hi5_num += Data.CIN_dormant_58;
-        age58 = Data.CurrentAge - (Data.LatentTimer[Woman::High58] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        age58 = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::High58] + Data.DormancyTimer[Woman::High58] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
         causalHPVhi5age += age58;
         causalHPVhi5ageMatrix[age58][Data.year58]++;
         DwellTime_CA_hi5_denom++;
@@ -922,7 +929,8 @@ void Output::calcDwellTime(Woman &Data) {
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_oHR;
         DwellTime_CIN_CA_allhr_num += Data.CAoHR;
         Dormancy_HPV_CIN_allhr_num += Data.CIN_dormant_oHR;
-        ageoHR = Data.CurrentAge - (Data.LatentTimer[Woman::otherHR] + Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
+        ageoHR = Data.CurrentAge - (Data.HPVinfectionTimer[Woman::otherHR] + Data.DormancyTimer[Woman::otherHR] +
+                Data.ca1Timer + Data.ca2Timer + Data.ca3Timer);
         causalHPVallhrage += ageoHR;
         causalHPVallhrageMatrix[ageoHR][Data.yearoHR]++;
         DwellTime_CA_allhr_denom++;

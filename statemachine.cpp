@@ -493,28 +493,92 @@ void StateMachine::GetMortality(Woman &Data, Inputs &Tables) {
 
 void StateMachine::GetVaccineEff(Woman &Data, Inputs &Tables, bool burnin) {
     if(burnin){
-        vaccine_eff_1618 = 0;
-        vaccine_eff_high5 = 0;
-        vaccine_deg_1618 = 1 - vaccine_eff_1618;
-        vaccine_deg_high5 = 1 - vaccine_eff_high5;
+        vaccine_eff_16 = 0;
+        vaccine_eff_18 = 0;
+        vaccine_eff_31 = 0;
+        vaccine_eff_33 = 0;
+        vaccine_eff_45 = 0;
+        vaccine_eff_52 = 0;
+        vaccine_eff_58 = 0;
+        vaccine_deg_16 = 1 - vaccine_eff_16;
+        vaccine_deg_18 = 1 - vaccine_eff_18;
+        vaccine_deg_31 = 1 - vaccine_eff_31;
+        vaccine_deg_33 = 1 - vaccine_eff_33;
+        vaccine_deg_45 = 1 - vaccine_eff_45;
+        vaccine_deg_52 = 1 - vaccine_eff_52;
+        vaccine_deg_58 = 1 - vaccine_eff_58;
+
     } else {
         if (Data.completevaccine) {
-            vaccine_eff_1618 = Tables.VE_1618;
-            vaccine_eff_high5 = Tables.VE_high5;
+            vaccine_eff_16 = Tables.VE_1618;
+            vaccine_eff_18 = Tables.VE_1618;
+            vaccine_eff_31 = Tables.VE_high5;
+            vaccine_eff_33 = Tables.VE_high5;
+            vaccine_eff_45 = Tables.VE_high5;
+            vaccine_eff_52 = Tables.VE_high5;
+            vaccine_eff_58 = Tables.VE_high5;
             if (Data.CurrentAge > (Tables.VaccineDuration + Tables.VaccineStartAge)) {
-                vaccine_eff_1618 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                vaccine_eff_16 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
                                             (Tables.VaccineDuration + Data.vaccineage),
-                                            vaccine_eff_1618);
-                vaccine_eff_high5 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                            vaccine_eff_16);
+                vaccine_eff_18 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                          (Tables.VaccineDuration + Data.vaccineage),
+                                          vaccine_eff_18);
+                vaccine_eff_31 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
                                              (Tables.VaccineDuration + Data.vaccineage),
-                                             vaccine_eff_high5);
+                                             vaccine_eff_31);
+                vaccine_eff_33 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                          (Tables.VaccineDuration + Data.vaccineage),
+                                          vaccine_eff_33);
+                vaccine_eff_45 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                          (Tables.VaccineDuration + Data.vaccineage),
+                                          vaccine_eff_45);
+                vaccine_eff_52 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                          (Tables.VaccineDuration + Data.vaccineage),
+                                          vaccine_eff_52);
+                vaccine_eff_58 = CalcEff (Tables.VaccineWaneTime, Data.CurrentAge,
+                                          (Tables.VaccineDuration + Data.vaccineage),
+                                          vaccine_eff_58);
             }
         } else {
-            vaccine_eff_1618 = 0;
-            vaccine_eff_high5 = 0;
+            vaccine_eff_16 = 0;
+            vaccine_eff_18 = 0;
+            vaccine_eff_31 = 0;
+            vaccine_eff_33 = 0;
+            vaccine_eff_45 = 0;
+            vaccine_eff_52 = 0;
+            vaccine_eff_58 = 0;
         }
-        vaccine_deg_1618 = 1 - vaccine_eff_1618;
-        vaccine_deg_high5 = 1 - vaccine_eff_high5;
+
+        if(Data.HPVLatentinfectionTimer[1] > 0){
+            vaccine_eff_16 = vaccine_eff_16*Tables.VaccineEfficacyPrior;
+        }
+        if(Data.HPVLatentinfectionTimer[2] > 0){
+            vaccine_eff_18 = vaccine_eff_18*Tables.VaccineEfficacyPrior;
+        }
+        if(Data.HPVLatentinfectionTimer[3] > 0){
+            vaccine_eff_31 = vaccine_eff_31*Tables.VaccineEfficacyPrior;
+        }
+        if(Data.HPVLatentinfectionTimer[4] > 0){
+            vaccine_eff_33 = vaccine_eff_33*Tables.VaccineEfficacyPrior;
+        }
+        if(Data.HPVLatentinfectionTimer[5] > 0){
+            vaccine_eff_45 = vaccine_eff_45*Tables.VaccineEfficacyPrior;
+        }
+        if(Data.HPVLatentinfectionTimer[6] > 0){
+            vaccine_eff_52 = vaccine_eff_52*Tables.VaccineEfficacyPrior;
+        }
+        if(Data.HPVLatentinfectionTimer[7] > 0){
+            vaccine_eff_58 = vaccine_eff_58*Tables.VaccineEfficacyPrior;
+        }
+
+        vaccine_deg_16 = 1 - vaccine_eff_16;
+        vaccine_deg_18 = 1 - vaccine_eff_18;
+        vaccine_deg_31 = 1 - vaccine_eff_31;
+        vaccine_deg_33 = 1 - vaccine_eff_33;
+        vaccine_deg_45 = 1 - vaccine_eff_45;
+        vaccine_deg_52 = 1 - vaccine_eff_52;
+        vaccine_deg_58 = 1 - vaccine_eff_58;
     }
 }
 
@@ -930,49 +994,49 @@ void StateMachine::GetHPVRisk(Woman &Data, Inputs &Tables, Woman::hpvT genotype)
             break;
         case Woman::High16:
             if (!Data.hpv16) {
-                pHPV = Tables.pHPV_16[Data.CurrentAge] * Data.immune_deg_16 * vaccine_deg_1618;
+                pHPV = Tables.pHPV_16[Data.CurrentAge] * Data.immune_deg_16 * vaccine_deg_16;
             } else {
                 pHPV = 0;
             }
             break;
         case Woman::High18:
             if (!Data.hpv18) {
-                pHPV = Tables.pHPV_18[Data.CurrentAge] * Data.immune_deg_18 * vaccine_deg_1618;
+                pHPV = Tables.pHPV_18[Data.CurrentAge] * Data.immune_deg_18 * vaccine_deg_18;
             } else {
                 pHPV = 0;
             }
             break;
         case Woman::High31:
             if (!Data.hpv31) {
-                pHPV = Tables.pHPV_31[Data.CurrentAge] * Data.immune_deg_31 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_31[Data.CurrentAge] * Data.immune_deg_31 * vaccine_deg_31;
             } else {
                 pHPV = 0;
             }
             break;
         case Woman::High33:
             if (!Data.hpv33) {
-                pHPV = Tables.pHPV_33[Data.CurrentAge] * Data.immune_deg_33 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_33[Data.CurrentAge] * Data.immune_deg_33 * vaccine_deg_33;
             } else {
                 pHPV = 0;
             }
             break;
         case Woman::High45:
             if (!Data.hpv45) {
-                pHPV = Tables.pHPV_45[Data.CurrentAge] * Data.immune_deg_45 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_45[Data.CurrentAge] * Data.immune_deg_45 * vaccine_deg_45;
             } else {
                 pHPV = 0;
             }
             break;
         case Woman::High52:
             if (!Data.hpv52) {
-                pHPV = Tables.pHPV_52[Data.CurrentAge] * Data.immune_deg_52 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_52[Data.CurrentAge] * Data.immune_deg_52 * vaccine_deg_52;
             } else {
                 pHPV = 0;
             }
             break;
         case Woman::High58:
             if (!Data.hpv58) {
-                pHPV = Tables.pHPV_58[Data.CurrentAge] * Data.immune_deg_58 * vaccine_deg_high5;
+                pHPV = Tables.pHPV_58[Data.CurrentAge] * Data.immune_deg_58 * vaccine_deg_58;
             } else {
                 pHPV = 0;
             }
