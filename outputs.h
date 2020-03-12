@@ -47,6 +47,8 @@ public:
     IntMatrix HPV16denom;
     IntMatrix HPV18denom;
     IntMatrix HPVdenom;
+    int CINdenom;
+    int CINnum;
 
     IntMatrix CAdead;
     IntMatrix count;
@@ -112,6 +114,10 @@ public:
     int DwellTime_CA_18_denom;
     int DwellTime_CA_hi5_denom;
     int DwellTime_CA_allhr_denom;
+    int DwellTime_CA_16_latent_denom;
+    int DwellTime_CA_18_latent_denom;
+    int DwellTime_CA_hi5_latent_denom;
+    int DwellTime_CA_allhr_latent_denom;
     int DwellTime_CA_detected_denom;
     int DwellTime_CA_detected_num;
     int causalHPV16age;
@@ -152,6 +158,8 @@ public:
     void createCalibOutput(int y);
     void calcDwellTime(Woman &Data);
     void writeDwellTime(std::string *Outdir, int TotalSimYears);
+    void calcValidation(Woman &Data);
+    void writeValidation(std::string *Outdir);
     void writeCalibOutput(std::string *Outdir, std::string calib_targs_names);
     void calcLE(Woman &Data, Inputs &Tables, int y);
 

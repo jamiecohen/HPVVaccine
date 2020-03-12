@@ -19,6 +19,7 @@ using namespace std;
 Output RunBirthCohort(string, string, string, string);
 Output RunPopulation(string, string, string, string);
 void RunCalibration(calibrate &calib, Inputs &tables, int i);
+void RunValidation(Inputs &tables, Output &trace);
 
 int main(int argc, char* argv[]) {
     string DataFolder;
@@ -35,8 +36,8 @@ int main(int argc, char* argv[]) {
     string RunsFileName(DataFolder);
     string FileName;
     if(argc == 1){
-        RunsFileName.append("Vaccine_DegreeLatency_VEpriorinf_1.ini");
-        FileName = "Vaccine_DegreeLatency_VEpriorinf_1.ini";
+        RunsFileName.append("Valid_NoImmunity.ini");
+        FileName = "Valid_NoImmunity.ini";
     }
     else if(argc > 1){
         RunsFileName.append(argv[1]);
@@ -266,6 +267,59 @@ int main(int argc, char* argv[]) {
                 modeloutputs[i].writeCEA (&OutputDir, ModelStopAge, TotalSimYears);
             }
         }
+    } else if (RunsFile.GetValue(RunType, "RunType") == "Validation") {
+
+        cout << "Running " << FileName << endl;
+        Inputs tables(OutputFolder, DataFolder);
+        tables.loadRFG (RunsFileName, RunType);
+
+        string ModelStruct = "Validation";
+        if(tables.Latency){
+            ModelStruct.append("_Latency");
+        } else{
+            ModelStruct.append("_NoLatency");
+        }
+        switch(tables.ImmuneMechanism){
+            case Inputs::Degree:
+                ModelStruct.append("_Degree");
+                break;
+            case Inputs::Factor:
+                ModelStruct.append("_Factor");
+                break;
+            case Inputs::None:
+                ModelStruct.append("_NoImmunity");
+                break;
+        }
+
+        int TotalSimYears = tables.BurnInYears;
+        Output modeloutput(tables, TotalSimYears);
+        RunValidation(tables, modeloutput);
+
+        string OutDir = OutputFolder.append("HPVVaccine_Validation");
+        if(tables.Latency){
+            OutDir.append("_Latency");
+        } else{
+            OutDir.append("_NoLatency");
+        }
+        switch(tables.ImmuneMechanism){
+            case Inputs::Degree:
+                OutDir.append("_Degree");
+                break;
+            case Inputs::Factor:
+                OutDir.append("_Factor");
+                break;
+            case Inputs::None:
+                OutDir.append("_NoImmunity");
+                break;
+        }
+        if(argc == 4){
+            OutDir.append("/");
+            OutDir.append(argv[3]);
+        }
+
+        const boost::filesystem::path dir (OutDir);
+        boost::filesystem::create_directories (dir);
+        modeloutput.writeValidation(&OutDir);
 
     }
 
@@ -431,4 +485,37 @@ Output RunPopulation(string RunsFileName, string CurKey, string OutputFolder, st
 
     women.clear();
     return(trace);
+}
+
+void RunValidation(Inputs &tables, Output &trace){
+    helper help;
+    StateMachine Machine;
+    tables.loadVariables ();
+    int BurnInModelYear = tables.StartYear - tables.BurnInYears;
+    int ModelStartAge = tables.ModelStartAge;
+    int ModelStopAge = tables.ModelStopAge;
+    vector<Woman> women;
+    women.reserve(tables.CohortSize);
+    for (int j = ModelStartAge; j < ModelStopAge; j++) {
+        for (int k = 0; k < tables.burnin[j]; k++) {
+            Woman newWoman(j, BurnInModelYear, help, tables.ScreenCoverage);
+            women.push_back(newWoman);
+        }
+    }
+
+    for(int y = 0; y < tables.BurnInYears; y++){
+        for (auto & k : women) {
+            Machine.runPopulationYear (k, tables, trace, true, help, y);
+            if (!k.Alive) {
+                k.reset(ModelStartAge, BurnInModelYear + 1, help, tables.ScreenCoverage);
+            }
+        }
+        BurnInModelYear++;
+    }
+    for (auto & k : women) {
+        if(k.CurrentAge >= 15 && k.CurrentAge <= 65){
+            trace.calcValidation (k);
+        }
+    }
+    women.clear();
 }

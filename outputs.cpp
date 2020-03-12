@@ -152,6 +152,9 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         HPVdenom[i].resize (y);
     }
+    CINdenom = 0;
+    CINnum = 0;
+
     HPV16denom.resize (Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         HPV16denom[i].resize (y);
@@ -240,6 +243,10 @@ Output::Output(Inputs &Tables, int y) {
     DwellTime_CA_18_denom = 0;
     DwellTime_CA_hi5_denom = 0;
     DwellTime_CA_allhr_denom = 0;
+    DwellTime_CA_16_latent_denom = 0;
+    DwellTime_CA_18_latent_denom = 0;
+    DwellTime_CA_hi5_latent_denom = 0;
+    DwellTime_CA_allhr_latent_denom = 0;
     DwellTime_CA_detected_denom = 0;
     DwellTime_CA_detected_num = 0;
     Dormancy_HPV_CIN_16_num = 0;
@@ -259,7 +266,7 @@ Output::Output(Inputs &Tables, int y) {
 }
 
 void Output::createTrace(Woman &Data, int y) {
-    // No Cancer, HPV16, HPV18, HPV31, HPV33, HPV45, HPV52, HPV58
+    // No Cancer, allhr, HPV16, HPV18, HPVhi5, HPVoHR, HPVLR, CIN+
     
     if(!Data.cancer){
         if(Data.CurrentAge >= 15){
@@ -273,7 +280,7 @@ void Output::createTrace(Woman &Data, int y) {
             HPV18denom[Data.CurrentAge][y]++;
         }
 
-        if(accumulate(Data.HPVinfections.begin(), Data.HPVinfections.end(), 0) == 0){
+        if(accumulate(Data.HPVinfectionTimer.begin(), Data.HPVinfectionTimer.end(), 0) == 0){
             HPVdenom[Data.CurrentAge][y]++;
         }
         trace[Data.CurrentAge][y][0]++; // no cancer (prev DENOM)
@@ -297,6 +304,7 @@ void Output::createTrace(Woman &Data, int y) {
         if(Data.hpvlo){
             trace[Data.CurrentAge][y][6]++; // all prevalent HPVLR
         }
+
     }
 }
 
@@ -788,6 +796,9 @@ void Output::calcDwellTime(Woman &Data) {
 
         causalHPV16age += age16;
         causalHPV16ageMatrix[age16][Data.year16]++;
+        if(Data.CIN_latent_16 > 0){
+            DwellTime_CA_16_latent_denom++;
+        }
         DwellTime_CA_16_denom++;
 
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_16;
@@ -797,6 +808,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += age16;
         causalHPVallhrageMatrix[age16][Data.year16]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_16 > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 
     if(Data.CA18 > 0){
@@ -810,6 +824,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPV18age += age18;
         causalHPV18ageMatrix[age18][Data.year18]++;
         DwellTime_CA_18_denom++;
+        if(Data.CIN_latent_18 > 0){
+            DwellTime_CA_18_latent_denom++;
+        }
 
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_18;
         Dormancy_HPV_CIN_allhr_num += Data.CIN_dormant_18;
@@ -818,6 +835,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += age18;
         causalHPVallhrageMatrix[age18][Data.year18]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_18 > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 
     if(Data.CA31 > 0){
@@ -831,6 +851,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVhi5age += age31;
         causalHPVhi5ageMatrix[age31][Data.year31]++;
         DwellTime_CA_hi5_denom++;
+        if(Data.CIN_latent_31 > 0){
+            DwellTime_CA_hi5_latent_denom++;
+        }
 
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_31;
         Dormancy_HPV_CIN_allhr_num += Data.CIN_dormant_31;
@@ -839,6 +862,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += age31;
         causalHPVallhrageMatrix[age31][Data.year31]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_31 > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 
     if(Data.CA33 > 0){
@@ -852,6 +878,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVhi5age += age33;
         causalHPVhi5ageMatrix[age33][Data.year33]++;
         DwellTime_CA_hi5_denom++;
+        if(Data.CIN_latent_33 > 0){
+            DwellTime_CA_hi5_latent_denom++;
+        }
 
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_33;
         Dormancy_HPV_CIN_allhr_num += Data.CIN_dormant_33;
@@ -860,6 +889,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += age33;
         causalHPVallhrageMatrix[age33][Data.year33]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_33 > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 
     if(Data.CA45 > 0){
@@ -873,6 +905,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVhi5age += age45;
         causalHPVhi5ageMatrix[age45][Data.year45]++;
         DwellTime_CA_hi5_denom++;
+        if(Data.CIN_latent_45 > 0){
+            DwellTime_CA_hi5_latent_denom++;
+        }
 
         Dormancy_HPV_CIN_allhr_num += Data.CIN_dormant_45;
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_45;
@@ -881,6 +916,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += age45;
         causalHPVallhrageMatrix[age45][Data.year45]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_45 > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 
     if(Data.CA52 > 0){
@@ -894,6 +932,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVhi5age += age52;
         causalHPVhi5ageMatrix[age52][Data.year52]++;
         DwellTime_CA_hi5_denom++;
+        if(Data.CIN_latent_52 > 0){
+            DwellTime_CA_hi5_latent_denom++;
+        }
 
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_52;
         Dormancy_HPV_CIN_allhr_num += Data.CIN_dormant_52;
@@ -902,6 +943,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += age52;
         causalHPVallhrageMatrix[age52][Data.year52]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_52 > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 
     if(Data.CA58 > 0){
@@ -914,6 +958,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVhi5age += age58;
         causalHPVhi5ageMatrix[age58][Data.year58]++;
         DwellTime_CA_hi5_denom++;
+        if(Data.CIN_latent_58 > 0){
+            DwellTime_CA_hi5_latent_denom++;
+        }
 
         DwellTime_HPV_CIN_allhr_num += Data.CIN58;
         Latency_HPV_CIN_allhr_num += Data.CIN_latent_58;
@@ -922,6 +969,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += age58;
         causalHPVallhrageMatrix[age58][Data.year58]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_58 > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 
     if(Data.CAoHR > 0){
@@ -934,6 +984,9 @@ void Output::calcDwellTime(Woman &Data) {
         causalHPVallhrage += ageoHR;
         causalHPVallhrageMatrix[ageoHR][Data.yearoHR]++;
         DwellTime_CA_allhr_denom++;
+        if(Data.CIN_latent_oHR > 0){
+            DwellTime_CA_allhr_latent_denom++;
+        }
     }
 }
 
@@ -952,35 +1005,40 @@ void Output::writeDwellTime(std::string *Outdir, int TotalSimYears) {
         output << "CIN to CA" << '\t';
         output << "CA to CAd" << '\t';
         output << "Dormancy Time" << '\t';
-        output << "Latency Time" << endl;
+        output << "Latency Time" << '\t';
+        output << "Prop Re-Infect" << endl;
         output << "HPV16" << '\t';
         output << static_cast<double>(causalHPV16age)/DwellTime_CA_16_denom << '\t';
         output << static_cast<double>(DwellTime_HPV_CIN_16_num)/DwellTime_CA_16_denom << '\t';
         output << static_cast<double>(DwellTime_CIN_CA_16_num)/DwellTime_CA_16_denom << '\t';
         output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << '\t';
-        output << static_cast<double>(Dormancy_HPV_CIN_16_num)/DwellTime_CA_16_denom << '\t';
-        output << static_cast<double>(Latency_HPV_CIN_16_num)/DwellTime_CA_16_denom << endl;
+        output << static_cast<double>(Dormancy_HPV_CIN_16_num)/DwellTime_CA_16_latent_denom << '\t';
+        output << static_cast<double>(Latency_HPV_CIN_16_num)/DwellTime_CA_16_latent_denom << '\t';
+        output << static_cast<double>(DwellTime_CA_16_latent_denom)/DwellTime_CA_16_denom << endl;
         output << "HPV18" << '\t';
         output << static_cast<double>(causalHPV18age)/DwellTime_CA_18_denom << '\t';
         output << static_cast<double>(DwellTime_HPV_CIN_18_num)/DwellTime_CA_18_denom << '\t';
         output << static_cast<double>(DwellTime_CIN_CA_18_num)/DwellTime_CA_18_denom << '\t';
         output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << '\t';
-        output << static_cast<double>(Dormancy_HPV_CIN_18_num)/DwellTime_CA_18_denom << '\t';
-        output << static_cast<double>(Latency_HPV_CIN_18_num)/DwellTime_CA_18_denom << endl;
+        output << static_cast<double>(Dormancy_HPV_CIN_18_num)/DwellTime_CA_18_latent_denom << '\t';
+        output << static_cast<double>(Latency_HPV_CIN_18_num)/DwellTime_CA_18_latent_denom << '\t';
+        output << static_cast<double>(DwellTime_CA_18_latent_denom)/DwellTime_CA_18_denom << endl;
         output << "HPVhi5" << '\t';
         output << static_cast<double>(causalHPVhi5age)/DwellTime_CA_hi5_denom << '\t';
         output << static_cast<double>(DwellTime_HPV_CIN_hi5_num)/DwellTime_CA_hi5_denom << '\t';
         output << static_cast<double>(DwellTime_CIN_CA_hi5_num)/DwellTime_CA_hi5_denom << '\t';
         output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << '\t';
-        output << static_cast<double>(Dormancy_HPV_CIN_hi5_num)/DwellTime_CA_hi5_denom << '\t';
-        output << static_cast<double>(Latency_HPV_CIN_hi5_num)/DwellTime_CA_hi5_denom << endl;
+        output << static_cast<double>(Dormancy_HPV_CIN_hi5_num)/DwellTime_CA_hi5_latent_denom << '\t';
+        output << static_cast<double>(Latency_HPV_CIN_hi5_num)/DwellTime_CA_hi5_latent_denom << '\t';
+        output << static_cast<double>(DwellTime_CA_hi5_latent_denom)/DwellTime_CA_hi5_denom << endl;
         output << "hrHPV" << '\t';
         output << static_cast<double>(causalHPVallhrage)/DwellTime_CA_allhr_denom << '\t';
         output << static_cast<double>(DwellTime_HPV_CIN_allhr_num)/DwellTime_CA_allhr_denom << '\t';
         output << static_cast<double>(DwellTime_CIN_CA_allhr_num)/DwellTime_CA_allhr_denom << '\t';
         output << static_cast<double>(DwellTime_CA_detected_num)/DwellTime_CA_detected_denom << '\t';
         output << static_cast<double>(Dormancy_HPV_CIN_allhr_num)/DwellTime_CA_allhr_denom << '\t';
-        output << static_cast<double>(Latency_HPV_CIN_allhr_num)/DwellTime_CA_allhr_denom << endl;
+        output << static_cast<double>(Latency_HPV_CIN_allhr_num)/DwellTime_CA_allhr_denom << '\t';
+        output << static_cast<double>(DwellTime_CA_allhr_latent_denom)/DwellTime_CA_allhr_denom << endl;
 
     }
     else
@@ -1122,6 +1180,34 @@ void Output::calcLE(Woman &Data, Inputs &Tables, int y) {
     } else {
         YLL[y] += Tables.LifeExpectancy[Data.CurrentAge][0];
     }
+}
+
+void Output::calcValidation(Woman &Data) {
+    if((accumulate(Data.CIN2LesionTimer.begin(), Data.CIN2LesionTimer.end(), 0) +
+        accumulate(Data.CIN3LesionTimer.begin(), Data.CIN3LesionTimer.end(), 0)) == 0){
+        CINdenom++; // no CIN (prev DENOM)
+    } else {
+        CINnum++; // all prevalent CIN
+    }
+}
+
+void Output::writeValidation(std::string *Outdir) {
+
+    ofstream output;
+    string OutputFileName;
+    OutputFileName.append(*Outdir);
+    OutputFileName.append("/");
+    OutputFileName.append("_Validation");
+    OutputFileName.append(extension);
+    output.open(OutputFileName.c_str (), ios::out);
+
+    if(output) {
+        output << static_cast<double>(CINnum) / CINdenom << endl;
+    } else
+        cerr << "Warning: Unable to open " << OutputFileName << endl;
+    output.close();
+    output.clear();
+
 }
 
 Output::~Output(void) = default;
