@@ -47,8 +47,9 @@ public:
     IntMatrix HPV16denom;
     IntMatrix HPV18denom;
     IntMatrix HPVdenom;
-    int CINdenom;
-    int CINnum;
+    int NormalCyto;
+    int HPV16;
+    int HPV18;
 
     IntMatrix CAdead;
     IntMatrix count;

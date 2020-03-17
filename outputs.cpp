@@ -152,8 +152,9 @@ Output::Output(Inputs &Tables, int y) {
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
         HPVdenom[i].resize (y);
     }
-    CINdenom = 0;
-    CINnum = 0;
+    NormalCyto = 0;
+    HPV16 = 0;
+    HPV18 = 0;
 
     HPV16denom.resize (Tables.ModelStopAge + 1);
     for (int i = 0; i <= Tables.ModelStopAge; i++) {
@@ -1183,12 +1184,14 @@ void Output::calcLE(Woman &Data, Inputs &Tables, int y) {
 }
 
 void Output::calcValidation(Woman &Data) {
-    if((accumulate(Data.CIN2LesionTimer.begin(), Data.CIN2LesionTimer.end(), 0) +
-        accumulate(Data.CIN3LesionTimer.begin(), Data.CIN3LesionTimer.end(), 0)) == 0){
-        CINdenom++; // no CIN (prev DENOM)
-    } else {
-        CINnum++; // all prevalent CIN
+    NormalCyto++;
+    if(Data.hpv16){
+        HPV16++;
     }
+    if(Data.hpv18){
+        HPV18++;
+    }
+
 }
 
 void Output::writeValidation(std::string *Outdir) {
@@ -1202,7 +1205,10 @@ void Output::writeValidation(std::string *Outdir) {
     output.open(OutputFileName.c_str (), ios::out);
 
     if(output) {
-        output << static_cast<double>(CINnum) / CINdenom << endl;
+        output << "HPV16" << '\t';
+        output << static_cast<double>(HPV16) / NormalCyto << endl;
+        output << "HPV18" << '\t';
+        output << static_cast<double>(HPV18) / NormalCyto << endl;
     } else
         cerr << "Warning: Unable to open " << OutputFileName << endl;
     output.close();

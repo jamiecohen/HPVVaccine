@@ -514,7 +514,12 @@ void RunValidation(Inputs &tables, Output &trace){
     }
     for (auto & k : women) {
         if(k.CurrentAge >= 15 && k.CurrentAge <= 65){
-            trace.calcValidation (k);
+            if(!k.cancer){
+                if((accumulate(k.CIN2LesionTimer.begin(), k.CIN2LesionTimer.end(), 0) +
+                    accumulate(k.CIN3LesionTimer.begin(), k.CIN3LesionTimer.end(), 0)) == 0){
+                    trace.calcValidation (k);
+                }
+            }
         }
     }
     women.clear();
